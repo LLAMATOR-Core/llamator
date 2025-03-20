@@ -67,6 +67,15 @@ class TestCrescendo(TestBase):
     Original Paper: https://arxiv.org/abs/2404.01833"""
 
     test_name = "crescendo"
+    info = {
+        "name": "Crescendo",
+        "code_name": "crescendo",
+        "description": {
+            "en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement. Original Paper: https://arxiv.org/abs/2404.01833",
+            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833"
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py"
+    }
 
     def __init__(
         self,
@@ -104,9 +113,9 @@ class TestCrescendo(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
-            logging.info(f"{self.test_name} attack report saved to {csv_path}")
+            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     def stop_criterion(self, tested_client_history: List[Dict[str, str]]) -> bool:
         if len(tested_client_history) < self.multistage_depth * 2:
@@ -137,7 +146,7 @@ class TestCrescendo(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.test_name, self.status, "Generating", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Generating", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_model_system_prompt = ATTACK_MODEL_SYSTEM_PROMPT_TEMPLATE.format(
@@ -150,7 +159,7 @@ class TestCrescendo(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -166,7 +175,7 @@ class TestCrescendo(TestBase):
                 logger.warning("Error while generating attack prompt (didn't receive response) ...")
                 self.status.report_error(row["goal"])
                 continue
-            logger.info(f"Test '{self.test_name}': generated attack strategy #{attack_prompt_index}: {attack_strategy}")
+            logger.info(f"Test '{self.info['name']}': generated attack strategy #{attack_prompt_index}: {attack_strategy}")
 
             tested_client_chat = ChatSession(
                 client=self.client_config.get_target_client(),
@@ -181,7 +190,7 @@ class TestCrescendo(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -219,7 +228,7 @@ class TestCrescendo(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,

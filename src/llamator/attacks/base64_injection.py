@@ -37,6 +37,15 @@ class TestBase64Injection(TestBase):
     """Challenges the LLM with a dataset of lines, encoded into base64."""
 
     test_name = "base64_injection"
+    info = {
+        "name": "Base64 Injection",
+        "code_name": "base64_injection",
+        "description": {
+            "en": "Challenges the LLM with a dataset of lines, encoded into base64.",
+            "ru": "Испытывает LLM с набором строк, закодированных в base64."
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/base64_injection.py"
+    }
 
     def __init__(
         self,
@@ -73,7 +82,7 @@ class TestBase64Injection(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
             logging.info(f"Base64 Injection attack report saved to {csv_path}")
 
@@ -104,7 +113,7 @@ class TestBase64Injection(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.test_name, self.status, "Working", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Working", 0, self.num_attempts)
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]  # "regular_string"
             attack_prompt_bytes = attack_prompt.encode("utf-8")  # "b'regular_string"
@@ -132,9 +141,9 @@ class TestBase64Injection(TestBase):
                     expected_response=row["goal"],
                     actual_response=response,
                 )
-                logger.info(f"Test '{self.test_name}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 logger.info(
-                    f"Test '{self.test_name}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                    f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                 )
 
                 if verified:
@@ -151,7 +160,7 @@ class TestBase64Injection(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -163,7 +172,7 @@ class TestBase64Injection(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,

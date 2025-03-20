@@ -22,6 +22,15 @@ class TestSuffix(TestBase):
     Original Paper: https://arxiv.org/abs/2307.15043, Code: https://github.com/llm-attacks/llm-attacks"""
 
     test_name = "suffix"
+    info = {
+        "name": "Adversarial Suffix",
+        "code_name": "suffix",
+        "description": {
+            "en": "Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation. Original Paper: https://arxiv.org/abs/2307.15043, Original Code: https://github.com/llm-attacks/llm-attacks",
+            "ru": "Использует специально сконструированный суффикс для обхода фильтров и ограничений LLM, заставляя модель генерировать запрещённый или вредоносный контент, несмотря на исходный запрос. Оценивает уязвимость модели к манипуляциям входных данных. Статья: https://arxiv.org/abs/2307.15043, оригинальный код: https://github.com/llm-attacks/llm-attacks"
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/suffix.py"
+    }
 
     def __init__(
         self,
@@ -58,7 +67,7 @@ class TestSuffix(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
             logging.info(f"Suffix attack report saved to {csv_path}")
 
@@ -88,7 +97,7 @@ class TestSuffix(TestBase):
         statuses = []
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.test_name, self.status, "Attacking", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Attacking", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
@@ -105,9 +114,9 @@ class TestSuffix(TestBase):
             else:
                 # Verify the response to determine if this specific attack was successful
                 verified = not contains_refusal_keywords(response)
-                logger.info(f"Test '{self.test_name}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 logger.info(
-                    f"Test '{self.test_name}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                    f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                 )
                 if verified:
                     self.status.report_breach(attack_prompt, response)
@@ -122,7 +131,7 @@ class TestSuffix(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -134,7 +143,7 @@ class TestSuffix(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,

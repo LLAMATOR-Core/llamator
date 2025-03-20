@@ -4,30 +4,18 @@ from typing import List, Type
 
 from .attack_provider.run_tests import TestBase
 from .client.chat_client import ClientBase
+from .attack_provider.attack_registry import test_classes
 
-AvailableTests = [
-    "aim_jailbreak",
-    "base64_injection",
-    "bon",
-    "complimentary_transition",
-    "crescendo",
-    "do_anything_now_jailbreak",
-    "ethical_compliance",
-    "harmful_behavior",
-    "harmful_behavior_multistage",
-    "linguistic_evasion",
-    "logical_inconsistencies",
-    "past_tense",
-    "RU_do_anything_now_jailbreak",
-    "RU_typoglycemia_attack",
-    "RU_ucar",
-    "shuffle",
-    "suffix",
-    "sycophancy",
-    "system_prompt_leakage",
-    "typoglycemia_attack",
-    "ucar",
-]
+def get_registered_test_code_names() -> List[str]:
+    """
+    Возвращает список кодовых названий (code_name) всех зарегистрированных тестов,
+    основанный на декораторе @register_test и поле info['code_name'] в классах тестов.
+    """
+    code_names = []
+    for cls in test_classes:
+        if hasattr(cls, 'info') and 'code_name' in cls.info:
+            code_names.append(cls.info['code_name'])
+    return code_names
 
 
 def validate_model(client_model: ClientBase) -> bool:
@@ -63,7 +51,8 @@ def validate_model(client_model: ClientBase) -> bool:
 
 def validate_tests(tests: List[str]) -> bool:
     """
-    Validates that each test from the provided list is present in the AvailableTests list.
+    Validates that each test from the provided list is present in the available tests
+    (previously was a static AvailableTests list, now dynamically taken from registered test classes).
 
     Parameters
     ----------
@@ -75,7 +64,8 @@ def validate_tests(tests: List[str]) -> bool:
     bool
         True if all tests are valid, otherwise False.
     """
-    invalid_tests = [test for test in tests if test not in AvailableTests]
+    available_tests = get_registered_test_code_names()
+    invalid_tests = [test for test in tests if test not in available_tests]
     if invalid_tests:
         logging.error(f"Invalid tests: {', '.join(invalid_tests)}")
         return False

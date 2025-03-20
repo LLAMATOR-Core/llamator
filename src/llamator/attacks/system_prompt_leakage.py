@@ -47,6 +47,15 @@ class TestSystemPromptLeakage(TestBase):
     """Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement."""
 
     test_name = "system_prompt_leakage"
+    info = {
+        "name": "System Prompt Leakage",
+        "code_name": "system_prompt_leakage",
+        "description": {
+            "en": "Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement.",
+            "ru": "Провоцирует LLM выдать системные инструкции с помощью датасета вредоносных промтов с последующим улучшением атакующей моделью."
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/system_prompt_leakage.py"
+    }
 
     def __init__(
         self,
@@ -84,9 +93,9 @@ class TestSystemPromptLeakage(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
-            logging.info(f"{self.test_name} attack report saved to {csv_path}")
+            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     @staticmethod
     def refine_attack_prompt(tested_client_response: str) -> str:
@@ -122,7 +131,7 @@ class TestSystemPromptLeakage(TestBase):
                 .reset_index(drop=True)
             )
 
-        yield StatusUpdate(self.client_config, self.test_name, self.status, "Attacking", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Attacking", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
@@ -136,9 +145,9 @@ class TestSystemPromptLeakage(TestBase):
                 self.status.report_error(attack_prompt)
                 continue
             verified = self.stop_criterion(tested_client_chat.history)
-            logger.info(f"Test '{self.test_name}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+            logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
             logger.info(
-                f"Test '{self.test_name}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
             )
             if verified:
                 self.status.report_breach(attack_prompt, response)
@@ -189,7 +198,7 @@ class TestSystemPromptLeakage(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -201,7 +210,7 @@ class TestSystemPromptLeakage(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,

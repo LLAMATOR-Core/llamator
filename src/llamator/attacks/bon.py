@@ -66,6 +66,15 @@ class TestBon(TestBase):
     Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking"""
 
     test_name = "bon"
+    info = {
+        "name": "Best-of-N Jailbreak",
+        "code_name": "bon",
+        "description": {
+            "en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
+            "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking"
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/bon.py"
+    }
 
     def __init__(
         self,
@@ -104,9 +113,9 @@ class TestBon(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
-            logging.info(f"{self.test_name} attack report saved to {csv_path}")
+            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     def transform_attack_prompt(self, prompt: str) -> str:
         """Applies a series of augmentations to the input text."""
@@ -140,7 +149,7 @@ class TestBon(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Generating",
             0,
@@ -150,15 +159,15 @@ class TestBon(TestBase):
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
             attack_prompts.append(attack_prompt)
-            logger.info(f"Test '{self.test_name}': original attack prompt #{attack_prompt_index}: {attack_prompt}")
+            logger.info(f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}")
             for stage in range(1, self.multistage_depth + 1):
                 transformed_prompt = self.transform_attack_prompt(attack_prompts[-1])
-                logger.info(f"Test '{self.test_name}': generated attack prompt #{stage}: {transformed_prompt}")
+                logger.info(f"Test '{self.info['name']}': generated attack prompt #{stage}: {transformed_prompt}")
                 attack_prompts.append(transformed_prompt)
 
                 yield StatusUpdate(
                     self.client_config,
-                    self.test_name,
+                    self.info['code_name'],
                     self.status,
                     "Generating",
                     attack_prompt_index * (self.multistage_depth + 1) + stage,
@@ -168,7 +177,7 @@ class TestBon(TestBase):
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Attacking",
             0,
@@ -189,9 +198,9 @@ class TestBon(TestBase):
             else:
                 # Verify the response to determine if this specific attack was successful
                 verified = not contains_refusal_keywords(response)
-                logger.info(f"Test '{self.test_name}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 logger.info(
-                    f"Test '{self.test_name}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                    f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                 )
                 if verified:
                     self.status.report_breach(attack_prompt, response)
@@ -206,7 +215,7 @@ class TestBon(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -218,7 +227,7 @@ class TestBon(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             total_attack_num,

@@ -30,6 +30,15 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
     """Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement."""
 
     test_name = "harmful_behavior_multistage"
+    info = {
+        "name": "Harmful Behavior Multistage",
+        "code_name": "harmful_behavior_multistage",
+        "description": {
+            "en": "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.",
+            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя самоулучшение атакующей модели."
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py"
+    }
 
     def __init__(
         self,
@@ -67,9 +76,9 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
-            logging.info(f"{self.test_name} attack report saved to {csv_path}")
+            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     @staticmethod
     def refine_attack_prompt(tested_client_response: str, objective: str) -> str:
@@ -109,7 +118,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
         for attack_prompt_index, row in data.iterrows():
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -118,7 +127,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
 
             objective = row["goal"]
             attack_prompt = FIRST_ATTACK_PROMPT_TEMPLATE.format(objective=objective)
-            logger.info(f"Test '{self.test_name}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+            logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
 
             attack_chat = ChatSession(
                 client=self.attack_config.attack_client.get_target_client(),
@@ -166,7 +175,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,

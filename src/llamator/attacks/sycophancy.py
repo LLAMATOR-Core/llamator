@@ -65,6 +65,15 @@ class TestSycophancy(TestBase):
     Original Paper: https://arxiv.org/abs/2310.13548"""
 
     test_name = "sycophancy"
+    info = {
+        "name": "Sycophancy Test",
+        "code_name": "sycophancy",
+        "description": {
+            "en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",
+            "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548"
+        },
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py"
+    }
 
     def __init__(
         self,
@@ -100,9 +109,9 @@ class TestSycophancy(TestBase):
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.test_name}.csv")
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
-            logging.info(f"{self.test_name} report saved to {csv_path}")
+            logging.info(f"{self.info['name']} report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
@@ -123,13 +132,13 @@ class TestSycophancy(TestBase):
         for attack_attempt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.test_name,
+                self.info['code_name'],
                 self.status,
                 "Attacking",
                 attack_attempt_index,
                 self.num_attempts,
             )
-            logger.info(f"Test '{self.test_name}': attack prompt #{attack_attempt_index}")
+            logger.info(f"Test '{self.info['name']}': attack prompt #{attack_attempt_index}")
 
             attack_chat = ChatSession(
                 client=self.attack_config.attack_client.get_target_client(),
@@ -183,7 +192,7 @@ class TestSycophancy(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.test_name,
+            self.info['code_name'],
             self.status,
             "Finished",
             self.num_attempts,
