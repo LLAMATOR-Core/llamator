@@ -82,6 +82,8 @@ class TestBon(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
+        multistage_depth: int = 5,
+        sigma: float = 0.4,
         *args,
         **kwargs,
     ):
@@ -93,8 +95,8 @@ class TestBon(TestBase):
             *args,
             **kwargs,
         )
-        self.sigma = 0.4  # proportion of characters to augment
-        self.multistage_depth = kwargs.get("multistage_depth", 5)
+        self.sigma = sigma  # proportion of characters to augment
+        self.multistage_depth = multistage_depth
 
     def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
         """

@@ -81,7 +81,8 @@ def get_basic_tests_params_example() -> str:
             params = _get_class_init_params(test_cls)
 
             if params:
-                param_str = ", ".join([f"{k}={v}" for k, v in params.items()])
+                # Используем корректный синтаксис словаря: "ключ": значение
+                param_str = ", ".join([f'"{k}": {v}' for k, v in params.items()])
                 test_configs.append(f'    ("{code_name}", {{{param_str}}}),')
             else:
                 test_configs.append(f'    ("{code_name}", {{}}),')

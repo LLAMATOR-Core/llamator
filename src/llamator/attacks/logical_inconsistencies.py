@@ -76,6 +76,7 @@ class TestLogicalInconsistencies(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
+        multistage_depth: int = 20,
         *args,
         **kwargs,
     ):
@@ -87,7 +88,7 @@ class TestLogicalInconsistencies(TestBase):
             *args,
             **kwargs,
         )
-        self.multistage_depth = kwargs.get("multistage_depth", 20)
+        self.multistage_depth = multistage_depth
 
     def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
         """
