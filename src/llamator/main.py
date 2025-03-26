@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
-from typing import List, Optional, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type
 
 import colorama
 from dotenv import load_dotenv
@@ -38,9 +38,8 @@ def start_testing(
     tested_model: ClientBase,
     config: dict,
     num_threads: Optional[int] = 1,
-    tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
-    multistage_depth: Optional[int] = 20,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
 ):
     """
     Start testing.
@@ -71,34 +70,12 @@ def start_testing(
 
     num_threads : int, optional
         Number of threads for parallel test execution (default is 1).
-    tests_with_attempts : List[Tuple[str, int]], optional
-        List of test names and their corresponding number of attempts.
-        Available tests:
-        - aim_jailbreak
-        - base64_injection
-        - bon
-        - complimentary_transition
-        - crescendo
-        - do_anything_now_jailbreak
-        - ethical_compliance
-        - harmful_behavior
-        - harmful_behavior_multistage
-        - linguistic_evasion
-        - logical_inconsistencies
-        - past_tense
-        - RU_do_anything_now_jailbreak
-        - RU_typoglycemia_attack
-        - RU_ucar
-        - shuffle
-        - suffix
-        - sycophancy
-        - system_prompt_leakage
-        - typoglycemia_attack
-        - ucar
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        List of custom test instances and their corresponding number of attempts.
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        List of test names and parameter dictionaries for standard tests (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        List of custom test classes and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
 
     Returns
     -------
@@ -151,35 +128,33 @@ def start_testing(
         return
 
     # Validate the test list
-    if tests_with_attempts and not validate_tests([test[0] for test in tests_with_attempts]):
+    if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
         logging.error("The test list contains invalid values.")
         return
 
     # Validate custom tests
-    if custom_tests_with_attempts and not validate_custom_tests([test[0] for test in custom_tests_with_attempts]):
+    if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
         logging.error("One or more custom tests failed validation.")
         return
 
     if enable_reports:
         # Running tests with the specified parameters
         setup_models_and_tests(
-            attack_model,
-            tested_model,
+            attack_model=attack_model,
+            tested_model=tested_model,
             num_threads=num_threads,
-            tests_with_attempts=tests_with_attempts,
-            custom_tests_with_attempts=custom_tests_with_attempts,
+            basic_tests_params=basic_tests_params,
+            custom_tests_params=custom_tests_params,
             artifacts_path=artifacts_run_path,
-            multistage_depth=multistage_depth,
         )
     else:
         setup_models_and_tests(
-            attack_model,
-            tested_model,
+            attack_model=attack_model,
+            tested_model=tested_model,
             num_threads=num_threads,
-            tests_with_attempts=tests_with_attempts,
-            custom_tests_with_attempts=custom_tests_with_attempts,
+            basic_tests_params=basic_tests_params,
+            custom_tests_params=custom_tests_params,
             artifacts_path=None,
-            multistage_depth=multistage_depth,
         )
 
     logging.info("Completion of testing")

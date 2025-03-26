@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import List, Optional, Tuple, Type
+from typing import Dict, List, Optional, Tuple, Type
 
 from ..attack_provider.test_base import TestBase
 from ..client.attack_config import AttackConfig
@@ -31,10 +31,9 @@ def register_test(cls) -> None:
 def instantiate_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
-    basic_tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
-    multistage_depth: Optional[int] = 20,
 ) -> List[TestBase]:
     """
     Instantiate and return a list of test instances based on registered test classes
@@ -46,14 +45,14 @@ def instantiate_tests(
         Configuration object for the client.
     attack_config : AttackConfig
         Configuration object for the attack.
-    basic_tests_with_attempts : List[Tuple[str, int]], optional
-        List of basic test names and repeat counts (default is None).
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        List of custom test classes and repeat counts (default is None).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        A list of basic test names and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], dict]], optional
+        A list of custom test classes and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved (default is './artifacts').
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
 
     Returns
     -------
@@ -73,36 +72,33 @@ def instantiate_tests(
     tests = []
 
     # Create instances of basic test classes
-    if basic_tests_with_attempts is not None:
-        basic_tests_dict = dict(basic_tests_with_attempts)
+    if basic_tests_params is not None:
+        # Сконвертируем список кортежей (test_name, kwargs) в словарь {test_name: kwargs}
+        basic_tests_dict = dict(basic_tests_params)
         for cls in test_classes:
             if cls.test_name in basic_tests_dict:
-                num_attempts = basic_tests_dict[cls.test_name]
+                test_kwargs = basic_tests_dict[cls.test_name]
 
                 test_instance = cls(
-                    client_config,
-                    attack_config,
+                    client_config=client_config,
+                    attack_config=attack_config,
                     artifacts_path=csv_report_path,
-                    num_attempts=num_attempts,
-                    multistage_depth=multistage_depth,
+                    **test_kwargs,
                 )
-                logger.debug(f"Instantiating attack test class: {cls.__name__} with {num_attempts} attempts")
+                logger.debug(f"Instantiating attack test class: {cls.__name__} with kwargs: {test_kwargs}")
                 tests.append(test_instance)
 
-    # Process custom tests with attempts
-    if custom_tests_with_attempts is not None:
-        for custom_test_cls, num_attempts in custom_tests_with_attempts:
+    # Process custom tests with parameters
+    if custom_tests_params is not None:
+        for custom_test_cls, test_kwargs in custom_tests_params:
             try:
                 test_instance = custom_test_cls(
-                    client_config,
-                    attack_config,
+                    client_config=client_config,
+                    attack_config=attack_config,
                     artifacts_path=csv_report_path,
-                    num_attempts=num_attempts,
-                    multistage_depth=multistage_depth,
+                    **test_kwargs,
                 )
-                logger.debug(
-                    f"Instantiating custom test class: {custom_test_cls.__name__} with {num_attempts} attempts"
-                )
+                logger.debug(f"Instantiating custom test class: {custom_test_cls.__name__} with kwargs: {test_kwargs}")
                 tests.append(test_instance)
             except Exception as e:
                 logger.error(f"Error instantiating custom test {custom_test_cls.__name__}: {e}")

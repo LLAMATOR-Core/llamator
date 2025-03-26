@@ -1,5 +1,6 @@
+import logging
 import textwrap
-from typing import Tuple, Type
+from typing import Dict, Generator, List, Optional, Tuple, Type
 
 import colorama
 from pydantic import ValidationError
@@ -113,10 +114,9 @@ def run_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
     threads_count: int,
-    basic_tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
-    multistage_depth: Optional[int] = 20,
 ):
     """
     Run the tests on the given client and attack configurations.
@@ -129,16 +129,14 @@ def run_tests(
         The configuration for the attack model.
     threads_count : int
         The number of threads to use for parallel testing.
-    basic_tests_with_attempts : List[Tuple[str, int]], optional
-        A list where each element is a list consisting of a basic test name and the number of attempts
-        to be executed (default is None).
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        A list where each element is a list consisting of a custom test instance and the number of attempts
-        to be executed (default is None).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        A list of basic test names and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        A list of custom test classes and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved.
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
 
     Returns
     -------
@@ -148,17 +146,16 @@ def run_tests(
 
     logger.debug("Initializing tests...")
     # Extract the test names from the list
-    basic_test_names = [test[0] for test in basic_tests_with_attempts] if basic_tests_with_attempts else []
+    basic_test_names = [test[0] for test in basic_tests_params] if basic_tests_params else []
     logger.debug(f"List of basic tests: {basic_test_names}")
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
-        client_config,
-        attack_config,
-        basic_tests_with_attempts=basic_tests_with_attempts,
-        custom_tests_with_attempts=custom_tests_with_attempts,
+        client_config=client_config,
+        attack_config=attack_config,
+        basic_tests_params=basic_tests_params,
+        custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
-        multistage_depth=multistage_depth,
     )
 
     # Run tests in parallel mode
@@ -328,10 +325,9 @@ def setup_models_and_tests(
     attack_model: ClientBase,
     tested_model: ClientBase,
     num_threads: Optional[int] = 1,
-    tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
-    multistage_depth: Optional[int] = 20,
 ):
     """
     Set up and validate the models, then run the tests.
@@ -344,16 +340,14 @@ def setup_models_and_tests(
         The model that will be tested for vulnerabilities.
     num_threads : int, optional
         The number of threads to use for parallel testing (default is 1).
-    tests_with_attempts : List[Tuple[str, int]], optional
-        A list where each element is a list consisting of a basic test name and the number of attempts
-        to be executed (default is None).
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        A list where each element is a list consisting of a custom test instance and the number of attempts
-        to be executed (default is None).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        A list of basic test names and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        A list where each element is a list consisting of a custom test class and a parameter dictionary
+        (default is None).
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved.
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
 
     Returns
     -------
@@ -375,11 +369,10 @@ def setup_models_and_tests(
 
     # Run tests
     run_tests(
-        client_config,
-        attack_config,
+        client_config=client_config,
+        attack_config=attack_config,
         threads_count=num_threads,
-        basic_tests_with_attempts=tests_with_attempts,
-        custom_tests_with_attempts=custom_tests_with_attempts,
+        basic_tests_params=basic_tests_params,
+        custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
-        multistage_depth=multistage_depth,
     )
