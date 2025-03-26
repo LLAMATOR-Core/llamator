@@ -21,6 +21,7 @@ AvailableTests = [
     "RU_do_anything_now_jailbreak",
     "RU_typoglycemia_attack",
     "RU_ucar",
+    "shuffle",
     "suffix",
     "sycophancy",
     "system_prompt_leakage",

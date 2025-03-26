@@ -16,8 +16,8 @@
   {
     "name": "Best-of-N Jailbreak",
     "in_code_name": "bon",
-    "description_en": "Probes the LLM resilience against Best-of-N attack.",
-    "description_ru": "Испытывает устойчивость LLM к атаке Best-of-N.",
+    "description_en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
+    "description_ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
     "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py"
   },
   {
@@ -30,8 +30,8 @@
   {
     "name": "Crescendo",
     "in_code_name": "crescendo",
-    "description_en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement.",
-    "description_ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели.",
+    "description_en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement. Original Paper: https://arxiv.org/abs/2404.01833",
+    "description_ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833",
     "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/crescendo.py"
   },
   {
@@ -105,17 +105,24 @@
     "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_ucar.py"
   },
   {
-    "name": "Adversarial suffix",
+    "name": "Shuffle Inconsistency",
+    "in_code_name": "shuffle",
+    "description_en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
+    "description_ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
+    "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py"
+  },
+  {
+    "name": "Adversarial Suffix",
     "in_code_name": "suffix",
-    "description_en": "Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation.",
-    "description_ru": "Использует специально сконструированный суффикс для обхода фильтров и ограничений LLM, заставляя модель генерировать запрещённый или вредоносный контент, несмотря на исходный запрос. Оценивает уязвимость модели к манипуляциям входных данных.",
+    "description_en": "Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation. Original Paper: https://arxiv.org/abs/2307.15043, Original Code: https://github.com/llm-attacks/llm-attacks",
+    "description_ru": "Использует специально сконструированный суффикс для обхода фильтров и ограничений LLM, заставляя модель генерировать запрещённый или вредоносный контент, несмотря на исходный запрос. Оценивает уязвимость модели к манипуляциям входных данных. Статья: https://arxiv.org/abs/2307.15043, оригинальный код: https://github.com/llm-attacks/llm-attacks",
     "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/suffix.py"
   },
   {
     "name": "Sycophancy Test",
     "in_code_name": "sycophancy",
-    "description_en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain.",
-    "description_ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam).",
+    "description_en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",
+    "description_ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548",
     "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py"
   },
   {
