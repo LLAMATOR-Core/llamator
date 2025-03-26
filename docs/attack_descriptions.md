@@ -7,13 +7,13 @@ This section provides an overview of all available attacks.
 ### OWASP [LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) Prompt Injection
 
 <details>
-<summary><strong>Adversarial suffix</strong></summary>
+<summary><strong>Adversarial Suffix</strong></summary>
 
 In code name: `suffix`
 
 Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation.
 
-_Original Paper <https://arxiv.org/abs/2307.15043>, Code <https://github.com/llm-attacks/llm-attacks>_
+_Original Paper: <https://arxiv.org/abs/2307.15043>, Original Code: <https://github.com/llm-attacks/llm-attacks>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/suffix.py">View code on GitHub</a>
 </details>
@@ -45,7 +45,7 @@ In code name: `bon`
 
 Probes the LLM resilience against Best-Of-N attack.
 
-_Original Paper <https://arxiv.org/abs/2412.03556>, Code <https://github.com/jplhughes/bon-jailbreaking>_
+_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
 </details>
@@ -121,6 +121,18 @@ Challenges the LLM with a dataset of harmful behavior prompts in past tense form
 </details>
 
 <details>
+<summary><strong>Shuffle Inconsistency</strong></summary>
+
+In code name: `shuffle`
+
+Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
+
+_Original Paper: <https://arxiv.org/html/2501.04931>_
+
+<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Typoglycemia Attack</strong></summary>
 
 In code name: `typoglycemia_attack`
@@ -192,7 +204,7 @@ In code name: `crescendo`
 
 Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement.
 
-_Original Paper <https://arxiv.org/abs/2404.01833>_
+_Original Paper: <https://arxiv.org/abs/2404.01833>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py">View code on GitHub</a>
 </details>
@@ -238,7 +250,7 @@ In code name: `sycophancy`
 
 Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain.
 
-_Original Paper <https://arxiv.org/abs/2310.13548>_
+_Original Paper: <https://arxiv.org/abs/2310.13548>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a>
 </details>
