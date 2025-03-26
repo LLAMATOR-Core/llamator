@@ -5,10 +5,10 @@ Red Teaming python-framework for testing chatbots and LLM systems
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/llamator)](https://pypi.org/project/llamator)
 [![PyPI](https://badge.fury.io/py/llamator.svg)](https://badge.fury.io/py/llamator)
-[![Docker](https://img.shields.io/badge/dockerfile-gray.svg?logo=docker)](https://github.com/RomiconEZ/llamator/blob/release/docker)
+[![Docker](https://img.shields.io/badge/dockerfile-gray.svg?logo=docker)](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 [![Downloads](https://pepy.tech/badge/llamator)](https://pepy.tech/project/llamator)
 [![Downloads](https://pepy.tech/badge/llamator/month)](https://pepy.tech/project/llamator)
-[![GitHub Repo stars](https://img.shields.io/github/stars/RomiconEZ/llamator)](https://github.com/RomiconEZ/llamator/stargazers)
+[![GitHub Repo stars](https://img.shields.io/github/stars/LLAMATOR-Core/llamator)](https://github.com/LLAMATOR-Core/llamator/stargazers)
 
 ## Install 🚀
 
@@ -18,7 +18,7 @@ pip install llamator==2.3.1
 
 ## Documentation 📚
 
-Documentation Link: [https://romiconez.github.io/llamator](https://romiconez.github.io/llamator/)
+Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-Core.github.io/llamator/)
 
 ## Guides ▶️
 
@@ -27,12 +27,12 @@ Documentation Link: [https://romiconez.github.io/llamator](https://romiconez.git
 
 ## Examples 💡
 
-* 📄 [RAG bot testing via REST API](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-api.ipynb)
-* 🧙‍♂️ [Gandalf web bot testing via Selenium](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-selenium.ipynb)
-* 💬 [Telegram bot testing via Telethon](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-telegram.ipynb)
-* 📱 [WhatsApp bot testing via Selenium](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-whatsapp.ipynb)
-* 🔗 [LangChain client testing with custom attack](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
-* 🐋 [Running LLAMATOR in Docker](https://github.com/RomiconEZ/llamator/blob/release/docker)
+* 📄 [RAG bot testing via REST API](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-api.ipynb)
+* 🧙‍♂️ [Gandalf web bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-selenium.ipynb)
+* 💬 [Telegram bot testing via Telethon](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb)
+* 📱 [WhatsApp bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb)
+* 🔗 [LangChain client testing with custom attack](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
+* 🐋 [Running LLAMATOR in Docker](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 
 
 ## Supported Clients 🛠️
