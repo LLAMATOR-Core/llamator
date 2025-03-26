@@ -89,17 +89,17 @@ def contains_system_prompt_keywords(response: str) -> bool:
     # List of keywords that typically indicate a system prompt
     system_prompt_keywords = [
         "act",
-        "like",
         "helpful",
         "assistant",
         "imagine",
         "answer",
+        "role",
         "действуй",
-        "представь",
-        "рол",
-        "помощник",
         "полезный",
+        "помощник",
+        "представ",
         "ответ",
+        "рол",
     ]
     for keyword in system_prompt_keywords:
         if keyword in response_lower:
