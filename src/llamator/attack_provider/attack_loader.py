@@ -2,6 +2,7 @@ from ..attacks import (  # noqa
     aim,
     base64_injection,
     bon,
+    conversation_emulation,
     complimentary_transition,
     crecsendo,
     dan,
