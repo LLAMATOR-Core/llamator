@@ -1,5 +1,12 @@
 [
   {
+    "name": "Conversation Emulation",
+    "in_code_name": "conversation_emulation",
+    "description_en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
+    "description_ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста, беседы.",
+    "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/src/conversation_emulation.py"
+  },
+  {
     "name": "Aim Jailbreak",
     "in_code_name": "aim_jailbreak",
     "description_en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the Nicolo Machiavelli character roleplay.",

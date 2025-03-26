@@ -6,6 +6,7 @@ from .attack_provider.run_tests import TestBase
 from .client.chat_client import ClientBase
 
 AvailableTests = [
+    "conversation_emulation",
     "aim_jailbreak",
     "base64_injection",
     "bon",
