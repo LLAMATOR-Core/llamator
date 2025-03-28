@@ -35,7 +35,7 @@ BRIGHT = colorama.Style.BRIGHT
 
 def start_testing(
     attack_model: ClientBase,
-    judge_model: ClientBase,
+    judge_model: Optional[ClientBase],
     tested_model: ClientBase,
     config: dict,
     num_threads: Optional[int] = 1,
@@ -49,7 +49,7 @@ def start_testing(
     ----------
     attack_model : ClientBase
         The attacking model used to generate tests.
-    judge_model : ClientBase
+    judge_model : ClientBase, optional
         The judge model used to evaluate test responses.
     tested_model : ClientBase
         The model being tested against the attacks.
@@ -125,10 +125,11 @@ def start_testing(
         logging.error("Attack model failed validation.")
         return
 
-    # Validate judge model
-    if not validate_model(judge_model):
-        logging.error("Judge model failed validation.")
-        return
+    # Validate judge model only if it is not None
+    if judge_model is not None:
+        if not validate_model(judge_model):
+            logging.error("Judge model failed validation.")
+            return
 
     # Validate tested model
     if not validate_model(tested_model):

@@ -32,7 +32,7 @@ def register_test(cls) -> None:
 def instantiate_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
-    judge_config: JudgeConfig,
+    judge_config: Optional[JudgeConfig] = None,
     basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
@@ -47,7 +47,7 @@ def instantiate_tests(
         Configuration object for the client.
     attack_config : AttackConfig
         Configuration object for the attack.
-    judge_config : JudgeConfig
+    judge_config : JudgeConfig, optional
         Configuration object for the judge.
     basic_tests_params : List[Tuple[str, dict]], optional
         A list of basic test names and parameter dictionaries (default is None).
