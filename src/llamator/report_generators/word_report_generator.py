@@ -213,7 +213,7 @@ def create_word_report(
     # Set page margins
     sections = document.sections
     for section in sections:
-        section.top_margin = Inches(0.7)   # Top margin
+        section.top_margin = Inches(0.7)  # Top margin
         section.bottom_margin = Inches(0.7)  # Bottom margin
         section.left_margin = Inches(0.8)  # Left margin
         section.right_margin = Inches(0.8)  # Right margin

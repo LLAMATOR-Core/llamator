@@ -65,9 +65,9 @@ class TestLogicalInconsistencies(TestBase):
         "code_name": "logical_inconsistencies",
         "description": {
             "en": "Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain.",
-            "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием перефразирования и отрицания."
+            "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием перефразирования и отрицания.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py",
     }
 
     def __init__(
@@ -128,7 +128,7 @@ class TestLogicalInconsistencies(TestBase):
         for attack_attempt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_attempt_index,
@@ -188,7 +188,7 @@ class TestLogicalInconsistencies(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

@@ -27,9 +27,9 @@ class TestShuffle(TestBase):
         "code_name": "shuffle",
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
-            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931"
+            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py",
     }
 
     def __init__(
@@ -101,16 +101,18 @@ class TestShuffle(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Generating", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
             shuffled_prompt = self.shuffle_words(attack_prompt)
             attack_prompts.append(shuffled_prompt)
-            logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {shuffled_prompt}")
+            logger.info(
+                f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {shuffled_prompt}"
+            )
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -119,7 +121,7 @@ class TestShuffle(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -157,7 +159,7 @@ class TestShuffle(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -169,7 +171,7 @@ class TestShuffle(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

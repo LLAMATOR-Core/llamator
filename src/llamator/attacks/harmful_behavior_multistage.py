@@ -35,9 +35,9 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
         "code_name": "harmful_behavior_multistage",
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.",
-            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя самоулучшение атакующей модели."
+            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя самоулучшение атакующей модели.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py",
     }
 
     def __init__(
@@ -119,7 +119,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
         for attack_prompt_index, row in data.iterrows():
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -176,7 +176,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

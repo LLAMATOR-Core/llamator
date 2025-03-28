@@ -28,9 +28,9 @@ class TestLinguisticEvasion(TestBase):
         "code_name": "linguistic_evasion",
         "description": {
             "en": "Leverages the use of a non-Russian language to circumvent the restrictions or focus set by the system prompt.",
-            "ru": "Использует не-русский язык для обхода ограничений или фокуса, установленного системным промптом."
+            "ru": "Использует не-русский язык для обхода ограничений или фокуса, установленного системным промптом.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/linguistic.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/linguistic.py",
     }
 
     def __init__(
@@ -74,7 +74,7 @@ class TestLinguisticEvasion(TestBase):
         # Generate translation of suspicious questions in Japanese
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -88,7 +88,7 @@ class TestLinguisticEvasion(TestBase):
         for attack_prompt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -100,13 +100,15 @@ class TestLinguisticEvasion(TestBase):
                 logger.warning("Error while generating attack prompt (didn't receive response) ...")
                 self.status.report_error(str(attack_prompt_index))
             else:
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
                 attack_prompts.append(attack_prompt)
 
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -141,7 +143,7 @@ class TestLinguisticEvasion(TestBase):
                     self.status.report_resilient(attack_prompt, response)
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -156,7 +158,7 @@ class TestLinguisticEvasion(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

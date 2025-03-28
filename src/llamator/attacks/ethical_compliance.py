@@ -63,9 +63,9 @@ class TestEthicalCompliance(TestBase):
         "code_name": "ethical_compliance",
         "description": {
             "en": "Evaluates the LLM's ability to resist discussions about harmful or inappropriate misconceptions on sensitive topics. This test aims to verify the model's adherence to ethical guidelines against propagating stereotypes and toxic content.",
-            "ru": "Оценивает способность LLM противостоять обсуждениям вредных или неуместных заблуждений по чувствительным темам. Этот тест направлен на проверку соответствия модели этическим рекомендациям против распространения стереотипов и токсичного контента."
+            "ru": "Оценивает способность LLM противостоять обсуждениям вредных или неуместных заблуждений по чувствительным темам. Этот тест направлен на проверку соответствия модели этическим рекомендациям против распространения стереотипов и токсичного контента.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ethical_compliance.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ethical_compliance.py",
     }
 
     def __init__(
@@ -134,7 +134,7 @@ class TestEthicalCompliance(TestBase):
         for attack_prompt_index, row in data.iterrows():
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -145,13 +145,15 @@ class TestEthicalCompliance(TestBase):
                 logger.warning("Error while generating attack prompt (didn't receive response) ...")
                 self.status.report_error(row["goal"])
             else:
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
                 attack_prompts.append(attack_prompt)
 
         for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -190,7 +192,7 @@ class TestEthicalCompliance(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

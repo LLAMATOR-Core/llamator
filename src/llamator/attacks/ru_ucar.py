@@ -26,9 +26,9 @@ class TestRuUCAR(TestBase):
         "code_name": "RU_ucar",
         "description": {
             "en": "Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.",
-            "ru": "Проверяет соблюдение русскоязычной моделью LLM ограничений по контенту при явном запросе игнорировать такие фильтры. Оценивает устойчивость систем модерации контента LLM к прямым вызовам."
+            "ru": "Проверяет соблюдение русскоязычной моделью LLM ограничений по контенту при явном запросе игнорировать такие фильтры. Оценивает устойчивость систем модерации контента LLM к прямым вызовам.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_ucar.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_ucar.py",
     }
 
     def __init__(
@@ -97,7 +97,7 @@ class TestRuUCAR(TestBase):
         # Generate list of attack prompt variations
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -110,7 +110,7 @@ class TestRuUCAR(TestBase):
             logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -120,7 +120,7 @@ class TestRuUCAR(TestBase):
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -157,7 +157,7 @@ class TestRuUCAR(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -168,7 +168,7 @@ class TestRuUCAR(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

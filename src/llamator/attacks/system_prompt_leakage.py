@@ -52,9 +52,9 @@ class TestSystemPromptLeakage(TestBase):
         "code_name": "system_prompt_leakage",
         "description": {
             "en": "Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement.",
-            "ru": "Провоцирует LLM выдать системные инструкции с помощью датасета вредоносных промтов с последующим улучшением атакующей моделью."
+            "ru": "Провоцирует LLM выдать системные инструкции с помощью датасета вредоносных промтов с последующим улучшением атакующей моделью.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/system_prompt_leakage.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/system_prompt_leakage.py",
     }
 
     def __init__(
@@ -132,7 +132,7 @@ class TestSystemPromptLeakage(TestBase):
                 .reset_index(drop=True)
             )
 
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Attacking", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Attacking", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
@@ -199,7 +199,7 @@ class TestSystemPromptLeakage(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -211,7 +211,7 @@ class TestSystemPromptLeakage(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

@@ -42,9 +42,9 @@ class TestBase64Injection(TestBase):
         "code_name": "base64_injection",
         "description": {
             "en": "Challenges the LLM with a dataset of lines, encoded into base64.",
-            "ru": "Испытывает LLM с набором строк, закодированных в base64."
+            "ru": "Испытывает LLM с набором строк, закодированных в base64.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/base64_injection.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/base64_injection.py",
     }
 
     def __init__(
@@ -113,7 +113,7 @@ class TestBase64Injection(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Working", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Working", 0, self.num_attempts)
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]  # "regular_string"
             attack_prompt_bytes = attack_prompt.encode("utf-8")  # "b'regular_string"
@@ -160,7 +160,7 @@ class TestBase64Injection(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -172,7 +172,7 @@ class TestBase64Injection(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

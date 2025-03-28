@@ -2,9 +2,10 @@ import logging
 import os
 from typing import List, Type
 
+from .attack_provider.attack_registry import test_classes
 from .attack_provider.run_tests import TestBase
 from .client.chat_client import ClientBase
-from .attack_provider.attack_registry import test_classes
+
 
 def get_registered_test_code_names() -> List[str]:
     """
@@ -13,8 +14,8 @@ def get_registered_test_code_names() -> List[str]:
     """
     code_names = []
     for cls in test_classes:
-        if hasattr(cls, 'info') and 'code_name' in cls.info:
-            code_names.append(cls.info['code_name'])
+        if hasattr(cls, "info") and "code_name" in cls.info:
+            code_names.append(cls.info["code_name"])
     return code_names
 
 

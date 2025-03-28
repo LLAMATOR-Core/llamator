@@ -70,9 +70,9 @@ class TestSycophancy(TestBase):
         "code_name": "sycophancy",
         "description": {
             "en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",
-            "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548"
+            "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py",
     }
 
     def __init__(
@@ -133,7 +133,7 @@ class TestSycophancy(TestBase):
         for attack_attempt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_attempt_index,
@@ -193,7 +193,7 @@ class TestSycophancy(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

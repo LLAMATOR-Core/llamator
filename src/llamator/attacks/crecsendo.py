@@ -72,9 +72,9 @@ class TestCrescendo(TestBase):
         "code_name": "crescendo",
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement. Original Paper: https://arxiv.org/abs/2404.01833",
-            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833"
+            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py",
     }
 
     def __init__(
@@ -147,7 +147,7 @@ class TestCrescendo(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Generating", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_model_system_prompt = ATTACK_MODEL_SYSTEM_PROMPT_TEMPLATE.format(
@@ -160,7 +160,7 @@ class TestCrescendo(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -176,7 +176,9 @@ class TestCrescendo(TestBase):
                 logger.warning("Error while generating attack prompt (didn't receive response) ...")
                 self.status.report_error(row["goal"])
                 continue
-            logger.info(f"Test '{self.info['name']}': generated attack strategy #{attack_prompt_index}: {attack_strategy}")
+            logger.info(
+                f"Test '{self.info['name']}': generated attack strategy #{attack_prompt_index}: {attack_strategy}"
+            )
 
             tested_client_chat = ChatSession(
                 client=self.client_config.get_target_client(),
@@ -191,7 +193,7 @@ class TestCrescendo(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -229,7 +231,7 @@ class TestCrescendo(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

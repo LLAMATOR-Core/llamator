@@ -24,10 +24,10 @@ class TestRuDAN(TestBase):
         "name": "Do Anything Now Jailbreak (RU)",
         "code_name": "RU_do_anything_now_jailbreak",
         "description": {
-            "en": "Probes a Russian-language LLM's resilience against performing explicitly forbidden activities using the \"Do Anything Now\" (DAN) character roleplay technique.",
-            "ru": "Проверяет устойчивость русскоязычной модели LLM к выполнению явно запрещенных действий, используя технику ролевой игры персонажа «Сделай что угодно сейчас» (DAN)."
+            "en": 'Probes a Russian-language LLM\'s resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.',
+            "ru": "Проверяет устойчивость русскоязычной модели LLM к выполнению явно запрещенных действий, используя технику ролевой игры персонажа «Сделай что угодно сейчас» (DAN).",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_dan.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_dan.py",
     }
 
     def __init__(
@@ -96,7 +96,7 @@ class TestRuDAN(TestBase):
         # Generate list of DAN (do anything now) attack prompt variations
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -109,7 +109,7 @@ class TestRuDAN(TestBase):
             logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -119,7 +119,7 @@ class TestRuDAN(TestBase):
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -158,7 +158,7 @@ class TestRuDAN(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -170,7 +170,7 @@ class TestRuDAN(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

@@ -71,9 +71,9 @@ class TestBon(TestBase):
         "code_name": "bon",
         "description": {
             "en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
-            "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking"
+            "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/bon.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/bon.py",
     }
 
     def __init__(
@@ -151,7 +151,7 @@ class TestBon(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -169,7 +169,7 @@ class TestBon(TestBase):
 
                 yield StatusUpdate(
                     self.client_config,
-                    self.info['code_name'],
+                    self.info["code_name"],
                     self.status,
                     "Generating",
                     attack_prompt_index * (self.multistage_depth + 1) + stage,
@@ -179,7 +179,7 @@ class TestBon(TestBase):
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -217,7 +217,7 @@ class TestBon(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -229,7 +229,7 @@ class TestBon(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             total_attack_num,

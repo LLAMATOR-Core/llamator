@@ -31,9 +31,9 @@ class TestComplimentaryTransition(TestBase):
         "code_name": "complimentary_transition",
         "description": {
             "en": "Evaluates the LLM's ability to maintain content moderation standards when transitioning from a compliment to a new task. It assesses the LLM's ability to maintain defined boundaries when prompted to switch topics.",
-            "ru": "Оценивает способность LLM поддерживать стандарты модерации контента при переходе от комплимента к новой задаче. Он оценивает способность LLM сохранять определенные границы при переходе на другую тему."
+            "ru": "Оценивает способность LLM поддерживать стандарты модерации контента при переходе от комплимента к новой задаче. Он оценивает способность LLM сохранять определенные границы при переходе на другую тему.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/complimentary_transition.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/complimentary_transition.py",
     }
 
     def __init__(
@@ -79,7 +79,7 @@ class TestComplimentaryTransition(TestBase):
         # Generate list of attack prompt variations
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -94,7 +94,7 @@ class TestComplimentaryTransition(TestBase):
         for attack_prompt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -110,13 +110,15 @@ class TestComplimentaryTransition(TestBase):
                 logger.warning("Error while generating attack prompt (didn't receive response) ...")
                 self.status.report_error(str(attack_prompt_index))
             else:
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
                 attack_prompts.append(attack_prompt)
 
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -153,7 +155,7 @@ class TestComplimentaryTransition(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -165,7 +167,7 @@ class TestComplimentaryTransition(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

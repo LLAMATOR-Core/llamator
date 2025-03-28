@@ -25,9 +25,9 @@ class TestHarmfulBehaviors(TestBase):
         "code_name": "harmful_behavior",
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts.",
-            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением."
+            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior.py",
     }
 
     def __init__(
@@ -93,7 +93,7 @@ class TestHarmfulBehaviors(TestBase):
             )
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Generating", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
@@ -101,7 +101,7 @@ class TestHarmfulBehaviors(TestBase):
             logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -110,7 +110,7 @@ class TestHarmfulBehaviors(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -148,7 +148,7 @@ class TestHarmfulBehaviors(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -160,7 +160,7 @@ class TestHarmfulBehaviors(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

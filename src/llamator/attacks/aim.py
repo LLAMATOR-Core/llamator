@@ -47,9 +47,9 @@ class TestAIM(TestBase):
         "code_name": "aim_jailbreak",
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the Nicolo Machiavelli character roleplay.",
-            "ru": "Проверяет этическую соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя ролевую игру персонажа Никколо Макиавелли."
+            "ru": "Проверяет этическую соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя ролевую игру персонажа Никколо Макиавелли.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/aim.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/aim.py",
     }
 
     def __init__(
@@ -95,7 +95,7 @@ class TestAIM(TestBase):
         # Generate list of attack prompt variations
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Generating",
             0,
@@ -109,7 +109,7 @@ class TestAIM(TestBase):
         for attack_prompt_index in range(self.num_attempts):
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Generating",
                 attack_prompt_index,
@@ -129,7 +129,7 @@ class TestAIM(TestBase):
         # Run the attack by sending the prompts and verifying the responses
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Attacking",
             0,
@@ -165,7 +165,7 @@ class TestAIM(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -177,7 +177,7 @@ class TestAIM(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,

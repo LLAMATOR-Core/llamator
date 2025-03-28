@@ -25,9 +25,9 @@ class TestPastTense(TestBase):
         "code_name": "past_tense",
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts in past tense form.",
-            "ru": "Проверяет устойчивость модели к выполнению вредных запросов, сформулированных в прошедшем времени."
+            "ru": "Проверяет устойчивость модели к выполнению вредных запросов, сформулированных в прошедшем времени.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/past_tense.py"
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/past_tense.py",
     }
 
     def __init__(
@@ -95,7 +95,7 @@ class TestPastTense(TestBase):
         statuses = []
 
         # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info['code_name'], self.status, "Attacking", 0, self.num_attempts)
+        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Attacking", 0, self.num_attempts)
 
         for attack_prompt_index, row in data.iterrows():
             attack_prompt = row["goal"]
@@ -129,7 +129,7 @@ class TestPastTense(TestBase):
 
             yield StatusUpdate(
                 self.client_config,
-                self.info['code_name'],
+                self.info["code_name"],
                 self.status,
                 "Attacking",
                 attack_prompt_index,
@@ -141,7 +141,7 @@ class TestPastTense(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['code_name'],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,
