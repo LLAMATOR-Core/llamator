@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from openpyxl.styles import Alignment, Border, PatternFill, Side
 from openpyxl.utils import get_column_letter
-from openpyxl import Workbook
+
 from llamator.attack_provider.attack_registry import test_classes
 
 
@@ -44,9 +44,9 @@ def create_attack_report(attack_data: list[dict], file_path: str) -> None:
 
         # Apply color coding based on the status (with softer palette colors)
         color_fill_mapping = {
-            "broken": "FFCCCB",     # light red
+            "broken": "FFCCCB",  # light red
             "resilient": "C1E1C1",  # light green
-            "error": "FFD580",      # light orange
+            "error": "FFD580",  # light orange
         }
 
         # Iterate over the status column and apply color
@@ -92,9 +92,9 @@ def create_attack_report_from_artifacts(
 
     # Dictionary for color mapping with paler colors
     color_fill_mapping = {
-        "broken": "FFF0F0",     # very pale red
+        "broken": "FFF0F0",  # very pale red
         "resilient": "F0FFF0",  # very pale green
-        "error": "FFF8E7",      # very pale orange
+        "error": "FFF8E7",  # very pale orange
     }
 
     # Define border style
