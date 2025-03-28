@@ -10,6 +10,7 @@ from ..attack_provider.work_progress_pool import ProgressWorker, ThreadSafeTaskI
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import *
 from ..client.client_config import ClientConfig
+from ..client.judge_config import JudgeConfig
 from ..format_output.results_table import print_table
 from .attack_loader import *  # noqa
 
@@ -113,6 +114,7 @@ def isResilient(test_status: TestStatus):
 def run_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
+    judge_config: JudgeConfig,
     threads_count: int,
     basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
@@ -127,6 +129,8 @@ def run_tests(
         The configuration for the tested model.
     attack_config : AttackConfig
         The configuration for the attack model.
+    judge_config : JudgeConfig
+        The configuration for the judge model.
     threads_count : int
         The number of threads to use for parallel testing.
     basic_tests_params : List[Tuple[str, dict]], optional
@@ -153,6 +157,7 @@ def run_tests(
     tests: List[TestBase] = instantiate_tests(
         client_config=client_config,
         attack_config=attack_config,
+        judge_config=judge_config,
         basic_tests_params=basic_tests_params,
         custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
@@ -323,6 +328,7 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
 
 def setup_models_and_tests(
     attack_model: ClientBase,
+    judge_model: ClientBase,
     tested_model: ClientBase,
     num_threads: Optional[int] = 1,
     basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
@@ -336,6 +342,8 @@ def setup_models_and_tests(
     ----------
     attack_model : ClientBase
         The model that will be used to perform the attacks.
+    judge_model : ClientBase
+        The model that will be used to judge test results.
     tested_model : ClientBase
         The model that will be tested for vulnerabilities.
     num_threads : int, optional
@@ -367,10 +375,18 @@ def setup_models_and_tests(
         logger.warning(f"Error accessing the Attack Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
         return
 
+    # Judge model setup
+    try:
+        judge_config = JudgeConfig(judge_client=ClientConfig(judge_model))
+    except (ModuleNotFoundError, ValidationError) as e:
+        logger.warning(f"Error accessing the Judge Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
+        return
+
     # Run tests
     run_tests(
         client_config=client_config,
         attack_config=attack_config,
+        judge_config=judge_config,
         threads_count=num_threads,
         basic_tests_params=basic_tests_params,
         custom_tests_params=custom_tests_params,

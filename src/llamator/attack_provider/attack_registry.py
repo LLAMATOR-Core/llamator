@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple, Type
 from ..attack_provider.test_base import TestBase
 from ..client.attack_config import AttackConfig
 from ..client.client_config import ClientConfig
+from ..client.judge_config import JudgeConfig
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ def register_test(cls) -> None:
 def instantiate_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
+    judge_config: JudgeConfig,
     basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
@@ -45,6 +47,8 @@ def instantiate_tests(
         Configuration object for the client.
     attack_config : AttackConfig
         Configuration object for the attack.
+    judge_config : JudgeConfig
+        Configuration object for the judge.
     basic_tests_params : List[Tuple[str, dict]], optional
         A list of basic test names and parameter dictionaries (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
@@ -82,6 +86,7 @@ def instantiate_tests(
                 test_instance = cls(
                     client_config=client_config,
                     attack_config=attack_config,
+                    judge_config=judge_config,
                     artifacts_path=csv_report_path,
                     **test_kwargs,
                 )
@@ -95,6 +100,7 @@ def instantiate_tests(
                 test_instance = custom_test_cls(
                     client_config=client_config,
                     attack_config=attack_config,
+                    judge_config=judge_config,
                     artifacts_path=csv_report_path,
                     **test_kwargs,
                 )
