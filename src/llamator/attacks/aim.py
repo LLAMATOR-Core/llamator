@@ -1,5 +1,6 @@
 import logging
 from typing import Generator, Optional
+
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
 from ..attack_provider.util import is_response_list

@@ -1,9 +1,9 @@
+import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Generator, List, Optional
 
 import pandas as pd
-import logging
 
 from ..client.attack_config import AttackConfig
 from ..client.client_config import ClientConfig

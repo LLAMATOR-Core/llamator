@@ -80,8 +80,8 @@ def instantiate_tests(
         # Сконвертируем список кортежей (test_name, kwargs) в словарь {test_name: kwargs}
         basic_tests_dict = dict(basic_tests_params)
         for cls in test_classes:
-            if cls.info['code_name'] in basic_tests_dict:
-                test_kwargs = basic_tests_dict[cls.info['code_name']]
+            if cls.info["code_name"] in basic_tests_dict:
+                test_kwargs = basic_tests_dict[cls.info["code_name"]]
 
                 test_instance = cls(
                     client_config=client_config,
