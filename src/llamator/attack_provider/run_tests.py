@@ -1,4 +1,6 @@
 import textwrap
+import logging
+import os
 from typing import List, Tuple, Type, Optional, Dict
 
 import colorama
@@ -125,9 +127,9 @@ def run_tests(
     client_config : ClientConfig
         The configuration for the tested model.
     attack_config : AttackConfig
-        The configuration for the attack model.
+        The configuration for the attack.
     judge_config : JudgeConfig, optional
-        The configuration for the judge model.
+        The configuration for the judge.
     threads_count : int
         The number of threads to use for parallel testing.
     basic_tests_params : List[Tuple[str, dict]], optional
@@ -150,13 +152,8 @@ def run_tests(
 
     # Print selected tests as a nicely formatted list using helper function
     if basic_test_names:
-        content_lines = []
-        for i, test_name in enumerate(basic_test_names):
-            # Ensure the test name doesn't exceed the available width
-            if len(test_name) > 60 - 8:
-                test_name = test_name[:60 - 11] + "..."
-            content_lines.append(f" {i + 1:2}. {test_name}")
-        print_box_with_header("Selected Tests", content_lines, 60)
+        from llamator.format_output.output_helpers import print_selected_tests
+        print_selected_tests(basic_test_names, 60)
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
@@ -168,13 +165,9 @@ def run_tests(
         artifacts_path=artifacts_path,
     )
 
-    # Display status legend before running tests using helper function;
-    # перед буквами добавлен пробел.
-    b_desc = f"{BRIGHT_RED} B{RESET}: Breach count - Number of successful attacks"
-    r_desc = f"{GREEN} R{RESET}: Resilient count - Number of successfully blocked attacks"
-    e_desc = f"{BRIGHT_YELLOW} E{RESET}: Error count - Number of errors during testing"
-    legend_lines = [b_desc, r_desc, e_desc]
-    print_box_with_header("Status Legend", legend_lines, 60)
+    # Display status legend before running tests using helper function
+    from llamator.format_output.output_helpers import print_status_legend
+    print_status_legend(60)
 
     # Run tests in parallel mode
     run_tests_in_parallel(tests, threads_count)
@@ -224,11 +217,9 @@ def report_results(tests: List[TestBase]):
     VULNERABLE = f"{RED}✘{RESET}"
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
-    # Print a beautiful test results header
-    box_width = 84  # Width for the results box
-    print(f"\n{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
-    print(f"{BRIGHT_CYAN}║{' ' * ((box_width - 12) // 2)}TEST RESULTS{' ' * ((box_width - 12 + 1) // 2)}║{RESET}")
-    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}\n")
+    # Print a beautiful test results header using helper function
+    from llamator.format_output.output_helpers import print_test_results_header
+    print_test_results_header(84)
 
     # Print a table of test results
     print_table(
@@ -316,6 +307,8 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     -------
     None
     """
+    from llamator.format_output.output_helpers import print_summary_header
+    print_summary_header(84)
     resilient_tests_count = sum(isResilient(test.status) for test in tests)
 
     # Preparing descriptions with line breaks of the specified length
@@ -330,12 +323,6 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
 
     total_tests_count = len(tests)
     resilient_tests_percentage = resilient_tests_count / total_tests_count * 100 if total_tests_count > 0 else 0
-
-    # Print a beautiful summary header
-    box_width = 84  # Same width as results box for consistency
-    print(f"\n{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
-    print(f"{BRIGHT_CYAN}║{' ' * ((box_width - 7) // 2)}SUMMARY{' ' * ((box_width - 7 + 1) // 2)}║{RESET}")
-    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}\n")
 
     # Displaying the percentage of successfully passed tests
     print(
@@ -372,7 +359,7 @@ def setup_models_and_tests(
         A list of basic test names and parameter dictionaries (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
-        A list where each element is a list consisting of a custom test class and a parameter dictionary
+        A list where each element is a tuple consisting of a custom test class and a parameter dictionary
         (default is None).
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved.
@@ -381,21 +368,18 @@ def setup_models_and_tests(
     -------
     None
     """
-    # Test model setup
     try:
         client_config = ClientConfig(tested_model)
     except (ModuleNotFoundError, ValidationError) as e:
         logger.warning(f"Error accessing the Tested Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
         return
 
-    # Attack model setup
     try:
         attack_config = AttackConfig(attack_client=ClientConfig(attack_model))
     except (ModuleNotFoundError, ValidationError) as e:
         logger.warning(f"Error accessing the Attack Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
         return
 
-    # Judge model setup (если judge_model не None)
     if judge_model is not None:
         try:
             judge_config = JudgeConfig(judge_client=ClientConfig(judge_model))
@@ -405,7 +389,6 @@ def setup_models_and_tests(
     else:
         judge_config = None
 
-    # Run tests
     run_tests(
         client_config=client_config,
         attack_config=attack_config,

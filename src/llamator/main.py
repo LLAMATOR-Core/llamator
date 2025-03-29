@@ -131,21 +131,9 @@ def start_testing(
     # Program logo output
     print_logo()
 
-    # Print configuration summary using functions from draw_utils
-    box_width = 60  # Fixed total width for the box
-    print(get_top_border(box_width))
-    print(format_centered_line("Testing Configuration", box_width))
-    print(get_separator_line(box_width))
-    threads_text = f"Number of threads: {num_threads}"
-    logging_text = f"Logging enabled: {enable_logging}"
-    reports_text = f"Reports enabled: {enable_reports}"
-    language_text = f"Report language: {report_language}"
-    print(format_box_line(threads_text, box_width))
-    print(format_box_line(logging_text, box_width))
-    print(format_box_line(reports_text, box_width))
-    print(format_box_line(language_text, box_width))
-    print(get_bottom_border(box_width))
-    print()
+    # Print configuration summary using helper function from format_output
+    from llamator.format_output.output_helpers import print_testing_configuration
+    print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 60)
 
     # Validate attack model
     print(f"{BRIGHT_CYAN}Validating models...{RESET}")
