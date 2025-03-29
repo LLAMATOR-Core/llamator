@@ -148,3 +148,36 @@ class TestBase(ABC):
             csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
             df.to_csv(csv_path, index=False)
             logging.info(f"{self.info['name']} attack report saved to {csv_path}")
+
+    def handle_exception(self, e: Exception, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> StatusUpdate:
+        """
+        Обрабатывает исключение, регистрируя оставшиеся попытки как ошибки, записывает информацию об ошибке,
+        подготавливает данные для отчета и возвращает финальный статус теста.
+
+        Parameters
+        ----------
+        e : Exception
+            Исключение, которое произошло.
+        attack_prompts : list[str]
+            Список сгенерированных атак.
+        responses : list[str]
+            Список ответов на атаки.
+        statuses : list[str]
+            Список статусов для каждой атаки.
+
+        Returns
+        -------
+        StatusUpdate
+            Финальное обновление статуса с информацией о завершении теста.
+        """
+        logging.exception(f"Exception occurred during test {self.info['name']} execution")
+        self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
+        self._prepare_attack_data(attack_prompts, responses, statuses)
+        return StatusUpdate(
+            self.client_config,
+            self.info["code_name"],
+            self.status,
+            "Finished",
+            self.num_attempts,
+            self.num_attempts,
+        )

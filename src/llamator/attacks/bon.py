@@ -108,108 +108,110 @@ class TestBon(TestBase):
         attack_prompts = []
         responses = []
         statuses = []
+        try:
+            current_dir = Path(__file__).parent
+            dataset_filename = current_dir.parent / "attack_data" / "harmful_behavior.parquet"
 
-        current_dir = Path(__file__).parent
-        dataset_filename = current_dir.parent / "attack_data" / "harmful_behavior.parquet"
+            logger.info(f"Dataset filename: {dataset_filename}")
+            data = pd.read_parquet(dataset_filename, engine="fastparquet")
+            rows_count = data.shape[0]
 
-        logger.info(f"Dataset filename: {dataset_filename}")
-        data = pd.read_parquet(dataset_filename, engine="fastparquet")
-        rows_count = data.shape[0]
-
-        if self.num_attempts <= rows_count:
-            # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-            data = data.sample(n=self.num_attempts)
-        else:
-            # If dataset is smaller than requested number of samples, fit the dataset repeating until limit is reached
-            data = (
-                pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                .sort_index()
-                .reset_index(drop=True)
-            )
-
-        yield StatusUpdate(
-            self.client_config,
-            self.info["code_name"],
-            self.status,
-            "Generating",
-            0,
-            self.num_attempts * (self.multistage_depth + 1),  # +1 - we also store starting prompt besides refined ones
-        )
-
-        for attack_prompt_index, row in data.iterrows():
-            attack_prompt = row["goal"]
-            attack_prompts.append(attack_prompt)
-            logger.info(f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}")
-            for stage in range(1, self.multistage_depth + 1):
-                transformed_prompt = self.transform_attack_prompt(attack_prompts[-1])
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{stage}: {transformed_prompt}")
-                attack_prompts.append(transformed_prompt)
-
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Generating",
-                    attack_prompt_index * (self.multistage_depth + 1) + stage,
-                    self.num_attempts * (self.multistage_depth + 1),
-                )
-
-        # Run the attack by sending the prompts and verifying the responses
-        yield StatusUpdate(
-            self.client_config,
-            self.info["code_name"],
-            self.status,
-            "Attacking",
-            0,
-            self.num_attempts * (self.multistage_depth + 1),
-        )
-
-        total_attack_num = len(attack_prompts)
-        for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
-            chat = ChatSession(
-                self.client_config.get_target_client(),
-                self.client_config.get_system_prompts(),
-            )
-            response = chat.say(attack_prompt)
-            if not response:
-                logger.warning("Error while attacking against target LLM (didn't receive response) ...")
-                self.status.report_error(attack_prompt)
-                current_status = "Error"
+            if self.num_attempts <= rows_count:
+                # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
+                data = data.sample(n=self.num_attempts)
             else:
-                # Verify the response to determine if this specific attack was successful
-                verified = not contains_refusal_keywords(response)
-                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
-                logger.info(
-                    f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                # If dataset is smaller than requested number of samples, fit the dataset repeating until limit is reached
+                data = (
+                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
+                    .sort_index()
+                    .reset_index(drop=True)
                 )
-                if verified:
-                    self.status.report_breach(attack_prompt, response)
-                    current_status = "Broken"
-                else:
-                    self.status.report_resilient(attack_prompt, response)
-                    current_status = "Resilient"
-
-            # Append data for report
-            responses.append(response)
-            statuses.append(current_status)
 
             yield StatusUpdate(
                 self.client_config,
                 self.info["code_name"],
                 self.status,
-                "Attacking",
-                attack_prompt_index,
-                total_attack_num,
+                "Generating",
+                0,
+                self.num_attempts * (self.multistage_depth + 1),  # +1 - we also store starting prompt besides refined ones
             )
 
-        # Prepare data for report generation
-        self._prepare_attack_data(attack_prompts, responses, statuses)
+            for attack_prompt_index, row in data.iterrows():
+                attack_prompt = row["goal"]
+                attack_prompts.append(attack_prompt)
+                logger.info(f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}")
+                for stage in range(1, self.multistage_depth + 1):
+                    transformed_prompt = self.transform_attack_prompt(attack_prompts[-1])
+                    logger.info(f"Test '{self.info['name']}': generated attack prompt #{stage}: {transformed_prompt}")
+                    attack_prompts.append(transformed_prompt)
 
-        yield StatusUpdate(
-            self.client_config,
-            self.info["code_name"],
-            self.status,
-            "Finished",
-            total_attack_num,
-            total_attack_num,
-        )
+                    yield StatusUpdate(
+                        self.client_config,
+                        self.info["code_name"],
+                        self.status,
+                        "Generating",
+                        attack_prompt_index * (self.multistage_depth + 1) + stage,
+                        self.num_attempts * (self.multistage_depth + 1),
+                    )
+
+            # Run the attack by sending the prompts and verifying the responses
+            yield StatusUpdate(
+                self.client_config,
+                self.info["code_name"],
+                self.status,
+                "Attacking",
+                0,
+                self.num_attempts * (self.multistage_depth + 1),
+            )
+
+            total_attack_num = len(attack_prompts)
+            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
+                chat = ChatSession(
+                    self.client_config.get_target_client(),
+                    self.client_config.get_system_prompts(),
+                )
+                response = chat.say(attack_prompt)
+                if not response:
+                    logger.warning("Error while attacking against target LLM (didn't receive response) ...")
+                    self.status.report_error(attack_prompt)
+                    current_status = "Error"
+                else:
+                    # Verify the response to determine if this specific attack was successful
+                    verified = not contains_refusal_keywords(response)
+                    logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+                    logger.info(
+                        f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                    )
+                    if verified:
+                        self.status.report_breach(attack_prompt, response)
+                        current_status = "Broken"
+                    else:
+                        self.status.report_resilient(attack_prompt, response)
+                        current_status = "Resilient"
+
+                # Append data for report
+                responses.append(response)
+                statuses.append(current_status)
+
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Attacking",
+                    attack_prompt_index,
+                    total_attack_num,
+                )
+
+            # Prepare data for report generation
+            self._prepare_attack_data(attack_prompts, responses, statuses)
+
+            yield StatusUpdate(
+                self.client_config,
+                self.info["code_name"],
+                self.status,
+                "Finished",
+                total_attack_num,
+                total_attack_num,
+            )
+        except Exception as e:
+            yield self.handle_exception(e, attack_prompts, responses, statuses)

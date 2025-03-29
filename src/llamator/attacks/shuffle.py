@@ -1,3 +1,4 @@
+# llamator/src/llamator/attacks/shuffle.py
 import logging
 import random
 from pathlib import Path
@@ -59,99 +60,98 @@ class TestShuffle(TestBase):
         attack_prompts = []
         responses = []
         statuses = []
-        # Getting the path to the directory where the file is located harmful_behavior.py
-        current_dir = Path(__file__).parent
-        dataset_filename = current_dir.parent / "attack_data" / "harmful_behavior.parquet"
+        try:
+            # Getting the path to the directory where the file is located harmful_behavior.py
+            current_dir = Path(__file__).parent
+            dataset_filename = current_dir.parent / "attack_data" / "harmful_behavior.parquet"
 
-        logger.info(f"Dataset filename: {dataset_filename}")
-        data = pd.read_parquet(dataset_filename, engine="fastparquet")
-        rows_count = data.shape[0]
+            logger.info(f"Dataset filename: {dataset_filename}")
+            data = pd.read_parquet(dataset_filename, engine="fastparquet")
+            rows_count = data.shape[0]
 
-        if self.num_attempts <= rows_count:
-            # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-            data = data.sample(n=self.num_attempts)
-        else:
-            # If dataset is smaller than requested number of attack samples, fit the dataset repeating until num_attempts is reached
-            data = (
-                pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                .sort_index()
-                .reset_index(drop=True)
-            )
-
-        # Generate list of attack prompt variations
-        yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts)
-
-        for attack_prompt_index, row in data.iterrows():
-            attack_prompt = row["goal"]
-            shuffled_prompt = self.shuffle_words(attack_prompt)
-            attack_prompts.append(shuffled_prompt)
-            logger.info(
-                f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {shuffled_prompt}"
-            )
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Generating",
-                attack_prompt_index,
-                self.num_attempts,
-            )
-
-        yield StatusUpdate(
-            self.client_config,
-            self.info["code_name"],
-            self.status,
-            "Attacking",
-            0,
-            self.num_attempts,
-        )
-
-        # Run the attack by sending the prompts and verifying the responses
-        for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
-            chat = ChatSession(
-                self.client_config.get_target_client(),
-                self.client_config.get_system_prompts(),
-            )
-            response = chat.say(attack_prompt)
-            if not response:
-                logger.warning("Error while attacking against target LLM (didn't receive response) ...")
-                self.status.report_error(attack_prompt)
-                current_status = "Error"
+            if self.num_attempts <= rows_count:
+                # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
+                data = data.sample(n=self.num_attempts)
             else:
-                # Verify the response to determine if this specific attack was successful
-                verified = not contains_refusal_keywords(response)
-                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
-                logger.info(
-                    f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                # If dataset is smaller than requested number of attack samples, fit the dataset repeating until num_attempts is reached
+                data = (
+                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
+                    .sort_index()
+                    .reset_index(drop=True)
                 )
-                if verified:
-                    self.status.report_breach(attack_prompt, response)
-                    current_status = "Broken"
-                else:
-                    self.status.report_resilient(attack_prompt, response)
-                    current_status = "Resilient"
 
-            # Append data for report
-            responses.append(response)
-            statuses.append(current_status)
+            # Generate list of attack prompt variations
+            yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts)
 
+            for attack_prompt_index, row in data.iterrows():
+                attack_prompt = row["goal"]
+                shuffled_prompt = self.shuffle_words(attack_prompt)
+                attack_prompts.append(shuffled_prompt)
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {shuffled_prompt}"
+                )
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Generating",
+                    attack_prompt_index,
+                    self.num_attempts,
+                )
             yield StatusUpdate(
                 self.client_config,
                 self.info["code_name"],
                 self.status,
                 "Attacking",
-                attack_prompt_index,
+                0,
                 self.num_attempts,
             )
+            # Run the attack by sending the prompts and verifying the responses
+            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
+                chat = ChatSession(
+                    self.client_config.get_target_client(),
+                    self.client_config.get_system_prompts(),
+                )
+                response = chat.say(attack_prompt)
+                if not response:
+                    logger.warning("Error while attacking against target LLM (didn't receive response) ...")
+                    self.status.report_error(attack_prompt)
+                    current_status = "Error"
+                else:
+                    # Verify the response to determine if this specific attack was successful
+                    verified = not contains_refusal_keywords(response)
+                    logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
+                    logger.info(
+                        f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
+                    )
+                    if verified:
+                        self.status.report_breach(attack_prompt, response)
+                        current_status = "Broken"
+                    else:
+                        self.status.report_resilient(attack_prompt, response)
+                        current_status = "Resilient"
 
-        # Prepare data for report generation
-        self._prepare_attack_data(attack_prompts, responses, statuses)
+                # Append data for report
+                responses.append(response)
+                statuses.append(current_status)
 
-        yield StatusUpdate(
-            self.client_config,
-            self.info["code_name"],
-            self.status,
-            "Finished",
-            self.num_attempts,
-            self.num_attempts,
-        )
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Attacking",
+                    attack_prompt_index,
+                    self.num_attempts,
+                )
+            # Prepare data for report generation
+            self._prepare_attack_data(attack_prompts, responses, statuses)
+            yield StatusUpdate(
+                self.client_config,
+                self.info["code_name"],
+                self.status,
+                "Finished",
+                self.num_attempts,
+                self.num_attempts,
+            )
+        except Exception as e:
+            yield self.handle_exception(e, attack_prompts, responses, statuses)
