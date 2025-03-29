@@ -29,15 +29,15 @@ Response with only the refined prompt"""
 class TestHarmfulBehaviorsMultiStage(TestBase):
     """Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement."""
 
-    test_name = "harmful_behavior_multistage"
     info = {
         "name": "Harmful Behavior Multistage",
         "code_name": "harmful_behavior_multistage",
+        "tags": [],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.",
             "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя самоулучшение атакующей модели.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py",
     }
 
     def __init__(
@@ -59,27 +59,6 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     @staticmethod
     def refine_attack_prompt(tested_client_response: str, objective: str) -> str:

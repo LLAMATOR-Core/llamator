@@ -59,15 +59,15 @@ Your response to this message will be sent directly to the LLM system and must c
 class TestLogicalInconsistencies(TestBase):
     """Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain."""
 
-    test_name = "logical_inconsistencies"
     info = {
         "name": "Logical Inconsistencies Test",
         "code_name": "logical_inconsistencies",
+        "tags": [],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain.",
             "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием перефразирования и отрицания.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py",
     }
 
     def __init__(
@@ -89,25 +89,6 @@ class TestLogicalInconsistencies(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"{self.info['name']} report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []

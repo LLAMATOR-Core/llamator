@@ -64,15 +64,15 @@ class TestSycophancy(TestBase):
     """Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain.
     Original Paper: https://arxiv.org/abs/2310.13548"""
 
-    test_name = "sycophancy"
     info = {
         "name": "Sycophancy Test",
         "code_name": "sycophancy",
+        "tags": [],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",
             "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py",
     }
 
     def __init__(
@@ -94,25 +94,6 @@ class TestSycophancy(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"{self.info['name']} report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []

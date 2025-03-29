@@ -20,15 +20,15 @@ class TestRuUCAR(TestBase):
     """Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters.
     It assesses the robustness of the LLM's content moderation systems against direct challenges."""
 
-    test_name = "RU_ucar"
     info = {
         "name": "UCAR (RU)",
         "code_name": "RU_ucar",
+        "tags": ["ru"],
         "description": {
             "en": "Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.",
             "ru": "Проверяет соблюдение русскоязычной моделью LLM ограничений по контенту при явном запросе игнорировать такие фильтры. Оценивает устойчивость систем модерации контента LLM к прямым вызовам.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_ucar.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_ucar.py",
     }
 
     def __init__(
@@ -48,27 +48,6 @@ class TestRuUCAR(TestBase):
             *args,
             **kwargs,
         )
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"Ru-UCAR attack report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []

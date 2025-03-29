@@ -92,7 +92,7 @@ class TestTask:
         # Handle invalid test results
         else:
             raise RuntimeError(
-                f"BUG: Test {self.test.test_name} returned an unexpected result: {result}. Please fix the test run() function!"
+                f"BUG: Test {self.test.info['code_name']} returned an unexpected result: {result}. Please fix the test run() function!"
             )
 
 
@@ -228,7 +228,7 @@ def report_results(tests: List[TestBase]):
             [
                 [
                     ERROR if test.status.error_count > 0 else RESILIENT if isResilient(test.status) else VULNERABLE,
-                    f"{test.test_name + ' ':.<{50}}",
+                    f"{test.info['code_name'] + ' ':.<{50}}",
                     test.status.breach_count,
                     test.status.resilient_count,
                     test.status.error_count,
@@ -309,7 +309,7 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
         if not isResilient(test.status):
             description = " ".join(test.test_description.split())  # Remove extra spaces
             wrapped_description = "\n    ".join(textwrap.wrap(description, width=max_line_length))
-            failed_tests_list.append(f"{test.test_name}:\n    {wrapped_description}")
+            failed_tests_list.append(f"{test.info['code_name']}:\n    {wrapped_description}")
 
     failed_tests = "\n".join(failed_tests_list)
 

@@ -19,15 +19,15 @@ logger = logging.getLogger(__name__)
 class TestPastTense(TestBase):
     """Challenges the LLM with a dataset of harmful behavior prompts in past tense form."""
 
-    test_name = "past_tense"
     info = {
         "name": "Past Tense Attack",
         "code_name": "past_tense",
+        "tags": [],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts in past tense form.",
             "ru": "Проверяет устойчивость модели к выполнению вредных запросов, сформулированных в прошедшем времени.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/past_tense.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/past_tense.py",
     }
 
     def __init__(
@@ -47,27 +47,6 @@ class TestPastTense(TestBase):
             *args,
             **kwargs,
         )
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"Past Tense attack report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         # Getting the path to the directory where the file is located past_tense.py

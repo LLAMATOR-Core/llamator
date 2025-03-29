@@ -66,15 +66,15 @@ class TestCrescendo(TestBase):
     operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement.
     Original Paper: https://arxiv.org/abs/2404.01833"""
 
-    test_name = "crescendo"
     info = {
         "name": "Crescendo",
         "code_name": "crescendo",
+        "tags": [],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement. Original Paper: https://arxiv.org/abs/2404.01833",
             "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/crescendo.py",
     }
 
     def __init__(
@@ -96,27 +96,6 @@ class TestCrescendo(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
     def stop_criterion(self, tested_client_history: List[Dict[str, str]]) -> bool:
         if len(tested_client_history) < self.multistage_depth * 2:

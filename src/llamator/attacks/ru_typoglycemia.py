@@ -18,15 +18,15 @@ logger = logging.getLogger(__name__)
 class TestRuTypoglycemia(TestBase):
     """Attempt to exploit a text processing vulnerability in LLMs that can cause them to generate incorrect responses to queries by removing random characters from words."""
 
-    test_name = "RU_typoglycemia_attack"
     info = {
         "name": "Typoglycemia Attack (RU)",
         "code_name": "RU_typoglycemia_attack",
+        "tags": ["ru"],
         "description": {
             "en": "Attempts to exploit a text processing vulnerability in Russian-language LLMs that can cause incorrect responses by removing random characters from words.",
             "ru": "Пытается использовать уязвимость в обработке текста русскоязычными моделями LLM, которая может вызвать неправильные ответы, удаляя случайные символы из слов.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py",
     }
 
     def __init__(
@@ -46,27 +46,6 @@ class TestRuTypoglycemia(TestBase):
             *args,
             **kwargs,
         )
-
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-
-        Returns:
-            None
-        """
-        # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
-
-        # Save the DataFrame as a CSV file to the artifacts path
-        if self.artifacts_path:
-            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
-            df.to_csv(csv_path, index=False)
-            logging.info(f"Typoglycemia attack report saved to {csv_path}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
