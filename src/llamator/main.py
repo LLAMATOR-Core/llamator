@@ -5,12 +5,20 @@ from logging.handlers import RotatingFileHandler
 from typing import Dict, List, Optional, Tuple, Type
 
 import colorama
+from colorama import Style, Fore
 from dotenv import load_dotenv
 
 from .attack_provider.run_tests import setup_models_and_tests
 from .attack_provider.test_base import TestBase
 from .client.chat_client import ClientBase
 from .format_output.logo import print_logo
+from .format_output.draw_utils import (
+    get_top_border,
+    get_bottom_border,
+    format_box_line,
+    format_centered_line,
+    get_separator_line
+)
 from .initial_validation import (
     validate_artifacts_path,
     validate_custom_tests,
@@ -28,12 +36,11 @@ load_dotenv(dotenv_path)
 colorama.init()
 
 # Defining constants for text reset and brightness
-RESET = colorama.Style.RESET_ALL
-BRIGHT = colorama.Style.BRIGHT
-BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
-BRIGHT_RED = colorama.Fore.RED + colorama.Style.BRIGHT
-BRIGHT_GREEN = colorama.Fore.GREEN + colorama.Style.BRIGHT
-
+RESET = Style.RESET_ALL
+BRIGHT = Style.BRIGHT
+BRIGHT_CYAN = Fore.CYAN + Style.BRIGHT
+BRIGHT_RED = Fore.RED + Style.BRIGHT
+BRIGHT_GREEN = Fore.GREEN + Style.BRIGHT
 
 def start_testing(
     attack_model: ClientBase,
@@ -80,7 +87,7 @@ def start_testing(
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
         List of custom test classes and parameter dictionaries (default is None).
-        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+        The dictionary keys and значения будут переданы в конструктор тестового класса.
 
     Returns
     -------
@@ -124,15 +131,21 @@ def start_testing(
     # Program logo output
     print_logo()
 
-    # Print configuration summary
-    print(f"{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════╗{RESET}")
-    print(f"{BRIGHT_CYAN}║                  Testing Configuration                   ║{RESET}")
-    print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════╣{RESET}")
-    print(f"{BRIGHT_CYAN}║{RESET} Number of threads: {num_threads:<36} {BRIGHT_CYAN}║{RESET}")
-    print(f"{BRIGHT_CYAN}║{RESET} Logging enabled: {str(enable_logging):<37} {BRIGHT_CYAN}║{RESET}")
-    print(f"{BRIGHT_CYAN}║{RESET} Reports enabled: {str(enable_reports):<36} {BRIGHT_CYAN}║{RESET}")
-    print(f"{BRIGHT_CYAN}║{RESET} Report language: {report_language:<37} {BRIGHT_CYAN}║{RESET}")
-    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════╝{RESET}\n")
+    # Print configuration summary using functions from draw_utils
+    box_width = 60  # Fixed total width for the box
+    print(get_top_border(box_width))
+    print(format_centered_line("Testing Configuration", box_width))
+    print(get_separator_line(box_width))
+    threads_text = f"Number of threads: {num_threads}"
+    logging_text = f"Logging enabled: {enable_logging}"
+    reports_text = f"Reports enabled: {enable_reports}"
+    language_text = f"Report language: {report_language}"
+    print(format_box_line(threads_text, box_width))
+    print(format_box_line(logging_text, box_width))
+    print(format_box_line(reports_text, box_width))
+    print(format_box_line(language_text, box_width))
+    print(get_bottom_border(box_width))
+    print()
 
     # Validate attack model
     print(f"{BRIGHT_CYAN}Validating models...{RESET}")
@@ -187,6 +200,7 @@ def start_testing(
 
     # Explicitly close log files at the end of the program
     for handler in logging.getLogger().handlers:
+        from logging.handlers import RotatingFileHandler
         if isinstance(handler, RotatingFileHandler):
             handler.close()
 
@@ -208,8 +222,10 @@ def start_testing(
             language=report_language,
         )
 
-    # Final message with a decorative border
-    print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════╗{RESET}")
-    print(f"{BRIGHT_CYAN}║               Thank you for using LLAMATOR!               ║{RESET}")
-    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════╝{RESET}")
+    # Final message with a properly aligned decorative border
+    box_width = 60  # Fixed total width for consistency
+    print(get_top_border(box_width))
+    thank_you_text = "Thank you for using LLAMATOR!"
+    print(format_centered_line(thank_you_text, box_width))
+    print(get_bottom_border(box_width))
     logging.shutdown()

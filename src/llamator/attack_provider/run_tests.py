@@ -26,6 +26,35 @@ RED = colorama.Fore.RED
 GREEN = colorama.Fore.GREEN
 BRIGHT_YELLOW = colorama.Fore.LIGHTYELLOW_EX + colorama.Style.BRIGHT
 
+def print_box(header: str, content_lines: List[str], box_width: int) -> None:
+    """
+    Helper function to print a box with a header and content lines with even borders.
+    """
+    # Импортируем функцию для очистки ANSI последовательностей
+    from ..format_output.draw_utils import strip_ansi
+    # Вывод верхней границы
+    print(f"{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
+    # Расчёт отступов для заголовка с учётом ANSI последовательностей
+    visible_header = strip_ansi(header)
+    header_len = len(visible_header)
+    left_padding = (box_width - header_len) // 2
+    right_padding = box_width - header_len - left_padding
+    print(f"{BRIGHT_CYAN}║{' ' * left_padding}{header}{' ' * right_padding}║{RESET}")
+    # Вывод разделительной линии
+    print(f"{BRIGHT_CYAN}╠{'═' * box_width}╣{RESET}")
+    # Вывод строк содержимого с автоматическим выравниванием
+    for line in content_lines:
+        visible_line = strip_ansi(line)
+        line_len = len(visible_line)
+        if line_len > box_width:
+            # Если строка длиннее, обрезаем её по видимой длине
+            visible_line = visible_line[:box_width]
+            line = visible_line
+            line_len = len(visible_line)
+        padding = box_width - line_len
+        print(f"{BRIGHT_CYAN}║{RESET}{line}{' ' * padding}{BRIGHT_CYAN}║{RESET}")
+    # Вывод нижней границы
+    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}")
 
 class TestTask:
     """
@@ -100,7 +129,6 @@ class TestTask:
                 f"BUG: Test {self.test.info['code_name']} returned an unexpected result: {result}. Please fix the test run() function!"
             )
 
-
 def simpleProgressBar(progress, total, color, bar_length=50):
     """Generate printable progress bar"""
     if total > 0:
@@ -110,11 +138,9 @@ def simpleProgressBar(progress, total, color, bar_length=50):
     else:
         return "[]"
 
-
 def isResilient(test_status: TestStatus):
     """Define test as passed if there were no errors or failures during test run"""
     return test_status.breach_count == 0 and test_status.error_count == 0
-
 
 def run_tests(
     client_config: ClientConfig,
@@ -158,14 +184,15 @@ def run_tests(
     basic_test_names = [test[0] for test in basic_tests_params] if basic_tests_params else []
     logger.debug(f"List of basic tests: {basic_test_names}")
 
-    # Print selected tests as a nicely formatted list
+    # Print selected tests as a nicely formatted list using helper function
     if basic_test_names:
-        print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════╗{RESET}")
-        print(f"{BRIGHT_CYAN}║                     Selected Tests                          ║{RESET}")
-        print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════════╣{RESET}")
+        content_lines = []
         for i, test_name in enumerate(basic_test_names):
-            print(f"{BRIGHT_CYAN}║{RESET} {i + 1:2}. {test_name:<52} {BRIGHT_CYAN}║{RESET}")
-        print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════╝{RESET}\n")
+            # Ensure the test name doesn't exceed the available width
+            if len(test_name) > 60 - 8:
+                test_name = test_name[:60 - 11] + "..."
+            content_lines.append(f" {i + 1:2}. {test_name}")
+        print_box("Selected Tests", content_lines, box_width=60)
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
@@ -177,24 +204,19 @@ def run_tests(
         artifacts_path=artifacts_path,
     )
 
-    # Display status legend before running tests
-    print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════╗{RESET}")
-    print(f"{BRIGHT_CYAN}║                     Status Legend                           ║{RESET}")
-    print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════════╣{RESET}")
-    print(
-        f"{BRIGHT_CYAN}║{RESET} {BRIGHT_RED}B{RESET}: Breach count - Number of successful attacks           {BRIGHT_CYAN}║{RESET}")
-    print(
-        f"{BRIGHT_CYAN}║{RESET} {GREEN}R{RESET}: Resilient count - Number of successfully blocked attacks {BRIGHT_CYAN}║{RESET}")
-    print(
-        f"{BRIGHT_CYAN}║{RESET} {BRIGHT_YELLOW}E{RESET}: Error count - Number of errors during testing          {BRIGHT_CYAN}║{RESET}")
-    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════╝{RESET}\n")
+    # Display status legend before running tests using helper function
+    box_width = 60  # Consistent box width
+    b_desc = f"{BRIGHT_RED}B{RESET}: Breach count - Number of successful attacks"
+    r_desc = f"{GREEN}R{RESET}: Resilient count - Number of successfully blocked attacks"
+    e_desc = f"{BRIGHT_YELLOW}E{RESET}: Error count - Number of errors during testing"
+    legend_lines = [b_desc, r_desc, e_desc]
+    print_box("Status Legend", legend_lines, box_width)
 
     # Run tests in parallel mode
     run_tests_in_parallel(tests, threads_count)
 
     # Report test results
     report_results(tests)
-
 
 def run_tests_in_parallel(tests: List[TestBase], threads_count: int = 1):
     """
@@ -221,7 +243,6 @@ def run_tests_in_parallel(tests: List[TestBase], threads_count: int = 1):
     # A known number of tests allows for progress bar display
     work_pool.run(ThreadSafeTaskIterator(test_tasks), len(tests))
 
-
 def report_results(tests: List[TestBase]):
     """
     Generate and print the test results.
@@ -240,12 +261,10 @@ def report_results(tests: List[TestBase]):
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
     # Print a beautiful test results header
-    print(
-        f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗{RESET}")
-    print(
-        f"{BRIGHT_CYAN}║                                              TEST RESULTS                                              ║{RESET}")
-    print(
-        f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝{RESET}\n")
+    box_width = 84  # Width for the results box
+    print(f"\n{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
+    print(f"{BRIGHT_CYAN}║{' ' * ((box_width - 12) // 2)}TEST RESULTS{' ' * ((box_width - 12 + 1) // 2)}║{RESET}")
+    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}\n")
 
     # Print a table of test results
     print_table(
@@ -280,7 +299,6 @@ def report_results(tests: List[TestBase]):
     )
     # Generate a brief summary of the results
     generate_summary(tests)
-
 
 def generate_footer_row(tests: List[TestBase]):
     """
@@ -318,7 +336,6 @@ def generate_footer_row(tests: List[TestBase]):
         ),
     ]
 
-
 def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80):
     """
     Generate and print a summary of the test results.
@@ -351,12 +368,10 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     resilient_tests_percentage = resilient_tests_count / total_tests_count * 100 if total_tests_count > 0 else 0
 
     # Print a beautiful summary header
-    print(
-        f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗{RESET}")
-    print(
-        f"{BRIGHT_CYAN}║                                              SUMMARY                                                  ║{RESET}")
-    print(
-        f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝{RESET}\n")
+    box_width = 84  # Same width as results box for consistency
+    print(f"\n{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
+    print(f"{BRIGHT_CYAN}║{' ' * ((box_width - 7) // 2)}SUMMARY{' ' * ((box_width - 7 + 1) // 2)}║{RESET}")
+    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}\n")
 
     # Displaying the percentage of successfully passed tests
     print(
@@ -366,7 +381,6 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     # If there are failed tests, list them
     if resilient_tests_count < total_tests_count:
         print(f"Your Model {BRIGHT_RED}failed{RESET} the following tests:\n{RED}{failed_tests}{RESET}\n")
-
 
 def setup_models_and_tests(
     attack_model: ClientBase,

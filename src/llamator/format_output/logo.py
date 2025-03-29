@@ -1,45 +1,49 @@
+"""
+Печатает логотип LLAMATOR с цветным градиентом.
+"""
+
 import colorama
+from colorama import Style, Fore, init
+from .draw_utils import get_top_border, get_bottom_border, get_empty_line, format_box_line, strip_ansi, format_centered_line
 
-RESET = colorama.Style.RESET_ALL
-DIM_WHITE = colorama.Style.DIM + colorama.Fore.WHITE
-LIGHT_MAGENTA = colorama.Fore.LIGHTMAGENTA_EX
-MAGENTA = colorama.Fore.MAGENTA
-BRIGHT = colorama.Style.BRIGHT
-BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
-CYAN = colorama.Fore.CYAN
-BRIGHT_BLUE = colorama.Fore.BLUE + colorama.Style.BRIGHT
-
+init()
 
 def print_logo() -> None:
     """
     Prints a colorful LLAMATOR logo to the console.
     """
     # Create a gradient effect for the logo
-    L1 = f"{BRIGHT_CYAN}__    {CYAN}__    {BRIGHT_CYAN}___    {CYAN}__  {BRIGHT_CYAN}______  {CYAN}__________ {BRIGHT_CYAN} ____"
-    L2 = f"{BRIGHT_CYAN}/ /   {CYAN}/ /   {BRIGHT_CYAN}/   |  {CYAN}/  |{BRIGHT_CYAN}/  /   |{CYAN}/_  __/ __ \\{BRIGHT_CYAN}/ __ \\"
-    L3 = f"{BRIGHT_CYAN}/ /   {CYAN}/ /   {BRIGHT_CYAN}/ /| | {CYAN}/ /|{BRIGHT_CYAN}_/ / /| | {CYAN}/ / / / / {BRIGHT_CYAN}/ /_/ /"
-    L4 = f"{BRIGHT_CYAN}/ /{CYAN}___/ /{BRIGHT_CYAN}___/ {CYAN}___ |/ /  / / {BRIGHT_CYAN}___ |/ / {CYAN}/ /_/ / {BRIGHT_CYAN}_, _/"
-    L5 = f"{BRIGHT_CYAN}/_{CYAN}____/_{BRIGHT_CYAN}____/{CYAN}_/  |_/_/  /_/{BRIGHT_CYAN}_/  |_/_/  {CYAN}\\____/{BRIGHT_CYAN}_/ |_|"
-
+    logo_lines = [
+        "__    __    ___    __  ______  __________  ____",
+        "/ /   / /   /   |  /  |/  /   |/_  __/ __ \\/ __ \\",
+        "/ /   / /   / /| | / /|_/ / /| | / / / / / / /_/ /",
+        "/ /___/ /___/ ___ |/ /  / / ___ |/ / / /_/ / _, _/",
+        "/_____/_____/_/  |_/_/  /_/_/  |_/_/  \\____/_/ |_|"
+    ]
+    colored_logo_lines = []
+    for line in logo_lines:
+        colored_line = ""
+        for i, char in enumerate(line):
+            # Create a gradient effect by alternating colors
+            if i % 10 < 5:
+                colored_line += f"{Fore.CYAN + Style.BRIGHT}{char}{Style.RESET_ALL}"
+            else:
+                colored_line += f"{Fore.CYAN}{char}{Style.RESET_ALL}"
+        colored_logo_lines.append(colored_line)
     # Version tag
-    version_line = f"{DIM_WHITE}v2.3.1{RESET}"
-
-    # Subtitle with a different color
-    subtitle = f"{BRIGHT}{LIGHT_MAGENTA}LLM Attack & Monitoring Assistant for Testing Operational Resilience{RESET}"
-
-    # Border for the logo to make it stand out more
-    top_border = f"{BRIGHT_BLUE}╔{'═' * 68}╗{RESET}"
-    bottom_border = f"{BRIGHT_BLUE}╚{'═' * 68}╝{RESET}"
-
-    # Print everything with spacing for better appearance
-    print(f"\n{top_border}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {L1}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {L2}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {L3}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {L4}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {L5}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {' ' * 66}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {subtitle:^66}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{BRIGHT_BLUE}║{RESET}  {' ' * 56}{version_line:>10}  {BRIGHT_BLUE}║{RESET}")
-    print(f"{bottom_border}")
+    version_line = f"{Style.DIM}v2.3.1{Style.RESET_ALL}"
+    # Вычисляем максимальную длину строки без ANSI кодов
+    inner_content_max = max(max(len(strip_ansi(line)) for line in colored_logo_lines), len("v2.3.1"))
+    # Общая ширина рамки = максимальная длина + 4 (по 1 пробелу слева и справа и границы)
+    box_width = inner_content_max + 4
+    print("\n" + get_top_border(box_width))
+    for line in colored_logo_lines:
+        print(format_box_line(line, box_width))
+    print(get_empty_line(box_width))
+    # Выравнивание версии по правому краю
+    inner_width = box_width - 4
+    version_padding = inner_width - len("v2.3.1")
+    version_line_formatted = f"{' ' * version_padding}{version_line}"
+    print(format_box_line(version_line_formatted, box_width))
+    print(get_bottom_border(box_width))
     print()

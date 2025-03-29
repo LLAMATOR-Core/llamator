@@ -72,6 +72,7 @@ class WorkProgressPool:
             for worker_id in range(self.num_workers)
         ]
         # Remove the queue_progress_bar as we don't want to display overall progress
+        self.tasks_count = None
         self.semaphore = threading.Semaphore(
             self.num_workers
         )  # Used to ensure that at most this number of tasks are immediately pending waiting for free worker slot
@@ -107,7 +108,7 @@ class WorkProgressPool:
     def run(self, tasks, tasks_count=None):
         self.tasks_count = tasks_count
 
-        # We've removed the queue_progress_bar setup and update
+        # We don't initialize or update queue_progress_bar anymore
 
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             # Pass each worker its own progress bar reference
