@@ -81,7 +81,7 @@ def get_basic_tests_params_example() -> str:
     return example
 
 
-def get_preset_tests_params_example(preset_name: Literal["all", "standard"]) -> str:
+def get_preset_tests_params_example(preset_name: Literal["all", "standard"] = "all") -> str:
     """
     Generate example code for configuring basic_tests_params based on a preset configuration.
     If preset_name is "all", returns configuration for all tests (as in get_basic_tests_params_example).
