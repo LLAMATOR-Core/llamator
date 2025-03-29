@@ -146,27 +146,15 @@ def start_testing(
         logging.error("One or more custom tests failed validation.")
         return
 
-    if enable_reports:
-        # Running tests with the specified parameters
-        setup_models_and_tests(
-            attack_model=attack_model,
-            judge_model=judge_model,
-            tested_model=tested_model,
-            num_threads=num_threads,
-            basic_tests_params=basic_tests_params,
-            custom_tests_params=custom_tests_params,
-            artifacts_path=artifacts_run_path,
-        )
-    else:
-        setup_models_and_tests(
-            attack_model=attack_model,
-            judge_model=judge_model,
-            tested_model=tested_model,
-            num_threads=num_threads,
-            basic_tests_params=basic_tests_params,
-            custom_tests_params=custom_tests_params,
-            artifacts_path=None,
-        )
+    setup_models_and_tests(
+        attack_model=attack_model,
+        judge_model=judge_model,
+        tested_model=tested_model,
+        num_threads=num_threads,
+        basic_tests_params=basic_tests_params,
+        custom_tests_params=custom_tests_params,
+        artifacts_path=artifacts_run_path if enable_reports else None,
+    )
 
     logging.info("Completion of testing")
 
