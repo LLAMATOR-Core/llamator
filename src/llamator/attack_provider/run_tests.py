@@ -97,15 +97,6 @@ class TestTask:
                 f"BUG: Test {self.test.info['code_name']} returned an unexpected result: {result}. Please fix the test run() function!"
             )
 
-def simpleProgressBar(progress, total, color, bar_length=50):
-    """Generate printable progress bar"""
-    if total > 0:
-        filled_length = int(round(bar_length * progress / float(total)))
-        bar = "█" * filled_length + "-" * (bar_length - filled_length)
-        return f"[{color}{bar}{RESET}] {progress}/{total}"
-    else:
-        return "[]"
-
 def isResilient(test_status: TestStatus):
     """Define test as passed if there were no errors or failures during test run"""
     return test_status.breach_count == 0 and test_status.error_count == 0
@@ -217,40 +208,37 @@ def report_results(tests: List[TestBase]):
     VULNERABLE = f"{RED}✘{RESET}"
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
+    # Define desired column widths for Attack Type and Strength
+    ATTACK_TYPE_WIDTH = 30
+    STRENGTH_WIDTH = 20
+
     # Print a beautiful test results header using helper function
     from llamator.format_output.output_helpers import print_test_results_header
     print_test_results_header(84)
 
-    # Print a table of test results
-    print_table(
-        title=None,  # We've already printed a more beautiful header
-        headers=[
-            "",
-            "Attack Type",
-            "Broken",
-            "Resilient",
-            "Errors",
-            "Strength",
-        ],
-        data=sorted(
+    # Подготавливаем строки данных без форматирования – все вычисления и выравнивания выполняются в results_table
+    rows = sorted(
+        [
             [
-                [
-                    ERROR if test.status.error_count > 0 else RESILIENT if isResilient(test.status) else VULNERABLE,
-                    f"{test.info['code_name'] + ' ':.<{50}}",
-                    test.status.breach_count,
-                    test.status.resilient_count,
-                    test.status.error_count,
-                    simpleProgressBar(
-                        test.status.resilient_count,
-                        test.status.total_count,
-                        GREEN if isResilient(test.status) else RED,
-                    ),
-                ]
-                for test in tests
-            ],
-            key=lambda x: x[1],
-        ),
+                ERROR if test.status.error_count > 0 else RESILIENT if isResilient(test.status) else VULNERABLE,
+                test.info["code_name"],
+                test.status.breach_count,
+                test.status.resilient_count,
+                test.status.error_count,
+                (test.status.resilient_count, test.status.total_count, isResilient(test.status))
+            ]
+            for test in tests
+        ],
+        key=lambda x: x[1],
+    )
+
+    print_table(
+        title=None,
+        headers=["", "Attack Type", "Broken", "Resilient", "Errors", "Strength"],
+        data=rows,
         footer_row=generate_footer_row(tests),
+        attack_type_width=ATTACK_TYPE_WIDTH,
+        strength_width=STRENGTH_WIDTH
     )
     # Generate a brief summary of the results
     generate_summary(tests)
@@ -273,22 +261,15 @@ def generate_footer_row(tests: List[TestBase]):
     VULNERABLE = f"{RED}✘{RESET}"
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
-    # Generate the final row for the test results table
     return [
-        ERROR
-        if all(test.status.error_count > 0 for test in tests)
-        else RESILIENT
-        if all(isResilient(test.status) for test in tests)
+        ERROR if all(test.status.error_count > 0 for test in tests)
+        else RESILIENT if all(isResilient(test.status) for test in tests)
         else VULNERABLE,
         f"{'Total (# tests): ':.<50}",
         sum(not isResilient(test.status) for test in tests),
         sum(isResilient(test.status) for test in tests),
         sum(test.status.error_count > 0 for test in tests),
-        simpleProgressBar(
-            sum(isResilient(test.status) for test in tests),
-            len(tests),
-            GREEN if all(isResilient(test.status) for test in tests) else RED,
-        ),
+        (sum(isResilient(test.status) for test in tests), len(tests), all(isResilient(test.status) for test in tests))
     ]
 
 def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80):
@@ -311,25 +292,18 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     print_summary_header(84)
     resilient_tests_count = sum(isResilient(test.status) for test in tests)
 
-    # Preparing descriptions with line breaks of the specified length
     failed_tests_list = []
     for test in tests:
         if not isResilient(test.status):
-            description = " ".join(test.test_description.split())  # Remove extra spaces
+            description = " ".join(test.test_description.split())
             wrapped_description = "\n    ".join(textwrap.wrap(description, width=max_line_length))
             failed_tests_list.append(f"{test.info['code_name']}:\n    {wrapped_description}")
 
     failed_tests = "\n".join(failed_tests_list)
-
     total_tests_count = len(tests)
     resilient_tests_percentage = resilient_tests_count / total_tests_count * 100 if total_tests_count > 0 else 0
 
-    # Displaying the percentage of successfully passed tests
-    print(
-        f"Your Model passed {int(resilient_tests_percentage)}% ({resilient_tests_count} out of {total_tests_count}) of attack simulations.\n"
-    )
-
-    # If there are failed tests, list them
+    print(f"Your Model passed {int(resilient_tests_percentage)}% ({resilient_tests_count} out of {total_tests_count}) of attack simulations.\n")
     if resilient_tests_count < total_tests_count:
         print(f"Your Model {BRIGHT_RED}failed{RESET} the following tests:\n{RED}{failed_tests}{RESET}\n")
 

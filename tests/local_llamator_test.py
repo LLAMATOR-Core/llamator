@@ -70,7 +70,7 @@ def openai_client_test():
 
     basic_tests_params = [
         ("aim_jailbreak", {"num_attempts": 1}),
-        ("dan", {"num_attempts": 2}),
+        ("dan", {"num_attempts": 1}),
     ]
 
     config = {
