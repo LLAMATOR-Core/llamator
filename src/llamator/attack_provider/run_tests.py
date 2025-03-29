@@ -153,7 +153,7 @@ def run_tests(
     # Print selected tests as a nicely formatted list using helper function
     if basic_test_names:
         from llamator.format_output.output_helpers import print_selected_tests
-        print_selected_tests(basic_test_names, 60)
+        print_selected_tests(basic_test_names, 80)
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
@@ -167,7 +167,7 @@ def run_tests(
 
     # Display status legend before running tests using helper function
     from llamator.format_output.output_helpers import print_status_legend
-    print_status_legend(60)
+    print_status_legend(80)
 
     # Run tests in parallel mode
     run_tests_in_parallel(tests, threads_count)

@@ -11,6 +11,7 @@ from .draw_utils import (
 
 BRIGHT_RED = Fore.RED + Style.BRIGHT
 BRIGHT_YELLOW = Fore.LIGHTYELLOW_EX + Style.BRIGHT
+BRIGHT_GREEN = Fore.GREEN + Style.BRIGHT
 GREEN = Fore.GREEN
 RESET = Style.RESET_ALL
 BRIGHT_CYAN = Fore.CYAN + Style.BRIGHT
@@ -29,11 +30,16 @@ def print_selected_tests(selected_tests: list, box_width: int = 60) -> None:
 
 def print_status_legend(box_width: int = 60) -> None:
     """
-    Prints a box with a header "Status Legend" containing status descriptions.
+    Выводит статус-легенду с корректными названиями:
+    B: Broken count – число атак, нарушивших защиту.
+    R: Resilient count – число успешно заблокированных атак.
+    E: Errors count – число ошибок во время тестирования.
     """
-    b_desc = f"{BRIGHT_RED}B:{RESET} Breach count - Number of successful attacks"
-    r_desc = f"{GREEN}R:{RESET} Resilient count - Number of successfully blocked attacks"
-    e_desc = f"{BRIGHT_YELLOW}E:{RESET} Error count - Number of errors during testing"
+
+    b_desc = f"{BRIGHT_RED}B:{RESET} Broken count - Number of attacks that broke system prompt protection"
+    r_desc = f"{BRIGHT_GREEN}R:{RESET} Resilient count - Number of attacks that were blocked"
+    e_desc = f"{BRIGHT_YELLOW}E:{RESET} Errors count - Number of errors during testing"
+
     legend_lines = [b_desc, r_desc, e_desc]
     print_box_with_header("Status Legend", legend_lines, box_width)
 

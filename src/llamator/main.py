@@ -1,7 +1,6 @@
 import logging
 import os
 from datetime import datetime
-from logging.handlers import RotatingFileHandler
 from typing import Dict, List, Optional, Tuple, Type
 
 import colorama
@@ -15,9 +14,7 @@ from .format_output.logo import print_logo
 from .format_output.draw_utils import (
     get_top_border,
     get_bottom_border,
-    format_box_line,
     format_centered_line,
-    get_separator_line
 )
 from .initial_validation import (
     validate_artifacts_path,
@@ -41,6 +38,74 @@ BRIGHT = Style.BRIGHT
 BRIGHT_CYAN = Fore.CYAN + Style.BRIGHT
 BRIGHT_RED = Fore.RED + Style.BRIGHT
 BRIGHT_GREEN = Fore.GREEN + Style.BRIGHT
+
+
+def validate_models_and_tests(
+    attack_model: ClientBase,
+    judge_model: Optional[ClientBase],
+    tested_model: ClientBase,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]],
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]]
+) -> bool:
+    """
+    Выполняет валидацию моделей и списка тестов.
+
+    Parameters
+    ----------
+    attack_model : ClientBase
+        Модель атаки.
+    judge_model : ClientBase, optional
+        Модель для оценки.
+    tested_model : ClientBase
+        Тестируемая модель.
+    basic_tests_params : List[Tuple[str, dict]], optional
+        Список базовых тестов с параметрами.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        Список кастомных тестов с параметрами.
+
+    Returns
+    -------
+    bool
+        True, если все проверки прошли успешно, иначе False.
+    """
+    print(f"{BRIGHT_CYAN}Validating models...{RESET}")
+    if not validate_model(attack_model):
+        print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
+        return False
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Attack model validated successfully.")
+
+    if judge_model is not None:
+        if not validate_model(judge_model):
+            print(f"{BRIGHT_RED}✘{RESET} Judge model failed validation.")
+            return False
+        else:
+            print(f"{BRIGHT_GREEN}✓{RESET} Judge model validated successfully.")
+    else:
+        print(f"{BRIGHT_CYAN}ℹ{RESET} No judge model specified.")
+
+    if not validate_model(tested_model):
+        print(f"{BRIGHT_RED}✘{RESET} Tested model failed validation.")
+        return False
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
+
+    if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
+        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid values.")
+        return False
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Test list validated successfully.")
+
+    if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
+        print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
+        return False
+    elif custom_tests_params:
+        print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
+
+    print("\n")
+
+    return True
+
 
 def start_testing(
     attack_model: ClientBase,
@@ -129,50 +194,15 @@ def start_testing(
         print(f"{BRIGHT_CYAN}ℹ{RESET} Logging has been set up with debug level: {debug_level}")
 
     # Program logo output
-    print_logo()
+    print_logo(box_width=80)
 
     # Print configuration summary using helper function from format_output
     from llamator.format_output.output_helpers import print_testing_configuration
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 60)
 
-    # Validate attack model
-    print(f"{BRIGHT_CYAN}Validating models...{RESET}")
-    if not validate_model(attack_model):
-        print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
+    # Выполнение валидации моделей и тестов
+    if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests_params, custom_tests_params):
         return
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Attack model validated successfully.")
-
-    # Validate judge model only if it is not None
-    if judge_model is not None:
-        if not validate_model(judge_model):
-            print(f"{BRIGHT_RED}✘{RESET} Judge model failed validation.")
-            return
-        else:
-            print(f"{BRIGHT_GREEN}✓{RESET} Judge model validated successfully.")
-    else:
-        print(f"{BRIGHT_CYAN}ℹ{RESET} No judge model specified.")
-
-    # Validate tested model
-    if not validate_model(tested_model):
-        print(f"{BRIGHT_RED}✘{RESET} Tested model failed validation.")
-        return
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
-
-    # Validate the test list
-    if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
-        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid values.")
-        return
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Test list validated successfully.")
-
-    # Validate custom tests
-    if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
-        print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
-        return
-    elif custom_tests_params:
-        print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
 
     setup_models_and_tests(
         attack_model=attack_model,
@@ -211,7 +241,7 @@ def start_testing(
         )
 
     # Final message with a properly aligned decorative border
-    box_width = 60  # Fixed total width for consistency
+    box_width = 80  # Fixed total width for consistency
     print(get_top_border(box_width))
     thank_you_text = "Thank you for using LLAMATOR!"
     print(format_centered_line(thank_you_text, box_width))
