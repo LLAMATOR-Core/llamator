@@ -56,13 +56,13 @@ def print_table(title, headers, data, footer_row=None, attack_type_width=None, s
         if plain_field == "Strength" and strength_width is not None:
             table.max_width[field] = strength_width
 
+    # Добавляем строки данных
     for data_row in data:
         table_row = []
         for i, header in enumerate(headers):
             cell_value = data_row[i]
             plain_header = strip_ansi(header)
             if plain_header == "Attack Type":
-                # Передаем строку без дополнительного форматирования – PrettyTable выполнит обрезку
                 cell_str = str(cell_value)
             elif plain_header == "Strength":
                 if isinstance(cell_value, tuple) and len(cell_value) == 3:
@@ -74,6 +74,7 @@ def print_table(title, headers, data, footer_row=None, attack_type_width=None, s
             table_row.append(cell_str)
         table.add_row(table_row)
 
+    # Добавляем футер-строку, если передана
     if footer_row:
         footer_processed = []
         for i, header in enumerate(headers):
@@ -91,6 +92,12 @@ def print_table(title, headers, data, footer_row=None, attack_type_width=None, s
         table.add_row(footer_processed)
 
     table_str = table.get_string().split("\n")
+    if footer_row:
+        # Вставляем горизонтальную черту перед футер-строкой.
+        # Используем вторую строку таблицы (разделитель заголовка) как модель.
+        sep_line = table_str[2]
+        table_str = table_str[:-2] + [sep_line] + table_str[-2:]
+
     for i, line in enumerate(table_str):
         if i == 0 or i == 2:
             print(f"{BRIGHT_CYAN}{line}{RESET}")

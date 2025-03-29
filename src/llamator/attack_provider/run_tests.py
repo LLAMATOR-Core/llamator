@@ -1,7 +1,5 @@
 import textwrap
-import logging
-import os
-from typing import List, Tuple, Type, Optional, Dict
+from typing import List, Tuple, Type
 
 import colorama
 from pydantic import ValidationError
@@ -14,7 +12,6 @@ from ..client.chat_client import *
 from ..client.client_config import ClientConfig
 from ..client.judge_config import JudgeConfig
 from ..format_output.results_table import print_table
-from ..format_output.draw_utils import print_box_with_header
 from .test_base import StatusUpdate, TestBase, TestStatus
 
 logger = logging.getLogger(__name__)
@@ -26,6 +23,10 @@ BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
 RED = colorama.Fore.RED
 GREEN = colorama.Fore.GREEN
 BRIGHT_YELLOW = colorama.Fore.LIGHTYELLOW_EX + colorama.Style.BRIGHT
+
+# Define desired column widths for Attack Type and Strength
+ATTACK_TYPE_WIDTH = 25
+STRENGTH_WIDTH = 20
 
 class TestTask:
     """
@@ -208,13 +209,8 @@ def report_results(tests: List[TestBase]):
     VULNERABLE = f"{RED}✘{RESET}"
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
-    # Define desired column widths for Attack Type and Strength
-    ATTACK_TYPE_WIDTH = 30
-    STRENGTH_WIDTH = 20
-
-    # Print a beautiful test results header using helper function
     from llamator.format_output.output_helpers import print_test_results_header
-    print_test_results_header(84)
+    print_test_results_header(80)
 
     # Подготавливаем строки данных без форматирования – все вычисления и выравнивания выполняются в results_table
     rows = sorted(
@@ -236,14 +232,13 @@ def report_results(tests: List[TestBase]):
         title=None,
         headers=["", "Attack Type", "Broken", "Resilient", "Errors", "Strength"],
         data=rows,
-        footer_row=generate_footer_row(tests),
+        footer_row=generate_footer_row(tests, ATTACK_TYPE_WIDTH),
         attack_type_width=ATTACK_TYPE_WIDTH,
         strength_width=STRENGTH_WIDTH
     )
-    # Generate a brief summary of the results
     generate_summary(tests)
 
-def generate_footer_row(tests: List[TestBase]):
+def generate_footer_row(tests: List[TestBase], attack_type_width: int):
     """
     Generate the footer row for the test results table.
 
@@ -251,6 +246,8 @@ def generate_footer_row(tests: List[TestBase]):
     ----------
     tests : List[TestBase]
         A list of test instances that have been executed.
+    attack_type_width : int
+        The maximum width for the 'Attack Type' column.
 
     Returns
     -------
@@ -265,7 +262,7 @@ def generate_footer_row(tests: List[TestBase]):
         ERROR if all(test.status.error_count > 0 for test in tests)
         else RESILIENT if all(isResilient(test.status) for test in tests)
         else VULNERABLE,
-        f"{'Total (# tests): ':.<50}",
+        f"{'Total (# tests): ':.<{attack_type_width}}",
         sum(not isResilient(test.status) for test in tests),
         sum(isResilient(test.status) for test in tests),
         sum(test.status.error_count > 0 for test in tests),
@@ -280,7 +277,6 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     ----------
     tests : List[TestBase]
         A list of test instances that have been executed.
-
     max_line_length : int, optional
         The maximum length of a line before wrapping, by default 80.
 
@@ -289,7 +285,7 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     None
     """
     from llamator.format_output.output_helpers import print_summary_header
-    print_summary_header(84)
+    print_summary_header(80)
     resilient_tests_count = sum(isResilient(test.status) for test in tests)
 
     failed_tests_list = []
