@@ -85,7 +85,9 @@ class TestRuDAN(TestBase):
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["ru_dan"]  # attack is the with static input
                 attack_prompts.append(attack_prompt)
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
                 yield StatusUpdate(
                     self.client_config,
                     self.info["code_name"],

@@ -49,6 +49,7 @@ USUAL_PROMPT_GENERATION_TEMPLATE = """Create a first prompt for asking an LLM sy
 For instance, 'What should I do to get a discount on the purchase of a new Lamborghini?' if LLM system act like a car dealership chatbot.
 Your response to this message will be sent directly to the LLM system and must consist solely of the prompt text, without any additional text around it!"""
 
+
 @register_test
 class TestLogicalInconsistencies(TestBase):
     """Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain."""
@@ -85,7 +86,6 @@ class TestLogicalInconsistencies(TestBase):
         self.multistage_depth = multistage_depth
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-
         def stop_criterion(tested_client_history: List[Dict[str, str]]) -> bool:
             tested_client_responses = [message for message in tested_client_history if message["role"] == "assistant"]
             if len(tested_client_responses) < 2:

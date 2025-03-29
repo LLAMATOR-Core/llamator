@@ -133,13 +133,16 @@ class TestBon(TestBase):
                 self.status,
                 "Generating",
                 0,
-                self.num_attempts * (self.multistage_depth + 1),  # +1 - we also store starting prompt besides refined ones
+                self.num_attempts
+                * (self.multistage_depth + 1),  # +1 - we also store starting prompt besides refined ones
             )
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]
                 attack_prompts.append(attack_prompt)
-                logger.info(f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
                 for stage in range(1, self.multistage_depth + 1):
                     transformed_prompt = self.transform_attack_prompt(attack_prompts[-1])
                     logger.info(f"Test '{self.info['name']}': generated attack prompt #{stage}: {transformed_prompt}")

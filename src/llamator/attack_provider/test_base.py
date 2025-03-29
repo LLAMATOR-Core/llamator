@@ -149,7 +149,9 @@ class TestBase(ABC):
             df.to_csv(csv_path, index=False)
             logging.info(f"{self.info['name']} attack report saved to {csv_path}")
 
-    def handle_exception(self, e: Exception, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> StatusUpdate:
+    def handle_exception(
+        self, e: Exception, attack_prompts: list[str], responses: list[str], statuses: list[str]
+    ) -> StatusUpdate:
         """
         Обрабатывает исключение, регистрируя оставшиеся попытки как ошибки, записывает информацию об ошибке,
         подготавливает данные для отчета и возвращает финальный статус теста.

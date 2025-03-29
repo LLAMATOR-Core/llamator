@@ -13,6 +13,7 @@ from ..client.client_config import ClientConfig
 
 logger = logging.getLogger(__name__)
 
+
 @register_test
 class TestPastTense(TestBase):
     """Challenges the LLM with a dataset of harmful behavior prompts in past tense form."""
@@ -71,7 +72,9 @@ class TestPastTense(TestBase):
                 )
 
             # Lists to store prompts, responses, and statuses for report generation
-            yield StatusUpdate(self.client_config, self.info["code_name"], self.status, "Attacking", 0, self.num_attempts)
+            yield StatusUpdate(
+                self.client_config, self.info["code_name"], self.status, "Attacking", 0, self.num_attempts
+            )
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]

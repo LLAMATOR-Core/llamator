@@ -99,7 +99,9 @@ class TestAIM(TestBase):
                     attack_task=attack_task
                 )  # Frame the task in the attack prompt template
                 attack_prompts.append(attack_prompt)
-                logger.info(f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}")
+                logger.info(
+                    f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
+                )
 
             # Run the attack by sending the prompts and verifying the responses
             yield StatusUpdate(
