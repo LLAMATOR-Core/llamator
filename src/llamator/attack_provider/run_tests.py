@@ -1,5 +1,6 @@
+import logging
 import textwrap
-from typing import Tuple, Type
+from typing import Dict, Generator, List, Optional, Tuple, Type
 
 import colorama
 from pydantic import ValidationError
@@ -9,6 +10,7 @@ from ..attack_provider.work_progress_pool import ProgressWorker, ThreadSafeTaskI
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import *
 from ..client.client_config import ClientConfig
+from ..client.judge_config import JudgeConfig
 from ..format_output.results_table import print_table
 from .attack_loader import *  # noqa
 
@@ -90,7 +92,7 @@ class TestTask:
         # Handle invalid test results
         else:
             raise RuntimeError(
-                f"BUG: Test {self.test.test_name} returned an unexpected result: {result}. Please fix the test run() function!"
+                f"BUG: Test {self.test.info['code_name']} returned an unexpected result: {result}. Please fix the test run() function!"
             )
 
 
@@ -112,11 +114,11 @@ def isResilient(test_status: TestStatus):
 def run_tests(
     client_config: ClientConfig,
     attack_config: AttackConfig,
+    judge_config: Optional[JudgeConfig],
     threads_count: int,
-    basic_tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
-    multistage_depth: Optional[int] = 20,
 ):
     """
     Run the tests on the given client and attack configurations.
@@ -127,18 +129,18 @@ def run_tests(
         The configuration for the tested model.
     attack_config : AttackConfig
         The configuration for the attack model.
+    judge_config : JudgeConfig, optional
+        The configuration for the judge model.
     threads_count : int
         The number of threads to use for parallel testing.
-    basic_tests_with_attempts : List[Tuple[str, int]], optional
-        A list where each element is a list consisting of a basic test name and the number of attempts
-        to be executed (default is None).
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        A list where each element is a list consisting of a custom test instance and the number of attempts
-        to be executed (default is None).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        A list of basic test names and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        A list of custom test classes and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved.
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
 
     Returns
     -------
@@ -148,17 +150,17 @@ def run_tests(
 
     logger.debug("Initializing tests...")
     # Extract the test names from the list
-    basic_test_names = [test[0] for test in basic_tests_with_attempts] if basic_tests_with_attempts else []
+    basic_test_names = [test[0] for test in basic_tests_params] if basic_tests_params else []
     logger.debug(f"List of basic tests: {basic_test_names}")
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
-        client_config,
-        attack_config,
-        basic_tests_with_attempts=basic_tests_with_attempts,
-        custom_tests_with_attempts=custom_tests_with_attempts,
+        client_config=client_config,
+        attack_config=attack_config,
+        judge_config=judge_config,
+        basic_tests_params=basic_tests_params,
+        custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
-        multistage_depth=multistage_depth,
     )
 
     # Run tests in parallel mode
@@ -226,7 +228,7 @@ def report_results(tests: List[TestBase]):
             [
                 [
                     ERROR if test.status.error_count > 0 else RESILIENT if isResilient(test.status) else VULNERABLE,
-                    f"{test.test_name + ' ':.<{50}}",
+                    f"{test.info['code_name'] + ' ':.<{50}}",
                     test.status.breach_count,
                     test.status.resilient_count,
                     test.status.error_count,
@@ -307,7 +309,7 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
         if not isResilient(test.status):
             description = " ".join(test.test_description.split())  # Remove extra spaces
             wrapped_description = "\n    ".join(textwrap.wrap(description, width=max_line_length))
-            failed_tests_list.append(f"{test.test_name}:\n    {wrapped_description}")
+            failed_tests_list.append(f"{test.info['code_name']}:\n    {wrapped_description}")
 
     failed_tests = "\n".join(failed_tests_list)
 
@@ -326,12 +328,12 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
 
 def setup_models_and_tests(
     attack_model: ClientBase,
+    judge_model: Optional[ClientBase],
     tested_model: ClientBase,
     num_threads: Optional[int] = 1,
-    tests_with_attempts: Optional[List[Tuple[str, int]]] = None,
-    custom_tests_with_attempts: Optional[List[Tuple[Type[TestBase], int]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
     artifacts_path: Optional[str] = None,
-    multistage_depth: Optional[int] = 20,
 ):
     """
     Set up and validate the models, then run the tests.
@@ -340,20 +342,20 @@ def setup_models_and_tests(
     ----------
     attack_model : ClientBase
         The model that will be used to perform the attacks.
+    judge_model : ClientBase, optional
+        The model that will be used to judge test results.
     tested_model : ClientBase
         The model that will be tested for vulnerabilities.
     num_threads : int, optional
         The number of threads to use for parallel testing (default is 1).
-    tests_with_attempts : List[Tuple[str, int]], optional
-        A list where each element is a list consisting of a basic test name and the number of attempts
-        to be executed (default is None).
-    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional
-        A list where each element is a list consisting of a custom test instance and the number of attempts
-        to be executed (default is None).
+    basic_tests_params : List[Tuple[str, dict]], optional
+        A list of basic test names and parameter dictionaries (default is None).
+        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+        A list where each element is a list consisting of a custom test class and a parameter dictionary
+        (default is None).
     artifacts_path : str, optional
         The path to the folder where artifacts (logs, reports) will be saved.
-    multistage_depth : int, optional
-        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).
 
     Returns
     -------
@@ -373,13 +375,23 @@ def setup_models_and_tests(
         logger.warning(f"Error accessing the Attack Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
         return
 
+    # Judge model setup (если judge_model не None)
+    if judge_model is not None:
+        try:
+            judge_config = JudgeConfig(judge_client=ClientConfig(judge_model))
+        except (ModuleNotFoundError, ValidationError) as e:
+            logger.warning(f"Error accessing the Judge Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
+            return
+    else:
+        judge_config = None
+
     # Run tests
     run_tests(
-        client_config,
-        attack_config,
+        client_config=client_config,
+        attack_config=attack_config,
+        judge_config=judge_config,
         threads_count=num_threads,
-        basic_tests_with_attempts=tests_with_attempts,
-        custom_tests_with_attempts=custom_tests_with_attempts,
+        basic_tests_params=basic_tests_params,
+        custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
-        multistage_depth=multistage_depth,
     )

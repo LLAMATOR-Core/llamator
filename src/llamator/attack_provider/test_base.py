@@ -1,5 +1,9 @@
+import logging
+import os
 from abc import ABC, abstractmethod
 from typing import Generator, List, Optional
+
+import pandas as pd
 
 from ..client.attack_config import AttackConfig
 from ..client.client_config import ClientConfig
@@ -89,7 +93,16 @@ class TestBase(ABC):
     The test sends a sequence of prompts and evaluate the responses while updating the status.
     """
 
-    test_name: str = ("Test Name",)
+    info = {
+        "name": "Test Name",
+        "code_name": "test_name",
+        "tags": [],
+        "description": {
+            "en": "Description in english",
+            "ru": "Описание на русском",
+        },
+        "github_link": "",
+    }
 
     def __init__(
         self,
@@ -114,3 +127,59 @@ class TestBase(ABC):
         This method is iterable. It yields StatusUpdate objects to report progress.
         """
         pass
+
+    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
+        """
+        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
+
+        Args:
+            attack_prompts (list[str]): List of attack texts generated during the test.
+            responses (list[str]): List of responses from the target system.
+            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
+
+        Returns:
+            None
+        """
+        # Create a DataFrame from the lists
+        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
+
+        # Save the DataFrame as a CSV file to the artifacts path
+        if self.artifacts_path:
+            csv_path = os.path.join(self.artifacts_path, f"{self.info['code_name']}.csv")
+            df.to_csv(csv_path, index=False)
+            logging.info(f"{self.info['name']} attack report saved to {csv_path}")
+
+    def handle_exception(
+        self, e: Exception, attack_prompts: list[str], responses: list[str], statuses: list[str]
+    ) -> StatusUpdate:
+        """
+        Обрабатывает исключение, регистрируя оставшиеся попытки как ошибки, записывает информацию об ошибке,
+        подготавливает данные для отчета и возвращает финальный статус теста.
+
+        Parameters
+        ----------
+        e : Exception
+            Исключение, которое произошло.
+        attack_prompts : list[str]
+            Список сгенерированных атак.
+        responses : list[str]
+            Список ответов на атаки.
+        statuses : list[str]
+            Список статусов для каждой атаки.
+
+        Returns
+        -------
+        StatusUpdate
+            Финальное обновление статуса с информацией о завершении теста.
+        """
+        logging.exception(f"Exception occurred during test {self.info['name']} execution")
+        self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
+        self._prepare_attack_data(attack_prompts, responses, statuses)
+        return StatusUpdate(
+            self.client_config,
+            self.info["code_name"],
+            self.status,
+            "Finished",
+            self.num_attempts,
+            self.num_attempts,
+        )
