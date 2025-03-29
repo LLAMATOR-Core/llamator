@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import logging
 import os
 from datetime import datetime
@@ -31,6 +30,9 @@ colorama.init()
 # Defining constants for text reset and brightness
 RESET = colorama.Style.RESET_ALL
 BRIGHT = colorama.Style.BRIGHT
+BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
+BRIGHT_RED = colorama.Fore.RED + colorama.Style.BRIGHT
+BRIGHT_GREEN = colorama.Fore.GREEN + colorama.Style.BRIGHT
 
 
 def start_testing(
@@ -98,11 +100,11 @@ def start_testing(
         enable_logging = False
         enable_reports = False
         artifacts_run_path = None
-        print("Logging and reports have been disabled.")
+        print(f"{BRIGHT_CYAN}ℹ{RESET} Logging and reports have been disabled.")
     else:
         # Validate the artifacts path
         if not validate_artifacts_path(artifacts_path):
-            print("Invalid artifacts path.")
+            print(f"{BRIGHT_RED}✘{RESET} Invalid artifacts path.")
             return
         elif enable_reports is True or enable_logging is True:
             # Create a new folder named 'LLAMATOR_run_{start_timestamp}' inside artifacts_path
@@ -112,39 +114,64 @@ def start_testing(
 
             # Update artifacts_path to point to the new run folder
             artifacts_run_path = run_folder_path
+            print(f"{BRIGHT_CYAN}ℹ{RESET} Artifacts will be saved to: {artifacts_run_path}")
 
     # Setup logging if enabled
     if enable_logging:
         setup_logging(debug_level, artifacts_run_path)
+        print(f"{BRIGHT_CYAN}ℹ{RESET} Logging has been set up with debug level: {debug_level}")
 
     # Program logo output
     print_logo()
 
+    # Print configuration summary
+    print(f"{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════╗{RESET}")
+    print(f"{BRIGHT_CYAN}║                  Testing Configuration                   ║{RESET}")
+    print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════╣{RESET}")
+    print(f"{BRIGHT_CYAN}║{RESET} Number of threads: {num_threads:<36} {BRIGHT_CYAN}║{RESET}")
+    print(f"{BRIGHT_CYAN}║{RESET} Logging enabled: {str(enable_logging):<37} {BRIGHT_CYAN}║{RESET}")
+    print(f"{BRIGHT_CYAN}║{RESET} Reports enabled: {str(enable_reports):<36} {BRIGHT_CYAN}║{RESET}")
+    print(f"{BRIGHT_CYAN}║{RESET} Report language: {report_language:<37} {BRIGHT_CYAN}║{RESET}")
+    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════╝{RESET}\n")
+
     # Validate attack model
+    print(f"{BRIGHT_CYAN}Validating models...{RESET}")
     if not validate_model(attack_model):
-        logging.error("Attack model failed validation.")
+        print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
         return
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Attack model validated successfully.")
 
     # Validate judge model only if it is not None
     if judge_model is not None:
         if not validate_model(judge_model):
-            logging.error("Judge model failed validation.")
+            print(f"{BRIGHT_RED}✘{RESET} Judge model failed validation.")
             return
+        else:
+            print(f"{BRIGHT_GREEN}✓{RESET} Judge model validated successfully.")
+    else:
+        print(f"{BRIGHT_CYAN}ℹ{RESET} No judge model specified.")
 
     # Validate tested model
     if not validate_model(tested_model):
-        logging.error("Tested model failed validation.")
+        print(f"{BRIGHT_RED}✘{RESET} Tested model failed validation.")
         return
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
 
     # Validate the test list
     if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
-        logging.error("The test list contains invalid values.")
+        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid values.")
         return
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Test list validated successfully.")
 
     # Validate custom tests
     if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
-        logging.error("One or more custom tests failed validation.")
+        print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
         return
+    elif custom_tests_params:
+        print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
 
     setup_models_and_tests(
         attack_model=attack_model,
@@ -167,8 +194,10 @@ def start_testing(
         report_language = validate_language(report_language)
         csv_folder_name = "csv_report"
         print(
-            f"{BRIGHT}{colorama.Fore.RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language, reader discretion is recommended.{RESET}"
+            f"{BRIGHT_RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language, reader discretion is recommended.{RESET}"
         )
+
+        print(f"{BRIGHT_CYAN}Generating reports...{RESET}")
         create_attack_report_from_artifacts(
             artifacts_dir=artifacts_run_path, csv_folder_name=csv_folder_name, report_file_name="attacks_report.xlsx"
         )
@@ -179,5 +208,8 @@ def start_testing(
             language=report_language,
         )
 
-    print(f"{BRIGHT}{colorama.Fore.CYAN}Thank you for using LLAMATOR!{RESET}")
+    # Final message with a decorative border
+    print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════╗{RESET}")
+    print(f"{BRIGHT_CYAN}║               Thank you for using LLAMATOR!               ║{RESET}")
+    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════╝{RESET}")
     logging.shutdown()

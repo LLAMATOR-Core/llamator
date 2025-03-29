@@ -158,6 +158,15 @@ def run_tests(
     basic_test_names = [test[0] for test in basic_tests_params] if basic_tests_params else []
     logger.debug(f"List of basic tests: {basic_test_names}")
 
+    # Print selected tests as a nicely formatted list
+    if basic_test_names:
+        print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════╗{RESET}")
+        print(f"{BRIGHT_CYAN}║                     Selected Tests                          ║{RESET}")
+        print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════════╣{RESET}")
+        for i, test_name in enumerate(basic_test_names):
+            print(f"{BRIGHT_CYAN}║{RESET} {i + 1:2}. {test_name:<52} {BRIGHT_CYAN}║{RESET}")
+        print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════╝{RESET}\n")
+
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
         client_config=client_config,
@@ -167,6 +176,18 @@ def run_tests(
         custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
     )
+
+    # Display status legend before running tests
+    print(f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════╗{RESET}")
+    print(f"{BRIGHT_CYAN}║                     Status Legend                           ║{RESET}")
+    print(f"{BRIGHT_CYAN}╠══════════════════════════════════════════════════════════════╣{RESET}")
+    print(
+        f"{BRIGHT_CYAN}║{RESET} {BRIGHT_RED}B{RESET}: Breach count - Number of successful attacks           {BRIGHT_CYAN}║{RESET}")
+    print(
+        f"{BRIGHT_CYAN}║{RESET} {GREEN}R{RESET}: Resilient count - Number of successfully blocked attacks {BRIGHT_CYAN}║{RESET}")
+    print(
+        f"{BRIGHT_CYAN}║{RESET} {BRIGHT_YELLOW}E{RESET}: Error count - Number of errors during testing          {BRIGHT_CYAN}║{RESET}")
+    print(f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════╝{RESET}\n")
 
     # Run tests in parallel mode
     run_tests_in_parallel(tests, threads_count)
@@ -218,9 +239,17 @@ def report_results(tests: List[TestBase]):
     VULNERABLE = f"{RED}✘{RESET}"
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
+    # Print a beautiful test results header
+    print(
+        f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗{RESET}")
+    print(
+        f"{BRIGHT_CYAN}║                                              TEST RESULTS                                              ║{RESET}")
+    print(
+        f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝{RESET}\n")
+
     # Print a table of test results
     print_table(
-        title="Test results",
+        title=None,  # We've already printed a more beautiful header
         headers=[
             "",
             "Attack Type",
@@ -289,6 +318,7 @@ def generate_footer_row(tests: List[TestBase]):
         ),
     ]
 
+
 def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80):
     """
     Generate and print a summary of the test results.
@@ -319,6 +349,14 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
 
     total_tests_count = len(tests)
     resilient_tests_percentage = resilient_tests_count / total_tests_count * 100 if total_tests_count > 0 else 0
+
+    # Print a beautiful summary header
+    print(
+        f"\n{BRIGHT_CYAN}╔══════════════════════════════════════════════════════════════════════════════════════════════════════╗{RESET}")
+    print(
+        f"{BRIGHT_CYAN}║                                              SUMMARY                                                  ║{RESET}")
+    print(
+        f"{BRIGHT_CYAN}╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝{RESET}\n")
 
     # Displaying the percentage of successfully passed tests
     print(

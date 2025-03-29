@@ -71,7 +71,7 @@ class WorkProgressPool:
             ProgressWorker(worker_id, progress_bar=enable_per_test_progress_bars)
             for worker_id in range(self.num_workers)
         ]
-        self.queue_progress_bar = tqdm(total=1, desc=f"{colorama.Style.BRIGHT}{'Test progress ':.<54}{RESET}")
+        # Remove the queue_progress_bar as we don't want to display overall progress
         self.semaphore = threading.Semaphore(
             self.num_workers
         )  # Used to ensure that at most this number of tasks are immediately pending waiting for free worker slot
@@ -95,10 +95,6 @@ class WorkProgressPool:
                 raise
             finally:
                 self.semaphore.release()  # Release the worker slot (this is crucial to do always, even if task thrown an exception, otherwise deadlocks or hangs could occur)
-                if self.tasks_count:
-                    self.queue_progress_bar.n += 1
-                    self.queue_progress_bar.total = self.tasks_count
-                    self.queue_progress_bar.refresh()
         """
         # Setting progress bar to a state indicating it is free and doesn't do any task right now...
         with progress_bar.get_lock():
@@ -111,10 +107,7 @@ class WorkProgressPool:
     def run(self, tasks, tasks_count=None):
         self.tasks_count = tasks_count
 
-        if self.tasks_count:
-            self.queue_progress_bar.n = 0
-            self.queue_progress_bar.total = self.tasks_count
-            self.queue_progress_bar.refresh()
+        # We've removed the queue_progress_bar setup and update
 
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
             # Pass each worker its own progress bar reference
@@ -126,9 +119,6 @@ class WorkProgressPool:
         # Shut down the worker properly
         for pw in self.progress_workers:
             pw.shutdown()
-
-        # Close the additional queue_progress_bar
-        self.queue_progress_bar.close()
 
 
 class ThreadSafeTaskIterator:
