@@ -12,6 +12,7 @@ RED = colorama.Fore.RED
 YELLOW = colorama.Fore.YELLOW
 GREEN = colorama.Fore.GREEN
 BLUE = colorama.Fore.BLUE
+BRIGHT = colorama.Style.BRIGHT
 RESET = colorama.Style.RESET_ALL
 
 
@@ -19,6 +20,10 @@ class ProgressWorker:
     def __init__(self, worker_id, progress_bar=False):
         self.worker_id = worker_id
         self.progress_bar = None
+        self.breach_count = 0
+        self.resilient_count = 0
+        self.error_count = 0
+
         if progress_bar:
             self.progress_bar = tqdm(
                 total=1,
@@ -32,13 +37,24 @@ class ProgressWorker:
         if self.progress_bar:
             self.progress_bar.close()
 
-    def update(self, task_name: str, progress: float, total: float, colour="BLACK"):
+    def update(self, task_name: str, progress: float, total: float, breach_count: int = 0, resilient_count: int = 0,
+               error_count: int = 0, colour="BLACK"):
         if not self.progress_bar:
             return
+
+        # Update tracking counts
+        self.breach_count = breach_count
+        self.resilient_count = resilient_count
+        self.error_count = error_count
+
+        # Format status info
+        status_info = f"[{BRIGHT}{RED}B:{breach_count}{RESET} | {BRIGHT}{GREEN}R:{resilient_count}{RESET} | {BRIGHT}{YELLOW}E:{error_count}{RESET}]"
+
         # Update the progress bar
         with self.progress_bar.get_lock():  # Ensure thread-safe updates
+            progress_text = f"{task_name + ' ':.<40} [{progress}/{total}] {status_info}"
             self.progress_bar.set_description(
-                f"Worker #{self.worker_id:02}: {task_name + ' ':.<50}{RESET}",
+                f"Worker #{self.worker_id:02}: {progress_text}{RESET}",
                 refresh=True,
             )
             self.progress_bar.colour = colour  # valid choices according to tqdm docs: [hex (#00ff00), BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE]
@@ -49,7 +65,7 @@ class ProgressWorker:
 
 class WorkProgressPool:
     def __init__(self, num_workers):
-        enable_per_test_progress_bars = False  # the feature is not tested well
+        enable_per_test_progress_bars = True  # Enable detailed progress bars
         self.num_workers = num_workers
         self.progress_workers = [
             ProgressWorker(worker_id, progress_bar=enable_per_test_progress_bars)

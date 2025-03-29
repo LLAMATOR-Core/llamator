@@ -1,6 +1,5 @@
-import logging
 import textwrap
-from typing import Dict, Generator, List, Optional, Tuple, Type
+from typing import List, Tuple, Type
 
 import colorama
 from pydantic import ValidationError
@@ -65,9 +64,12 @@ class TestTask:
 
                 # Update the progress worker with the test's status
                 progress_worker.update(
-                    task_name=f"{color}{statusUpdate.action}{RESET}: {statusUpdate.test_name}",
+                    task_name=f"{color}{statusUpdate.action}: {statusUpdate.test_name}{RESET}",
                     progress=statusUpdate.progress_position,
                     total=statusUpdate.progress_total,
+                    breach_count=statusUpdate.status.breach_count,
+                    resilient_count=statusUpdate.status.resilient_count,
+                    error_count=statusUpdate.status.error_count,
                     colour="BLUE",
                 )
 
@@ -83,9 +85,12 @@ class TestTask:
 
             # Update the progress worker with the test's status
             progress_worker.update(
-                task_name=f"{color}{statusUpdate.action}{RESET}: {statusUpdate.test_name}",
+                task_name=f"{color}{statusUpdate.action}: {statusUpdate.test_name}{RESET}",
                 progress=statusUpdate.progress_position,
                 total=statusUpdate.progress_total,
+                breach_count=statusUpdate.status.breach_count,
+                resilient_count=statusUpdate.status.resilient_count,
+                error_count=statusUpdate.status.error_count,
                 colour="BLUE",
             )
 
@@ -283,7 +288,6 @@ def generate_footer_row(tests: List[TestBase]):
             GREEN if all(isResilient(test.status) for test in tests) else RED,
         ),
     ]
-
 
 def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80):
     """
