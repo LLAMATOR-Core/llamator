@@ -1,19 +1,18 @@
 import textwrap
-from typing import List, Tuple, Type
+from typing import List, Tuple, Type, Optional, Dict
 
 import colorama
 from pydantic import ValidationError
 
 from ..attack_provider.attack_registry import instantiate_tests
+from ..attack_provider.attack_loader import *
 from ..attack_provider.work_progress_pool import ProgressWorker, ThreadSafeTaskIterator, WorkProgressPool
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import *
 from ..client.client_config import ClientConfig
 from ..client.judge_config import JudgeConfig
 from ..format_output.results_table import print_table
-from .attack_loader import *  # noqa
-
-# from .attack_loader import * - to register attacks defined in 'attack/*.py'
+from ..format_output.draw_utils import print_box_with_header
 from .test_base import StatusUpdate, TestBase, TestStatus
 
 logger = logging.getLogger(__name__)
@@ -25,36 +24,6 @@ BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
 RED = colorama.Fore.RED
 GREEN = colorama.Fore.GREEN
 BRIGHT_YELLOW = colorama.Fore.LIGHTYELLOW_EX + colorama.Style.BRIGHT
-
-def print_box(header: str, content_lines: List[str], box_width: int) -> None:
-    """
-    Helper function to print a box with a header and content lines with even borders.
-    """
-    # Импортируем функцию для очистки ANSI последовательностей
-    from ..format_output.draw_utils import strip_ansi
-    # Вывод верхней границы
-    print(f"{BRIGHT_CYAN}╔{'═' * box_width}╗{RESET}")
-    # Расчёт отступов для заголовка с учётом ANSI последовательностей
-    visible_header = strip_ansi(header)
-    header_len = len(visible_header)
-    left_padding = (box_width - header_len) // 2
-    right_padding = box_width - header_len - left_padding
-    print(f"{BRIGHT_CYAN}║{' ' * left_padding}{header}{' ' * right_padding}║{RESET}")
-    # Вывод разделительной линии
-    print(f"{BRIGHT_CYAN}╠{'═' * box_width}╣{RESET}")
-    # Вывод строк содержимого с автоматическим выравниванием
-    for line in content_lines:
-        visible_line = strip_ansi(line)
-        line_len = len(visible_line)
-        if line_len > box_width:
-            # Если строка длиннее, обрезаем её по видимой длине
-            visible_line = visible_line[:box_width]
-            line = visible_line
-            line_len = len(visible_line)
-        padding = box_width - line_len
-        print(f"{BRIGHT_CYAN}║{RESET}{line}{' ' * padding}{BRIGHT_CYAN}║{RESET}")
-    # Вывод нижней границы
-    print(f"{BRIGHT_CYAN}╚{'═' * box_width}╝{RESET}")
 
 class TestTask:
     """
@@ -71,7 +40,6 @@ class TestTask:
     __call__(progress_worker: ProgressWorker)
         Executes the test and updates the progress worker with the test's status.
     """
-
     def __init__(self, test):
         # Store the test instance for later execution
         self.test = test
@@ -110,8 +78,6 @@ class TestTask:
                 color = LIGHTBLUE
             elif statusUpdate.action == "Attacking":
                 color = RED
-            statusUpdate = result
-
             # Update the progress worker with the test's status
             progress_worker.update(
                 task_name=f"{color}{statusUpdate.action}: {statusUpdate.test_name}{RESET}",
@@ -177,8 +143,6 @@ def run_tests(
     -------
     None
     """
-    print(f"{BRIGHT_CYAN}Running tests on your system prompt{RESET} ...")
-
     logger.debug("Initializing tests...")
     # Extract the test names from the list
     basic_test_names = [test[0] for test in basic_tests_params] if basic_tests_params else []
@@ -192,7 +156,7 @@ def run_tests(
             if len(test_name) > 60 - 8:
                 test_name = test_name[:60 - 11] + "..."
             content_lines.append(f" {i + 1:2}. {test_name}")
-        print_box("Selected Tests", content_lines, box_width=60)
+        print_box_with_header("Selected Tests", content_lines, 60)
 
     # Instantiate all tests
     tests: List[TestBase] = instantiate_tests(
@@ -204,13 +168,13 @@ def run_tests(
         artifacts_path=artifacts_path,
     )
 
-    # Display status legend before running tests using helper function
-    box_width = 60  # Consistent box width
-    b_desc = f"{BRIGHT_RED}B{RESET}: Breach count - Number of successful attacks"
-    r_desc = f"{GREEN}R{RESET}: Resilient count - Number of successfully blocked attacks"
-    e_desc = f"{BRIGHT_YELLOW}E{RESET}: Error count - Number of errors during testing"
+    # Display status legend before running tests using helper function;
+    # перед буквами добавлен пробел.
+    b_desc = f"{BRIGHT_RED} B{RESET}: Breach count - Number of successful attacks"
+    r_desc = f"{GREEN} R{RESET}: Resilient count - Number of successfully blocked attacks"
+    e_desc = f"{BRIGHT_YELLOW} E{RESET}: Error count - Number of errors during testing"
     legend_lines = [b_desc, r_desc, e_desc]
-    print_box("Status Legend", legend_lines, box_width)
+    print_box_with_header("Status Legend", legend_lines, 60)
 
     # Run tests in parallel mode
     run_tests_in_parallel(tests, threads_count)
