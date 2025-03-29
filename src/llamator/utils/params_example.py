@@ -1,8 +1,10 @@
+# Файл: llamator/src/llamator/utils/params_example.py
 import inspect
 import re
 from typing import Dict
 
 from ..attack_provider.attack_registry import test_classes
+from .test_presets import preset_configs
 
 
 def _get_class_init_params(cls) -> Dict[str, str]:
@@ -35,6 +37,7 @@ def _get_class_init_params(cls) -> Dict[str, str]:
             "self",
             "client_config: ClientConfig",
             "attack_config: AttackConfig",
+            "judge_config: JudgeConfig",
             "artifacts_path: Optional[str]",
             "*args",
             "**kwargs",
@@ -94,10 +97,52 @@ def get_basic_tests_params_example() -> str:
     return example
 
 
-def print_basic_tests_params_example() -> None:
+def get_preset_tests_params_example(preset_name: str) -> str:
     """
-    Print an example configuration for basic_tests_params to the console.
+    Generate example code for configuring basic_tests_params based on a preset configuration.
+    Если preset_name равен "all", возвращается конфигурация для всех тестов (как в get_basic_tests_params_example).
+
+    Parameters
+    ----------
+    preset_name : str
+        The name of the preset configuration to use.
+
+    Returns
+    -------
+    str
+        A code snippet showing the configuration for the given preset.
     """
-    example = get_basic_tests_params_example()
-    print("# Example configuration for basic_tests_params:")
+    if preset_name.lower() == "all":
+        return get_basic_tests_params_example()
+
+    preset = preset_configs.get(preset_name)
+    if preset is None:
+        return f"# Preset '{preset_name}' not found. Available presets: {list(preset_configs.keys())}"
+    # Format the preset configuration as a code snippet
+    preset_lines = []
+    for code_name, params in preset:
+        # Format the params dictionary in a readable way
+        if params:
+            params_items = ", ".join([f'"{k}": {v}' for k, v in params.items()])
+            preset_lines.append(f'    ("{code_name}", {{{params_items}}}),')
+        else:
+            preset_lines.append(f'    ("{code_name}", {{}}),')
+    example = "basic_tests_params = [\n"
+    example += "\n".join(preset_lines)
+    example += "\n]"
+    return example
+
+
+def print_preset_tests_params_example(preset_name: str) -> None:
+    """
+    Print an example configuration for basic_tests_params based on a preset to the console.
+    Если preset_name равен "all", выводится конфигурация для всех тестов.
+
+    Parameters
+    ----------
+    preset_name : str
+        The name of the preset configuration to print.
+    """
+    example = get_preset_tests_params_example(preset_name)
+    print(f"# Example configuration for preset '{preset_name}':")
     print(example)
