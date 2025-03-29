@@ -102,7 +102,7 @@ def validate_models_and_tests(
     elif custom_tests_params:
         print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
 
-    print("\n")
+    print()
 
     return True
 
@@ -198,7 +198,7 @@ def start_testing(
 
     # Print configuration summary using helper function from format_output
     from llamator.format_output.output_helpers import print_testing_configuration
-    print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 60)
+    print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
     # Выполнение валидации моделей и тестов
     if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests_params, custom_tests_params):

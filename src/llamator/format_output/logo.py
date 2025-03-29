@@ -1,18 +1,14 @@
-"""
-Печатает логотип LLAMATOR с цветным градиентом.
-"""
-
-import colorama
-from colorama import Style, Fore, init
+from colorama import Style, init
+import textwrap
 from .draw_utils import get_top_border, get_bottom_border, get_empty_line, format_box_line, strip_ansi
 from ..__version__ import __version__
 
 init()
 
+
 def print_logo(box_width: int = 60) -> None:
     """
-    Печатает логотип LLAMATOR с цветным градиентом.
-    Параметр box_width задаёт минимальную ширину рамки.
+    Печатает логотип с фиксированным выравниванием и центрированной версией.
     """
     logo_raw = r"""
     __    __    ___    __  ______  __________  ____
@@ -21,23 +17,33 @@ def print_logo(box_width: int = 60) -> None:
  / /___/ /___/ ___ |/ /  / / ___ |/ / / /_/ / _, _/
 /_____/_____/_/  |_/_/  /_/_/  |_/_/  \____/_/ |_|
 """
-    logo_lines = logo_raw.strip("\n").split("\n")
-    version_line = f"{Style.DIM}v{__version__}{Style.RESET_ALL}"
-    # Вычисляем ширину, исходя из содержимого
-    inner_content_max = max(
-        max(len(strip_ansi(line)) for line in logo_lines),
-        len(f"v{__version__}")
-    )
-    calculated_width = inner_content_max + 4
-    # Используем большую ширину: либо заданную, либо вычисленную
+    logo_raw = textwrap.dedent(logo_raw).strip("\n")
+    logo_lines = logo_raw.split("\n")
+
+    # Определяем отступ для логотипа
+    first_line_clean = strip_ansi(logo_lines[0])
+    version_text = f"v{__version__}"
+    max_content_width = max(len(first_line_clean), len(version_text))
+
+    # Рассчитываем ширину рамки
+    calculated_width = max_content_width + 4
     final_box_width = max(box_width, calculated_width)
+    inner_width = final_box_width - 4
+
+    # Фиксированный отступ для логотипа
+    logo_padding = (inner_width - len(first_line_clean)) // 2
+    logo_padding_str = " " * logo_padding
+
     print("\n" + get_top_border(final_box_width))
     for line in logo_lines:
-        print(format_box_line(line, final_box_width))
+        aligned_line = logo_padding_str + line
+        print(format_box_line(aligned_line, final_box_width))
     print(get_empty_line(final_box_width))
-    inner_width = final_box_width - 4
-    version_padding = inner_width - len(f"v{__version__}")
-    version_line_formatted = f"{' ' * version_padding}{version_line}"
-    print(format_box_line(version_line_formatted, final_box_width))
+
+    # Центрируем версию по всей ширине блока
+    version_spaces = (inner_width - len(version_text)) // 2
+    version_line = f"{' ' * version_spaces}{Style.DIM}{version_text}{Style.RESET_ALL}"
+    print(format_box_line(version_line, final_box_width))
+
     print(get_bottom_border(final_box_width))
     print()
