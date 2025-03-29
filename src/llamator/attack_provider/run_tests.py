@@ -107,8 +107,8 @@ def run_tests(
     attack_config: AttackConfig,
     judge_config: Optional[JudgeConfig],
     threads_count: int,
-    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
-    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], dict]]] = None,
     artifacts_path: Optional[str] = None,
 ):
     """
@@ -127,7 +127,7 @@ def run_tests(
     basic_tests_params : List[Tuple[str, dict]], optional
         A list of basic test names and parameter dictionaries (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
-    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+    custom_tests_params : List[Tuple[Type[TestBase], dict]], optional
         A list of custom test classes and parameter dictionaries (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
     artifacts_path : str, optional
@@ -262,7 +262,7 @@ def generate_footer_row(tests: List[TestBase], attack_type_width: int):
         ERROR if all(test.status.error_count > 0 for test in tests)
         else RESILIENT if all(isResilient(test.status) for test in tests)
         else VULNERABLE,
-        f"{'Total (# tests): ':.<{attack_type_width}}",
+        f"{'Total (# tests)' :<{attack_type_width}}",
         sum(not isResilient(test.status) for test in tests),
         sum(isResilient(test.status) for test in tests),
         sum(test.status.error_count > 0 for test in tests),
@@ -308,8 +308,8 @@ def setup_models_and_tests(
     judge_model: Optional[ClientBase],
     tested_model: ClientBase,
     num_threads: Optional[int] = 1,
-    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
-    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
+    basic_tests_params: Optional[List[Tuple[str, dict]]] = None,
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], dict]]] = None,
     artifacts_path: Optional[str] = None,
 ):
     """
@@ -328,7 +328,7 @@ def setup_models_and_tests(
     basic_tests_params : List[Tuple[str, dict]], optional
         A list of basic test names and parameter dictionaries (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
-    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+    custom_tests_params : List[Tuple[Type[TestBase], dict]], optional
         A list where each element is a tuple consisting of a custom test class and a parameter dictionary
         (default is None).
     artifacts_path : str, optional
