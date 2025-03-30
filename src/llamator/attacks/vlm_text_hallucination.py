@@ -1,7 +1,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Generator, List, Literal, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -51,7 +51,7 @@ class TestVLMTextHallucination(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
-        attack_type: AVAILABLE_TEXT_HALLUCINATION_ATTACKS = "objects",
+        attack_types: Optional[List[AVAILABLE_TEXT_HALLUCINATION_ATTACKS]] = None,
         *args,
         **kwargs,
     ):
@@ -63,12 +63,7 @@ class TestVLMTextHallucination(TestBase):
             *args,
             **kwargs,
         )
-        if attack_type in AVAILABLE_TEXT_HALLUCINATION_ATTACKS.__args__:  # NOTE: not sure how to pass this arg
-            self.attack_type = attack_type
-        else:
-            raise ValueError(
-                f"Invalid attack type: {attack_type}. Must be one of {AVAILABLE_TEXT_HALLUCINATION_ATTACKS.__args__}"
-            )
+        self.attack_types = attack_types or list(AVAILABLE_TEXT_HALLUCINATION_ATTACKS.__args__)
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
         """
@@ -90,7 +85,7 @@ class TestVLMTextHallucination(TestBase):
             df.to_csv(csv_path, index=False)
             logging.info(f"{self.test_description} attack report saved to {csv_path}")
 
-    def _load_attack_data(self, attack_type: AVAILABLE_TEXT_HALLUCINATION_ATTACKS) -> pd.DataFrame:
+    def _load_attack_data(self, attack_types: List[AVAILABLE_TEXT_HALLUCINATION_ATTACKS]) -> pd.DataFrame:
         """
         Loads the attack data for the specified attack type.
         Args:
@@ -99,28 +94,31 @@ class TestVLMTextHallucination(TestBase):
             pd.DataFrame: A DataFrame containing the attack data.
         """
         data_path = Path(__file__).parents[1] / "attack_data/text_image/images"
-        attack_data_path = data_path / attack_type
-        if not data_path.exists():
-            raise ValueError(f"Data path {data_path} does not exist.")
-
         data = []
-        for file in attack_data_path.rglob("*.png"):
-            attack_text = file.stem.replace("_", " ")
-            ground_truth = self.ground_truth_template.format(attack_text)
-            image_encoded = imgpath2base64(file)
-            data.append(
-                dict(
-                    image_path=str(file.relative_to(data_path)),
-                    attack_text=attack_text,
-                    ground_truth=ground_truth,
-                    image_encoded=image_encoded,
+        for attack_type in attack_types:
+            attack_data_path = data_path / attack_type
+            if not data_path.exists():
+                raise ValueError(f"Data path {data_path} does not exist.")
+
+            for file in attack_data_path.rglob("*.png"):
+                attack_text = file.stem.replace("_", " ")
+                ground_truth = self.ground_truth_template.format(attack_text)
+                image_encoded = imgpath2base64(file)
+                data.append(
+                    dict(
+                        image_path=str(file.relative_to(data_path)),
+                        attack_text=attack_text,
+                        attack_type=attack_type,
+                        ground_truth=ground_truth,
+                        image_encoded=image_encoded,
+                    )
                 )
-            )
+
         df = pd.DataFrame(data)
         return df
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        df_attack = self._load_attack_data(self.attack_type).head(self.num_attempts)
+        df_attack = self._load_attack_data(self.attack_types).head(self.num_attempts)
         responses = []
         statuses = []
 
@@ -150,7 +148,7 @@ class TestVLMTextHallucination(TestBase):
             if not response_message:
                 response = ""
                 logger.warning("Error while attacking against target - didn't receive response")
-                self.status.report_error(f"Image: {image_path}")
+                self.status.report_error("Image: {}".format(image_path))
                 current_status = "Error"
             else:
                 # Checking the response of the tested model
