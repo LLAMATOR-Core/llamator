@@ -33,7 +33,7 @@ Actual response: """{actual_response}"""'''
 AVAILABLE_TEXT_HALLUCINATION_ATTACKS = Literal["objects", "instructions"]
 
 
-class TestVLMTextHallucination(TestBase):
+class TestVlmTextHallucination(TestBase):
     """Test class for VLM text hallucination attacks."""
 
     test_name = "test_vlm_text_hallucination"
