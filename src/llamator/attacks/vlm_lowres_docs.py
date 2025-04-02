@@ -76,12 +76,11 @@ class TestVlmLowresPdf(TestBase):
 
         data = []
         for file in data_path.rglob("*.png"):
-            attack_text = file.stem.replace("_", " ")
             image_encoded = imgpath2base64(file)
             data.append(
                 dict(
                     image_path=str(file.relative_to(data_path.parents[1])),
-                    attack_text=attack_text,
+                    ground_truth=self.ground_truth_template,
                     image_encoded=image_encoded,
                 )
             )
