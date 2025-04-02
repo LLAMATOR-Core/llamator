@@ -46,15 +46,6 @@ class TestVlmMAttack(TestBase):
         self.dataset = dataset
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
-        """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
-        Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-        Returns:
-            None
-        """
         # Create a DataFrame from the lists
         df = attack_df.copy().drop(["image_encoded"], axis=1, errors="ignore")
         df = df.assign(response_text=responses, status=statuses, caption=df["caption"].str[0])
@@ -68,7 +59,7 @@ class TestVlmMAttack(TestBase):
     def _load_attack_data(self, dataset: str, dataset_variations: List[AVAILABLE_DATASET_VARIATIONS]) -> pd.DataFrame:
         # dataset = self.dataset
         # dataset_variations = self.dataset_variations
-        dataset_variations = ["16"]  # FIXME: ideally this should be passed as parameter
+        # dataset_variations = ["16"]  # FIXME: ideally this should be passed as parameter
 
         m_attack_data_path = Path(__file__).parents[1] / "attack_data/M-Attack-VLM"
         input_data_path = m_attack_data_path / dataset
@@ -103,6 +94,11 @@ class TestVlmMAttack(TestBase):
 
         df_data = pd.DataFrame(data)
         df_attack = df_target.merge(df_data, on="image_id")
+
+        # Sort similar classes
+        df_attack["image_id"] = df_attack["image_id"].astype(int)
+        df_attack = df_attack.sort_values(["image_id", "dataset_variation"])
+
         return df_attack
 
     def run(self) -> Generator[StatusUpdate, None, None]:
