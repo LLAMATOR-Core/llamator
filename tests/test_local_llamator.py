@@ -70,16 +70,18 @@ def test_openai_client():
     )
 
 
-def test_langchain_client_yandexgpt():
+def test_langchain_client():
     """
-    Tests LangChain client from local llamator lib using Yandex GPT backend.
+    Tests LangChain client from local llamator lib using OpenAI backend.
 
     Environment variables
     ----------
-    YC_API_KEY : str
-        Yandex Cloud API key
-    FOLDER_ID : str
-        Yandex Cloud folder ID
+    OPENAI_CLIENT_API_KEY : str
+        API key for OpenAI compatible API
+    OPENAI_CLIENT_BASEURL : str
+        URL of OpenAI compatible API
+    OPENAI_CLIENT_MODEL : str
+        Type of model
     """
     load_dotenv()
 
@@ -89,19 +91,25 @@ def test_langchain_client_yandexgpt():
     importlib.reload(llamator.client.specific_chat_clients)
     importlib.reload(llamator.main)
 
-    folder_ID = os.getenv("FOLDER_ID")
+    api_key = os.getenv("OPENAI_CLIENT_API_KEY")
+    base_url = os.getenv("OPENAI_CLIENT_BASEURL")
+    model = os.getenv("OPENAI_CLIENT_MODEL")
 
     from llamator.client.specific_chat_clients import ClientLangChain
 
     attack_model = ClientLangChain(
-        backend="yandex_gpt",
+        backend="open_ai",
+        api_key=api_key,
+        base_url=base_url,
+        model=model,
         system_prompts=["You are a model for generating attacks on other models"],
-        model_uri=f"gpt://{folder_ID}/yandexgpt-lite/latest",
     )
 
     tested_model = ClientLangChain(
-        backend="yandex_gpt",
-        model_uri=f"gpt://{folder_ID}/yandexgpt-lite/latest",
+        backend="open_ai",
+        api_key=api_key,
+        base_url=base_url,
+        model=model,
         model_description="Support bot",
     )
 

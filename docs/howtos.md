@@ -2,12 +2,12 @@
 
 ## Notebooks Examples
 
-* 📄 [RAG bot testing via REST API](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-api.ipynb)
-* 🧙‍♂️ [Gandalf web bot testing via Selenium](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-selenium.ipynb)
-* 💬 [Telegram bot testing via Telethon](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-telegram.ipynb)
-* 📱 [WhatsApp bot testing via Selenium](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-whatsapp.ipynb)
-* 🔗 [LangChain client testing with custom attack](https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
-* 🐋 [Running LLAMATOR in Docker](https://github.com/RomiconEZ/llamator/blob/release/docker)
+* 📄 [RAG bot testing via REST API](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-api.ipynb)
+* 🧙‍♂️ [Gandalf web bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-selenium.ipynb)
+* 💬 [Telegram bot testing via Telethon](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb)
+* 📱 [WhatsApp bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb)
+* 🔗 [LangChain client testing with custom attack](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
+* 🐋 [Running LLAMATOR in Docker](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 
 ## Installation Guide
 
