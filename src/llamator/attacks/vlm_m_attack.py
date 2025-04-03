@@ -17,7 +17,12 @@ AVAILABLE_DATASET_VARIATIONS = Literal["4", "8", "16"]
 
 
 class TestVlmMAttack(TestBase):
-    """Test class for VLM text hallucination attacks."""
+    """
+    Test class for VLM M-Attack, which adds noise to the image to make VLM see it as a different image.
+    The attack originates from this research: https://github.com/VILA-Lab/M-Attack
+    It uses the dataset provided in the original research: https://huggingface.co/datasets/MBZUAI-LLM/M-Attack_AdvSamples
+    The dataset-variations correspond to different strengths of noise applied to the image.
+    """
 
     test_name = "test_vlm_m_attack"
 
@@ -46,7 +51,6 @@ class TestVlmMAttack(TestBase):
         self.dataset = dataset
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
-        # Create a DataFrame from the lists
         df = attack_df.copy().drop(["image_encoded"], axis=1, errors="ignore")
         df = df.assign(response_text=responses, status=statuses, caption=df["caption"].str[0])
 
@@ -61,6 +65,7 @@ class TestVlmMAttack(TestBase):
         # dataset_variations = self.dataset_variations
         # dataset_variations = ["16"]  # FIXME: ideally this should be passed as parameter
 
+        # TODO: downloaf images if the dataset is not available
         m_attack_data_path = Path(__file__).parents[1] / "attack_data/M-Attack-VLM"
         input_data_path = m_attack_data_path / dataset
 
