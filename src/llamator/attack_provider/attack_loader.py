@@ -3,6 +3,7 @@ from ..attacks import (  # noqa
     base64_injection,
     bon,
     complimentary_transition,
+    conversation_emulation,
     crecsendo,
     dan,
     ethical_compliance,

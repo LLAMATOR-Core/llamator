@@ -74,6 +74,7 @@ def start_testing(
     tests_with_attempts : List[Tuple[str, int]], optional
         List of test names and their corresponding number of attempts.
         Available tests:
+        - conversation_emulation
         - aim_jailbreak
         - base64_injection
         - bon
