@@ -1,3 +1,4 @@
+# llamator/src/llamator/report_generators/word_report_generator.py
 import logging
 import os
 
@@ -169,9 +170,9 @@ def create_word_report(
             "report_failed": "Failed to create Word report: {}",
             "csv_not_found": "CSV folder not found: {}",
             "csv_read_failed": "Failed to read CSV file {}: {}",
-            "status_column_missing": "'status' column is missing in {}. Skipping file.",
-            "test_not_found": "Test with code_name='{in_code}' not found in descriptions. Skipping {}.",
-            "description_missing": "Description for test '{}' not found. Using CSV filename.",
+            "status_column_missing": "The 'status' column is missing in {}. Skipping file.",
+            "test_not_found": "Test with `code_name = '{in_code}'` not found in descriptions. Skipping file {file}.",
+            "description_missing": "Description for test '{test}' not found. Using CSV file name.",
             "total": "Total",
         },
     }
@@ -314,7 +315,7 @@ def create_word_report(
             # Attempt to get the localized description
             test_description = test_info["description"].get(language, "")
             if not test_description:
-                logging.warning(lang["description_missing"].format(test_name))
+                logging.warning(lang["description_missing"].format(test=test_name))
                 test_name = in_code_name
                 test_description = ""
 
