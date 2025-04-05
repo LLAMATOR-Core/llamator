@@ -5,15 +5,16 @@
 """
 
 import re
-from .color_consts import RESET, BRIGHT, BLUE
+
+from .color_consts import BLUE, BRIGHT, RESET
 
 
 def strip_ansi(text: str) -> str:
     """
     Remove ANSI escape sequences from text.
     """
-    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', text)
+    ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+    return ansi_escape.sub("", text)
 
 
 def get_top_border(box_width: int) -> str:

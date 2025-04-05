@@ -1,9 +1,10 @@
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
+
 from tqdm import tqdm
 
-from llamator.format_output.color_consts import BRIGHT, RED, RESET, GREEN, YELLOW
+from llamator.format_output.color_consts import BRIGHT, GREEN, RED, RESET, YELLOW
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,16 @@ class ProgressWorker:
         if self.progress_bar:
             self.progress_bar.close()
 
-    def update(self, task_name: str, progress: float, total: float, breach_count: int = 0, resilient_count: int = 0,
-               error_count: int = 0, colour="BLACK"):
+    def update(
+        self,
+        task_name: str,
+        progress: float,
+        total: float,
+        breach_count: int = 0,
+        resilient_count: int = 0,
+        error_count: int = 0,
+        colour="BLACK",
+    ):
         if not self.progress_bar:
             return
 

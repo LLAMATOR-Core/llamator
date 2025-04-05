@@ -6,7 +6,7 @@
 """
 
 import colorama
-from colorama import Style, Fore
+from colorama import Fore, Style
 
 colorama.init(autoreset=False)
 

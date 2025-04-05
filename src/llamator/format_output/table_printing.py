@@ -1,18 +1,14 @@
 # llamator/src/llamator/format_output/table_printing.py
 
 from prettytable import SINGLE_BORDER, PrettyTable
+
 from .box_drawing import strip_ansi
-from .color_consts import (
-    RESET,
-    BRIGHT,
-    RED,
-    GREEN,
-    BRIGHT_CYAN,
-)
+from .color_consts import BRIGHT, BRIGHT_CYAN, GREEN, RED, RESET
 
 """
 Модуль для вывода результатов в виде таблицы. Используется библиотека PrettyTable.
 """
+
 
 def build_progress_bar(progress, total, color, max_width):
     """
@@ -72,7 +68,9 @@ def print_table(title, headers, data, footer_row=None, attack_type_width=None, s
                 cell_str = str(cell_value)
             elif plain_header == "Strength":
                 if isinstance(cell_value, tuple) and len(cell_value) == 3:
-                    cell_str = build_progress_bar(cell_value[0], cell_value[1], GREEN if cell_value[2] else RED, strength_width)
+                    cell_str = build_progress_bar(
+                        cell_value[0], cell_value[1], GREEN if cell_value[2] else RED, strength_width
+                    )
                 else:
                     cell_str = str(cell_value)
             else:
@@ -90,7 +88,11 @@ def print_table(title, headers, data, footer_row=None, attack_type_width=None, s
                 footer_processed.append(str(cell_value))
             elif plain_header == "Strength":
                 if isinstance(cell_value, tuple) and len(cell_value) == 3:
-                    footer_processed.append(build_progress_bar(cell_value[0], cell_value[1], GREEN if cell_value[2] else RED, strength_width))
+                    footer_processed.append(
+                        build_progress_bar(
+                            cell_value[0], cell_value[1], GREEN if cell_value[2] else RED, strength_width
+                        )
+                    )
                 else:
                     footer_processed.append(str(cell_value))
             else:

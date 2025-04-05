@@ -1,5 +1,6 @@
 import logging
 import os
+
 import pandas as pd
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE

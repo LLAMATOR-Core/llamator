@@ -4,14 +4,14 @@ from typing import List, Tuple, Type
 import colorama
 from pydantic import ValidationError
 
-from ..attack_provider.attack_registry import instantiate_tests
 from ..attack_provider.attack_loader import *
+from ..attack_provider.attack_registry import instantiate_tests
 from ..attack_provider.work_progress_pool import ProgressWorker, ThreadSafeTaskIterator, WorkProgressPool
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import *
 from ..client.client_config import ClientConfig
 from ..client.judge_config import JudgeConfig
-from ..format_output.color_consts import RESET, LIGHTBLUE, RED, BRIGHT_YELLOW, GREEN, BRIGHT_RED
+from ..format_output.color_consts import BRIGHT_RED, BRIGHT_YELLOW, GREEN, LIGHTBLUE, RED, RESET
 from ..format_output.table_printing import print_table
 from .test_base import StatusUpdate, TestBase, TestStatus
 
@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 # Define desired column widths for Attack Type and Strength
 ATTACK_TYPE_WIDTH = 25
 STRENGTH_WIDTH = 20
+
 
 class TestTask:
     """
@@ -36,6 +37,7 @@ class TestTask:
     __call__(progress_worker: ProgressWorker)
         Executes the test and updates the progress worker with the test's status.
     """
+
     def __init__(self, test):
         # Store the test instance for later execution
         self.test = test
@@ -91,9 +93,11 @@ class TestTask:
                 f"BUG: Test {self.test.info['code_name']} returned an unexpected result: {result}. Please fix the test run() function!"
             )
 
+
 def isResilient(test_status: TestStatus):
     """Define test as passed if there were no errors or failures during test run"""
     return test_status.breach_count == 0 and test_status.error_count == 0
+
 
 def run_tests(
     client_config: ClientConfig,
@@ -138,6 +142,7 @@ def run_tests(
     # Print selected tests as a nicely formatted list using helper function
     if basic_test_names:
         from llamator.format_output.output_helpers import print_selected_tests
+
         print_selected_tests(basic_test_names, 80)
 
     # Instantiate all tests
@@ -152,6 +157,7 @@ def run_tests(
 
     # Display status legend before running tests using helper function
     from llamator.format_output.output_helpers import print_status_legend
+
     print_status_legend(80)
 
     # Run tests in parallel mode
@@ -159,6 +165,7 @@ def run_tests(
 
     # Report test results
     report_results(tests)
+
 
 def run_tests_in_parallel(tests: List[TestBase], threads_count: int = 1):
     """
@@ -185,6 +192,7 @@ def run_tests_in_parallel(tests: List[TestBase], threads_count: int = 1):
     # A known number of tests allows for progress bar display
     work_pool.run(ThreadSafeTaskIterator(test_tasks), len(tests))
 
+
 def report_results(tests: List[TestBase]):
     """
     Generate and print the test results.
@@ -203,6 +211,7 @@ def report_results(tests: List[TestBase]):
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
     from llamator.format_output.output_helpers import print_test_results_header
+
     print_test_results_header(80)
 
     rows = sorted(
@@ -213,7 +222,7 @@ def report_results(tests: List[TestBase]):
                 test.status.breach_count,
                 test.status.resilient_count,
                 test.status.error_count,
-                (test.status.resilient_count, test.status.total_count, isResilient(test.status))
+                (test.status.resilient_count, test.status.total_count, isResilient(test.status)),
             ]
             for test in tests
         ],
@@ -226,9 +235,10 @@ def report_results(tests: List[TestBase]):
         data=rows,
         footer_row=generate_footer_row(tests, ATTACK_TYPE_WIDTH),
         attack_type_width=ATTACK_TYPE_WIDTH,
-        strength_width=STRENGTH_WIDTH
+        strength_width=STRENGTH_WIDTH,
     )
     generate_summary(tests)
+
 
 def generate_footer_row(tests: List[TestBase], attack_type_width: int):
     """
@@ -251,15 +261,18 @@ def generate_footer_row(tests: List[TestBase], attack_type_width: int):
     ERROR = f"{BRIGHT_YELLOW}⚠{RESET}"
 
     return [
-        ERROR if all(test.status.error_count > 0 for test in tests)
-        else RESILIENT if all(isResilient(test.status) for test in tests)
+        ERROR
+        if all(test.status.error_count > 0 for test in tests)
+        else RESILIENT
+        if all(isResilient(test.status) for test in tests)
         else VULNERABLE,
         f"{'Total (# tests)' :<{attack_type_width}}",
         sum(not isResilient(test.status) for test in tests),
         sum(isResilient(test.status) for test in tests),
         sum(test.status.error_count > 0 for test in tests),
-        (sum(isResilient(test.status) for test in tests), len(tests), all(isResilient(test.status) for test in tests))
+        (sum(isResilient(test.status) for test in tests), len(tests), all(isResilient(test.status) for test in tests)),
     ]
+
 
 def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80):
     """
@@ -277,6 +290,7 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     None
     """
     from llamator.format_output.output_helpers import print_summary_header
+
     print_summary_header(80)
     resilient_tests_count = sum(isResilient(test.status) for test in tests)
 
@@ -291,9 +305,12 @@ def generate_summary(tests: List[TestBase], max_line_length: Optional[int] = 80)
     total_tests_count = len(tests)
     resilient_tests_percentage = resilient_tests_count / total_tests_count * 100 if total_tests_count > 0 else 0
 
-    print(f"Your Model passed {int(resilient_tests_percentage)}% ({resilient_tests_count} out of {total_tests_count}) of attack simulations.\n")
+    print(
+        f"Your Model passed {int(resilient_tests_percentage)}% ({resilient_tests_count} out of {total_tests_count}) of attack simulations.\n"
+    )
     if resilient_tests_count < total_tests_count:
         print(f"Your Model {BRIGHT_RED}failed{RESET} the following tests:\n{RED}{failed_tests}{RESET}\n")
+
 
 def setup_models_and_tests(
     attack_model: ClientBase,

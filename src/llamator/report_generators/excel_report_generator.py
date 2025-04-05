@@ -1,4 +1,5 @@
 import os
+
 import pandas as pd
 from openpyxl.styles import Alignment, Border, PatternFill, Side
 from openpyxl.utils import get_column_letter
@@ -61,9 +62,7 @@ def create_attack_report(attack_data: list[dict], file_path: str) -> None:
 
 
 def create_attack_report_from_artifacts(
-    artifacts_dir: str,
-    csv_folder_name: str = "csv_report",
-    report_file_name: str = "attacks_report.xlsx"
+    artifacts_dir: str, csv_folder_name: str = "csv_report", report_file_name: str = "attacks_report.xlsx"
 ) -> None:
     """
     Creates a multi-sheet Excel report from each CSV file found in the specified folder.
@@ -81,9 +80,9 @@ def create_attack_report_from_artifacts(
     output_file_path = os.path.join(artifacts_dir, report_file_name)
 
     color_fill_mapping = {
-        "broken": "FFF0F0",    # pale red
-        "resilient": "F0FFF0", # pale green
-        "error": "FFF8E7",     # pale orange
+        "broken": "FFF0F0",  # pale red
+        "resilient": "F0FFF0",  # pale green
+        "error": "FFF8E7",  # pale orange
     }
     thin_border = Border(
         left=Side(style="thin"),

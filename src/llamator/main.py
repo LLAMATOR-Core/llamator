@@ -10,19 +10,9 @@ from dotenv import load_dotenv
 from .attack_provider.run_tests import setup_models_and_tests
 from .attack_provider.test_base import TestBase
 from .client.chat_client import ClientBase
+from .format_output.box_drawing import format_centered_line, get_bottom_border, get_top_border
+from .format_output.color_consts import BRIGHT, BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_RED, RESET
 from .format_output.logo import print_logo
-from .format_output.box_drawing import (
-    get_top_border,
-    get_bottom_border,
-    format_centered_line,
-)
-from .format_output.color_consts import (
-    BRIGHT,
-    RESET,
-    BRIGHT_CYAN,
-    BRIGHT_RED,
-    BRIGHT_GREEN,
-)
 from .initial_validation import (
     validate_artifacts_path,
     validate_custom_tests,
@@ -38,12 +28,13 @@ from .report_generators.word_report_generator import create_word_report
 dotenv_path = os.path.join(os.getcwd(), ".env")
 load_dotenv(dotenv_path)
 
+
 def validate_models_and_tests(
     attack_model: ClientBase,
     judge_model: Optional[ClientBase],
     tested_model: ClientBase,
     basic_tests_params: Optional[List[Tuple[str, Dict]]],
-    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]]
+    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]],
 ) -> bool:
     """
     Validates the provided models and the list of tests.
@@ -159,9 +150,9 @@ def _rename_reports_with_timestamp(artifacts_run_path: str, start_timestamp: str
 
 def start_testing(
     attack_model: ClientBase,
-    judge_model: Optional[ClientBase],
     tested_model: ClientBase,
     config: dict,
+    judge_model: Optional[ClientBase] = None,
     num_threads: Optional[int] = 1,
     basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
@@ -241,6 +232,7 @@ def start_testing(
 
     # Print test config info
     from llamator.format_output.output_helpers import print_testing_configuration
+
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
     # Validate
@@ -263,19 +255,20 @@ def start_testing(
     # Close log file handlers
     for handler in logging.getLogger().handlers:
         from logging.handlers import RotatingFileHandler
+
         if isinstance(handler, RotatingFileHandler):
             handler.close()
 
     # Generate reports if needed
     if enable_reports and artifacts_run_path:
         report_language = validate_language(report_language)
-        print(f"{BRIGHT_RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language. Reader discretion is advised.{RESET}")
+        print(
+            f"{BRIGHT_RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language. Reader discretion is advised.{RESET}"
+        )
 
         print(f"{BRIGHT_CYAN}Generating reports...{RESET}")
         create_attack_report_from_artifacts(
-            artifacts_dir=artifacts_run_path,
-            csv_folder_name="csv_report",
-            report_file_name="attacks_report.xlsx"
+            artifacts_dir=artifacts_run_path, csv_folder_name="csv_report", report_file_name="attacks_report.xlsx"
         )
         create_word_report(
             artifacts_dir=artifacts_run_path,

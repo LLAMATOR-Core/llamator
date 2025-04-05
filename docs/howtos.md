@@ -38,38 +38,23 @@ tested_model = llamator.ClientOpenAI(
     model_description="Model description",
 )
 
-# List of tests with the number of attempts
-tests_with_attempts = [
-    ("aim_jailbreak", 2),
-    ("base64_injection", 2),
-    ("bon", 2),
-    ("complimentary_transition", 2),
-    ("crescendo", 2),
-    # Uncomment the following lines to include additional tests
-    # ("do_anything_now_jailbreak", 2),
-    # ("RU_do_anything_now_jailbreak", 2),
-    # ("ethical_compliance", 2),
-    # ("harmful_behavior", 2),
-    # ("harmful_behavior_multistage", 2),
-    # ("linguistic_evasion", 2),
-    # ("logical_inconsistencies", 2),
-    # ("past_tense", 2),
-    # ("suffix", 2),
-    # ("sycophancy", 2),
-    # ("system_prompt_leakage", 2),
-    # ("typoglycemia_attack", 2),
-    # ("RU_typoglycemia_attack", 2),
-    # ("ucar", 2),
-    # ("RU_ucar", 2),
+# List of basic tests with parameters
+basic_tests_params = [
+    ("aim_jailbreak", {"num_attempts": 2}),
+    ("base64_injection", {"num_attempts": 2}),
+    ("bon", {"num_attempts": 2}),
+    ("complimentary_transition", {"num_attempts": 2}),
+    ("crescendo", {"num_attempts": 2}),
+    # Add other tests as needed
 ]
 
 # Configuration for testing
 config = {
-    "enable_logging": True,  # Enable logging
-    "enable_reports": True,  # Enable report generation
-    "artifacts_path": "./artifacts",  # Path to save artifacts
-    "debug_level": 1,  # Logging level: 0 - WARNING, 1 - INFO, 2 - DEBUG
-    "report_language": "en",  # Report language: 'en', 'ru'
+    "enable_logging": True,
+    "enable_reports": True,
+    "artifacts_path": "./artifacts",
+    "debug_level": 1,
+    "report_language": "en",
 }
 
 # Start testing
@@ -77,7 +62,57 @@ llamator.start_testing(
     attack_model=attack_model,
     tested_model=tested_model,
     config=config,
-    tests_with_attempts=tests_with_attempts,
-    multistage_depth=20,
+    basic_tests_params=basic_tests_params,
 )
 ```
+
+---
+
+## Helper Functions
+
+### `print_preset_tests_params_example`
+Prints example configuration for presets to the console.
+
+**Usage:**
+```python
+from llamator import print_preset_tests_params_example
+
+# Print configuration for 'standard' preset
+print_preset_tests_params_example("standard")
+
+# Print configuration for all available tests
+print_preset_tests_params_example("all")
+```
+
+### `get_preset_tests_params_example`
+Returns a string containing example configurations for presets.
+
+**Usage:**
+```python
+from llamator import get_preset_tests_params_example
+
+# Get example for 'standard' preset
+standard_preset = get_preset_tests_params_example("standard")
+print(standard_preset)
+
+# Get example for all available tests
+all_tests_preset = get_preset_tests_params_example("all")
+print(all_tests_preset)
+```
+
+### `print_chat_models_info`
+Displays information about available LangChain chat models, including parameters.
+
+**Usage:**
+```python
+from llamator import print_chat_models_info
+
+# Print basic model info
+print_chat_models_info()
+
+# Print detailed model info with parameters
+print_chat_models_info(detailed=True)
+```
+
+This information helps you quickly identify available chat models and their configurable parameters.
+

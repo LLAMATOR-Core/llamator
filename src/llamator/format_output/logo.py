@@ -1,15 +1,11 @@
 # llamator/src/llamator/format_output/logo.py
 
-from colorama import init
 import textwrap
-from .box_drawing import (
-    get_top_border,
-    get_bottom_border,
-    get_empty_line,
-    format_box_line,
-    strip_ansi,
-)
+
+from colorama import init
+
 from ..__version__ import __version__
+from .box_drawing import format_box_line, get_bottom_border, get_empty_line, get_top_border, strip_ansi
 from .color_consts import BRIGHT, RESET
 
 init()

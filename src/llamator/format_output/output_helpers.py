@@ -1,14 +1,14 @@
 # llamator/src/llamator/format_output/output_helpers.py
 
 from .box_drawing import (
-    print_box_with_header,
     format_box_line,
-    get_top_border,
-    get_bottom_border,
     format_centered_line,
+    get_bottom_border,
     get_separator_line,
+    get_top_border,
+    print_box_with_header,
 )
-from .color_consts import BRIGHT_RED, BRIGHT_YELLOW, BRIGHT_GREEN, BRIGHT_CYAN, GREEN, RESET
+from .color_consts import BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_RED, BRIGHT_YELLOW, GREEN, RESET
 
 
 def print_selected_tests(selected_tests: list, box_width: int = 60) -> None:
@@ -19,7 +19,7 @@ def print_selected_tests(selected_tests: list, box_width: int = 60) -> None:
     for i, test_name in enumerate(selected_tests):
         # Ensure the test name doesn't exceed the available width
         if len(test_name) > box_width - 8:
-            test_name = test_name[:box_width - 11] + "..."
+            test_name = test_name[: box_width - 11] + "..."
         content_lines.append(f" {i + 1:2}. {test_name}")
     print_box_with_header("Selected Tests", content_lines, box_width)
 
@@ -40,7 +40,9 @@ def print_status_legend(box_width: int = 60) -> None:
     print_box_with_header("Status Legend", legend_lines, box_width)
 
 
-def print_testing_configuration(num_threads: int, enable_logging: bool, enable_reports: bool, report_language: str, box_width: int = 60) -> None:
+def print_testing_configuration(
+    num_threads: int, enable_logging: bool, enable_reports: bool, report_language: str, box_width: int = 60
+) -> None:
     """
     Prints a box with a header "Testing Configuration" summarizing testing settings.
     """
