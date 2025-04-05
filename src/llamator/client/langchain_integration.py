@@ -172,9 +172,13 @@ def print_chat_models_info(detailed: bool = False) -> None:
             print("\nParameters:")
             for param_name, param in sorted(model_info.params.items()):
                 type_name = getattr(param.typ, "__name__", str(param.typ))
-                default_value = "None" if param.default is None else f"'{param.default}'" if isinstance(param.default,
-                                                                                                        str) else str(
-                    param.default)
+                default_value = (
+                    "None"
+                    if param.default is None
+                    else f"'{param.default}'"
+                    if isinstance(param.default, str)
+                    else str(param.default)
+                )
 
                 print(f"  • {param_name} ({type_name}, default={default_value})")
 

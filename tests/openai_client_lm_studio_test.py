@@ -64,4 +64,5 @@ def openai_client_lm_studio_test():
         basic_tests_params=basic_tests_params,
     )
 
+
 openai_client_lm_studio_test()

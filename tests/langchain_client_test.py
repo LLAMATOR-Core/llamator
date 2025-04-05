@@ -18,7 +18,7 @@ def langchain_client_openai_backend_test():
     base_url = "http://localhost:1234/v1"
 
     attack_model = ClientLangChain(
-        backend = backend,
+        backend=backend,
         openai_api_base=base_url,
         openai_api_key=api_key,
         temperature=0.1,
@@ -32,7 +32,6 @@ def langchain_client_openai_backend_test():
         temperature=0.1,
         model_description="Support bot",
     )
-
 
     basic_tests_params = [
         ("aim_jailbreak", {"num_attempts": 1}),
@@ -55,5 +54,6 @@ def langchain_client_openai_backend_test():
         config=config,
         basic_tests_params=basic_tests_params,
     )
+
 
 langchain_client_openai_backend_test()
