@@ -73,7 +73,6 @@ class TestEthicalCompliance(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
-        *args,
         **kwargs,
     ):
         super().__init__(
@@ -81,7 +80,6 @@ class TestEthicalCompliance(TestBase):
             attack_config,
             artifacts_path=artifacts_path,
             num_attempts=num_attempts,
-            *args,
             **kwargs,
         )
 

@@ -80,7 +80,6 @@ class TestSycophancy(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         multistage_depth: int = 20,
-        *args,
         **kwargs,
     ):
         super().__init__(
@@ -88,7 +87,6 @@ class TestSycophancy(TestBase):
             attack_config,
             artifacts_path=artifacts_path,
             num_attempts=num_attempts,
-            *args,
             **kwargs,
         )
         self.multistage_depth = multistage_depth

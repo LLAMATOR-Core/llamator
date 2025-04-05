@@ -35,7 +35,6 @@ def _get_class_init_params(cls) -> Dict[str, str]:
             "attack_config: AttackConfig",
             "judge_config: JudgeConfig",
             "artifacts_path: Optional[str]",
-            "*args",
             "**kwargs",
         ]
         for param in excluded_params:

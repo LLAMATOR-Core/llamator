@@ -266,7 +266,7 @@ class MultiStageInteractionSession:
         return False
 
     @staticmethod
-    def default_tested_client_response_handler(tested_client_response: str, *args, **kwargs) -> str:
+    def default_tested_client_response_handler(tested_client_response: str, **kwargs) -> str:
         """
         Default tested_client_response_handler function that returns the response unchanged.
 
@@ -274,8 +274,6 @@ class MultiStageInteractionSession:
         ----------
         tested_client_response : str
             The response from the tested client.
-        *args : tuple
-            Additional positional arguments (not used).
         **kwargs : dict
             Additional keyword arguments (not used).
 
