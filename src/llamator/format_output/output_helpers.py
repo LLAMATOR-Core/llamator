@@ -1,4 +1,3 @@
-import colorama
 from colorama import Style, Fore
 from .draw_utils import (
     get_top_border,

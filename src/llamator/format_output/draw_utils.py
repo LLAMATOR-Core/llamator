@@ -3,8 +3,6 @@
 """
 
 import re
-import textwrap
-import colorama
 from colorama import Style, Fore
 
 def strip_ansi(text: str) -> str:
