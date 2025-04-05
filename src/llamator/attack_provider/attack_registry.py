@@ -77,7 +77,7 @@ def instantiate_tests(
 
     # Create instances of basic test classes
     if basic_tests_params is not None:
-        # Сконвертируем список кортежей (test_name, kwargs) в словарь {test_name: kwargs}
+
         basic_tests_dict = dict(basic_tests_params)
         for cls in test_classes:
             if cls.info["code_name"] in basic_tests_dict:

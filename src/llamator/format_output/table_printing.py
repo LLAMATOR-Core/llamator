@@ -1,13 +1,18 @@
-import colorama
-from prettytable import SINGLE_BORDER, PrettyTable
-from .draw_utils import strip_ansi
+# llamator/src/llamator/format_output/table_printing.py
 
-RESET = colorama.Style.RESET_ALL
-BRIGHT = colorama.Style.BRIGHT
-RED = colorama.Fore.RED
-GREEN = colorama.Fore.GREEN
-BRIGHT_YELLOW = colorama.Fore.LIGHTYELLOW_EX + colorama.Style.BRIGHT
-BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
+from prettytable import SINGLE_BORDER, PrettyTable
+from .box_drawing import strip_ansi
+from .color_consts import (
+    RESET,
+    BRIGHT,
+    RED,
+    GREEN,
+    BRIGHT_CYAN,
+)
+
+"""
+Модуль для вывода результатов в виде таблицы. Используется библиотека PrettyTable.
+"""
 
 def build_progress_bar(progress, total, color, max_width):
     """
@@ -22,6 +27,7 @@ def build_progress_bar(progress, total, color, max_width):
         return f"[{color}{bar}{RESET}] {progress_str}"
     else:
         return "[]"
+
 
 def print_table(title, headers, data, footer_row=None, attack_type_width=None, strength_width=None):
     """

@@ -1,7 +1,16 @@
-from colorama import Style, init
+# llamator/src/llamator/format_output/logo.py
+
+from colorama import init
 import textwrap
-from .draw_utils import get_top_border, get_bottom_border, get_empty_line, format_box_line, strip_ansi
+from .box_drawing import (
+    get_top_border,
+    get_bottom_border,
+    get_empty_line,
+    format_box_line,
+    strip_ansi,
+)
 from ..__version__ import __version__
+from .color_consts import BRIGHT, RESET
 
 init()
 
@@ -42,7 +51,7 @@ def print_logo(box_width: int = 60) -> None:
 
     # Центрируем версию по всей ширине блока
     version_spaces = (inner_width - len(version_text)) // 2
-    version_line = f"{' ' * version_spaces}{Style.DIM}{version_text}{Style.RESET_ALL}"
+    version_line = f"{' ' * version_spaces}{BRIGHT}{version_text}{RESET}"
     print(format_box_line(version_line, final_box_width))
 
     print(get_bottom_border(final_box_width))

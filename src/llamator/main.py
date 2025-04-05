@@ -5,18 +5,23 @@ import os
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Type
 
-import colorama
-from colorama import Style, Fore
 from dotenv import load_dotenv
 
 from .attack_provider.run_tests import setup_models_and_tests
 from .attack_provider.test_base import TestBase
 from .client.chat_client import ClientBase
 from .format_output.logo import print_logo
-from .format_output.draw_utils import (
+from .format_output.box_drawing import (
     get_top_border,
     get_bottom_border,
     format_centered_line,
+)
+from .format_output.color_consts import (
+    BRIGHT,
+    RESET,
+    BRIGHT_CYAN,
+    BRIGHT_RED,
+    BRIGHT_GREEN,
 )
 from .initial_validation import (
     validate_artifacts_path,
@@ -32,15 +37,6 @@ from .report_generators.word_report_generator import create_word_report
 # Load user-defined environment variables
 dotenv_path = os.path.join(os.getcwd(), ".env")
 load_dotenv(dotenv_path)
-colorama.init()
-
-# Constants for styling
-RESET = Style.RESET_ALL
-BRIGHT = Style.BRIGHT
-BRIGHT_CYAN = Fore.CYAN + Style.BRIGHT
-BRIGHT_RED = Fore.RED + Style.BRIGHT
-BRIGHT_GREEN = Fore.GREEN + Style.BRIGHT
-
 
 def validate_models_and_tests(
     attack_model: ClientBase,

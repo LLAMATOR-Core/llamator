@@ -11,18 +11,11 @@ from ..client.attack_config import AttackConfig
 from ..client.chat_client import *
 from ..client.client_config import ClientConfig
 from ..client.judge_config import JudgeConfig
-from ..format_output.results_table import print_table
+from ..format_output.color_consts import RESET, LIGHTBLUE, RED, BRIGHT_YELLOW, GREEN, BRIGHT_RED
+from ..format_output.table_printing import print_table
 from .test_base import StatusUpdate, TestBase, TestStatus
 
 logger = logging.getLogger(__name__)
-
-RESET = colorama.Style.RESET_ALL
-LIGHTBLUE = colorama.Fore.LIGHTBLUE_EX
-BRIGHT_RED = colorama.Fore.RED + colorama.Style.BRIGHT
-BRIGHT_CYAN = colorama.Fore.CYAN + colorama.Style.BRIGHT
-RED = colorama.Fore.RED
-GREEN = colorama.Fore.GREEN
-BRIGHT_YELLOW = colorama.Fore.LIGHTYELLOW_EX + colorama.Style.BRIGHT
 
 # Define desired column widths for Attack Type and Strength
 ATTACK_TYPE_WIDTH = 25
@@ -212,7 +205,6 @@ def report_results(tests: List[TestBase]):
     from llamator.format_output.output_helpers import print_test_results_header
     print_test_results_header(80)
 
-    # Подготавливаем строки данных без форматирования – все вычисления и выравнивания выполняются в results_table
     rows = sorted(
         [
             [

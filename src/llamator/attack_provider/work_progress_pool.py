@@ -1,19 +1,11 @@
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
-
-import colorama
 from tqdm import tqdm
 
-logger = logging.getLogger(__name__)
+from llamator.format_output.color_consts import BRIGHT, RED, RESET, GREEN, YELLOW
 
-# Define color shortcuts
-RED = colorama.Fore.RED
-YELLOW = colorama.Fore.YELLOW
-GREEN = colorama.Fore.GREEN
-BLUE = colorama.Fore.BLUE
-BRIGHT = colorama.Style.BRIGHT
-RESET = colorama.Style.RESET_ALL
+logger = logging.getLogger(__name__)
 
 
 class ProgressWorker:

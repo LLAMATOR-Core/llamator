@@ -15,7 +15,7 @@ class TestLogEntry:
     def __init__(self, prompt: str, response: str, success: bool, additional_info: str):
         self.prompt = prompt  # The prompt sent to the LLM model
         self.response = response  # The response from the LLM model
-        self.success = success  # True if the attack was successful (this means system prompt was weak), False otherwise
+        self.success = success  # True if the attack was successful (system prompt was weak), False otherwise
         self.additional_info = additional_info
 
     def __str__(self):
@@ -24,7 +24,7 @@ class TestLogEntry:
 
 class TestStatus:
     """
-    Keeps track of the successful and failed prompts, as well as the log of all interactions with the target LLM model.
+    Keeps track of successful and failed prompts, as well as the log of all interactions with the target LLM model.
     """
 
     def __init__(self):
@@ -32,7 +32,7 @@ class TestStatus:
         self.resilient_count: int = 0
         self.error_count: int = 0
         self.total_count: int = 0
-        self.finished: bool = False  # This test is finished and the results are final
+        self.finished: bool = False  # Indicates the test is finished and the results are final
         self.log: List[TestLogEntry] = []
 
     def __str__(self):
@@ -42,9 +42,9 @@ class TestStatus:
         self,
         prompt: str,
         response: str,
-        additional_info: str = "Attack succesfully broke system prompt protection",
+        additional_info: str = "Attack successfully broke system prompt protection",
     ):
-        """Reports a succesful breach of the system prompt"""
+        """Reports a successful breach of the system prompt"""
         self.breach_count += 1
         self.total_count += 1
         self.log.append(TestLogEntry(prompt, response, True, additional_info))
@@ -61,7 +61,7 @@ class TestStatus:
         self.log.append(TestLogEntry(prompt, response, False, additional_info))
 
     def report_error(self, prompt: str, additional_info: str = "Error"):
-        "Reports an error during the test"
+        """Reports an error during the test"""
         self.error_count += 1
         self.total_count += 1
         self.log.append(TestLogEntry(prompt, None, False, additional_info))
@@ -90,7 +90,7 @@ class StatusUpdate:
 class TestBase(ABC):
     """
     A base class for test classes. Each test represents a different kind of attack against the target LLM model.
-    The test sends a sequence of prompts and evaluate the responses while updating the status.
+    The test sends a sequence of prompts and evaluates the responses while updating the status.
     """
 
     info = {
@@ -153,24 +153,24 @@ class TestBase(ABC):
         self, e: Exception, attack_prompts: list[str], responses: list[str], statuses: list[str]
     ) -> StatusUpdate:
         """
-        Обрабатывает исключение, регистрируя оставшиеся попытки как ошибки, записывает информацию об ошибке,
-        подготавливает данные для отчета и возвращает финальный статус теста.
+        Processes an exception by logging remaining attempts as errors, recording error information,
+        preparing data for the report, and returning the final test status.
 
         Parameters
         ----------
         e : Exception
-            Исключение, которое произошло.
+            The exception that occurred.
         attack_prompts : list[str]
-            Список сгенерированных атак.
+            List of generated attack prompts.
         responses : list[str]
-            Список ответов на атаки.
+            List of responses to the attacks.
         statuses : list[str]
-            Список статусов для каждой атаки.
+            List of statuses for each attack.
 
         Returns
         -------
         StatusUpdate
-            Финальное обновление статуса с информацией о завершении теста.
+            Final status update with test completion information.
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
