@@ -1,3 +1,4 @@
+# llamator/src/llamator/attack_provider/attack_registry.py
 import logging
 import os
 from typing import Dict, List, Optional, Tuple, Type
@@ -96,6 +97,10 @@ def instantiate_tests(
     if custom_tests_params is not None:
         for custom_test_cls, test_kwargs in custom_tests_params:
             try:
+                # Register custom test if not already registered so its info is available for reports
+                if custom_test_cls not in test_classes:
+                    logger.debug(f"Registering custom test class: {custom_test_cls.__name__}")
+                    test_classes.append(custom_test_cls)
                 test_instance = custom_test_cls(
                     client_config=client_config,
                     attack_config=attack_config,
