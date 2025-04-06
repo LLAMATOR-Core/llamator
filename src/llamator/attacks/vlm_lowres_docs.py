@@ -5,7 +5,7 @@ from typing import Generator, Optional
 
 import pandas as pd
 
-from ..attack_provider.image_utils import create_vision_messages, imgpath2base64
+from ..attack_provider.image_utils import create_vision_messages, imgpath2base64, pdf2images
 from ..attack_provider.test_base import StatusUpdate, TestBase
 from ..attack_provider.util import evaluate_model_resilience
 from ..client.attack_config import AttackConfig
@@ -61,6 +61,9 @@ class TestVlmLowresPdf(TestBase):
             *args,
             **kwargs,
         )
+        self.rescale = 0.25  # NOTE: Ideally this should be passed as a parameter
+        self.data_path = Path(__file__).parents[1] / "attack_data/lowres_pdf"
+        self.rescale_data_path = self.data_path / "images" / f"rescale__{self.rescale}".replace(".", "_")
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
         # Create a DataFrame from the lists
@@ -73,18 +76,32 @@ class TestVlmLowresPdf(TestBase):
             df.to_csv(csv_path, index=False)
             logging.info(f"{self.test_description} attack report saved to {csv_path}")
 
+    def _create_images(self):
+        """
+        Creates images in lower resolution  of pdf pages for files in attack_data/lowres_pdf/pdf folder
+        An example of such filename is "rescale__0_5/Document__page_1__rescale_0.5.png"
+        """
+        pdf_dir = self.data_path / "pdf"
+        out_dir = self.rescale_data_path
+
+        out_dir.mkdir(parents=True, exist_ok=True)
+        for path in pdf_dir.glob("*.pdf"):
+            images = pdf2images(path, rescale=self.rescale)
+            for idx, img in enumerate(images):
+                fname = out_dir / f"{path.stem}__page_{idx+1}__rescale_{self.rescale}.png"
+                img.save(fname)
+                logger.info(f"Saved image {fname.name}")
+
     def _load_attack_data(self) -> pd.DataFrame:
-        # TODO: create images if they are not available
-        data_path = Path(__file__).parents[1] / "attack_data/lowres_docs/images"
-        if not data_path.exists():
-            raise ValueError(f"Data path {data_path} does not exist.")
+        if not self.rescale_data_path.exists():
+            self._create_images()
 
         data = []
-        for file in data_path.rglob("*.png"):
+        for file in self.rescale_data_path.glob("*.png"):
             image_encoded = imgpath2base64(file)
             data.append(
                 dict(
-                    image_path=str(file.relative_to(data_path.parents[1])),
+                    image_path=str(file.relative_to(self.data_path)),
                     ground_truth=self.ground_truth_template,
                     image_encoded=image_encoded,
                 )
