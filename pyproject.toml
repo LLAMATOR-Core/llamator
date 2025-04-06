@@ -10,6 +10,7 @@ known_first_party = ['llamator']
 known_third_party = [ # Most popular libraries. Extend if necessary.
     'IPython',
     'PIL',
+    'pillow',
     'cv2',
     'dotenv',
     'editdistance',

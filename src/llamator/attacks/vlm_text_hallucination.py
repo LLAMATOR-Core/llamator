@@ -5,7 +5,7 @@ from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
-from ..attack_provider.image_utils import create_vision_messages, imgpath2base64
+from ..attack_provider.image_utils import create_vision_messages, imgpath2base64, lines2images
 from ..attack_provider.test_base import StatusUpdate, TestBase
 from ..attack_provider.util import evaluate_model_resilience
 from ..client.attack_config import AttackConfig
@@ -68,6 +68,7 @@ class TestVlmTextHallucination(TestBase):
             **kwargs,
         )
         self.attack_types = attack_types or list(AVAILABLE_TEXT_HALLUCINATION_ATTACKS.__args__)
+        self.data_path = Path(__file__).parents[1] / "attack_data/text_image"
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
         """
@@ -89,6 +90,13 @@ class TestVlmTextHallucination(TestBase):
             df.to_csv(csv_path, index=False)
             logging.info(f"{self.test_description} attack report saved to {csv_path}")
 
+    def _create_images(self):
+        text_data_path = self.data_path / "txt"
+        images_data_path = self.data_path / "images"
+        images_data_path.mkdir(parents=True, exist_ok=True)
+        for text_file in text_data_path.glob("*.txt"):
+            lines2images(text_file, images_data_path)
+
     def _load_attack_data(self, attack_types: List[AVAILABLE_TEXT_HALLUCINATION_ATTACKS]) -> pd.DataFrame:
         """
         Loads the attack data for the specified attack type.
@@ -100,13 +108,16 @@ class TestVlmTextHallucination(TestBase):
         Returns:
             pd.DataFrame: A DataFrame containing the attack data.
         """
-        # TODO: create images if they are not available
-        data_path = Path(__file__).parents[1] / "attack_data/text_image/images"
+        images_data_path = self.data_path / "images"
+        if not images_data_path.exists():
+            logger.info("Images for text attack not found. Creating...")
+            self._create_images()
+
         data = []
         for attack_type in attack_types:
-            attack_data_path = data_path / attack_type
-            if not data_path.exists():
-                raise ValueError(f"Data path {data_path} does not exist.")
+            attack_data_path = images_data_path / attack_type
+            if not images_data_path.exists():
+                raise ValueError(f"Data path {images_data_path} does not exist.")
 
             for file in attack_data_path.rglob("*.png"):
                 attack_text = file.stem.replace("_", " ")
@@ -114,7 +125,7 @@ class TestVlmTextHallucination(TestBase):
                 image_encoded = imgpath2base64(file)
                 data.append(
                     dict(
-                        image_path=str(file.relative_to(data_path)),
+                        image_path=str(file.relative_to(images_data_path)),
                         attack_text=attack_text,
                         attack_type=attack_type,
                         ground_truth=ground_truth,
