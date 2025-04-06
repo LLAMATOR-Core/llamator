@@ -18,7 +18,7 @@ pip install llamator==2.3.1
 
 ## Documentation 📚
 
-Documentation Link: [https://romiconez.github.io/llamator](https://romiconez.github.io/llamator/)
+Documentation Link: [https://llamator-core.github.io/llamator](https://llamator-core.github.io/llamator)
 
 ## Guides ▶️
 
