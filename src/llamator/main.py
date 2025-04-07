@@ -19,6 +19,7 @@ from .initial_validation import (
     validate_language,
     validate_model,
     validate_tests,
+    validate_basic_tests_params,
 )
 from .logging import setup_logging
 from .report_generators.excel_report_generator import create_attack_report_from_artifacts
@@ -37,25 +38,25 @@ def validate_models_and_tests(
     custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]],
 ) -> bool:
     """
-    Validates the provided models and the list of tests.
+    Validates the provided models and test configurations.
 
     Parameters
     ----------
     attack_model : ClientBase
-        Attack model.
-    judge_model : ClientBase, optional
-        Judge model.
+        The model that will be used to generate attacks.
+    judge_model : Optional[ClientBase]
+        The model that will judge the responses.
     tested_model : ClientBase
-        Target model to be tested.
-    basic_tests_params : List[Tuple[str, Dict]], optional
-        List of basic tests with parameters.
-    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
-        List of custom test classes with parameters.
+        The model being tested.
+    basic_tests_params : Optional[List[Tuple[str, Dict]]]
+        A list of basic tests with parameter dictionaries.
+    custom_tests_params : Optional[List[Tuple[Type[TestBase], Dict]]]
+        A list of custom test classes with parameter dictionaries.
 
     Returns
     -------
     bool
-        True if everything is valid, otherwise False.
+        True if all validations succeed, otherwise False.
     """
     print(f"{BRIGHT_CYAN}Validating models...{RESET}")
     if not validate_model(attack_model):
@@ -80,10 +81,17 @@ def validate_models_and_tests(
         print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
 
     if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
-        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid values.")
+        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid code names.")
         return False
     else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Test list validated successfully.")
+        print(f"{BRIGHT_GREEN}✓{RESET} Test code names validated successfully.")
+
+    if basic_tests_params and not validate_basic_tests_params(basic_tests_params):
+        print(f"{BRIGHT_RED}✘{RESET} One or more test parameters are invalid.")
+        return False
+    else:
+        if basic_tests_params:
+            print(f"{BRIGHT_GREEN}✓{RESET} Basic test parameters validated successfully.")
 
     if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
         print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
@@ -97,20 +105,20 @@ def validate_models_and_tests(
 
 def _rename_reports_with_timestamp(artifacts_run_path: str, start_timestamp: str) -> None:
     """
-    Renames the folder 'csv_report' and its CSV files, as well as the
-    Word / Excel reports and the main log file, appending the timestamp.
+    Renames the 'csv_report' folder and its CSV files, as well as the Word/Excel reports
+    and the main log file, appending a unique timestamp.
 
     Parameters
     ----------
     artifacts_run_path : str
-        The path to the folder where artifacts are stored.
+        The path to the artifacts directory (for example: logs, CSV reports).
     start_timestamp : str
-        The timestamp to be appended (e.g., "2025-04-05_16-02-18").
+        The timestamp string (e.g. '2025-04-05_16-02-18') to be appended to file names.
     """
     csv_folder_name = "csv_report"
 
     try:
-        # 1) Rename csv_report folder
+        # 1) Rename the csv_report folder
         old_csv_folder_path = os.path.join(artifacts_run_path, csv_folder_name)
         csv_folder_timestamped = f"{csv_folder_name}_{start_timestamp}"
         new_csv_folder_path = os.path.join(artifacts_run_path, csv_folder_timestamped)
@@ -118,11 +126,11 @@ def _rename_reports_with_timestamp(artifacts_run_path: str, start_timestamp: str
         if os.path.isdir(old_csv_folder_path):
             os.rename(old_csv_folder_path, new_csv_folder_path)
 
-            # 2) Add timestamp to each CSV file inside the renamed folder
+            # 2) Append the timestamp to each CSV file inside the renamed folder
             for filename in os.listdir(new_csv_folder_path):
                 if filename.lower().endswith(".csv"):
                     old_csv_file = os.path.join(new_csv_folder_path, filename)
-                    base_name, ext = os.path.splitext(filename)  # ext = ".csv"
+                    base_name, ext = os.path.splitext(filename)
                     new_csv_name = f"{base_name}_{start_timestamp}{ext}"
                     new_csv_file = os.path.join(new_csv_folder_path, new_csv_name)
                     os.rename(old_csv_file, new_csv_file)
@@ -164,33 +172,28 @@ def start_testing(
     ----------
     attack_model : ClientBase
         The model that generates attacks.
-    judge_model : ClientBase, optional
-        The model that judges the responses.
     tested_model : ClientBase
-        The model being tested.
+        The model to be tested for vulnerabilities.
     config : dict
-        Configuration dictionary with the following keys:
+        Configuration dictionary with keys:
         - 'enable_logging' : bool
             Whether to enable logging.
         - 'enable_reports' : bool
-            Whether to generate xlsx reports.
+            Whether to generate Excel/Word reports.
         - 'artifacts_path' : Optional[str]
-            Path to the folder for saving artifacts.
+            Path to the folder for saving artifacts (logs, CSV, etc.).
         - 'debug_level' : int
-            Level of logging verbosity (default is 1).
-            debug_level = 0 - WARNING.
-            debug_level = 1 - INFO.
-            debug_level = 2 - DEBUG.
+            Logging level (0=WARNING, 1=INFO, 2=DEBUG).
         - 'report_language' : str
-            Language for the report (default is 'en').
-            Possible values: 'en', 'ru'.
-    num_threads : int, optional
-        Number of threads for parallel execution.
-    basic_tests : List[Tuple[str, dict]], optional
-        List of test names and parameter dictionaries for standard tests (default is None).
-        The dictionary keys and values will be passed as keyword arguments to the test class constructor.
-    custom_tests : List[Tuple[Type[TestBase], Dict]], optional
-        List of custom test classes and parameter dictionaries (default is None).
+            Language code for the final report ('en' or 'ru').
+    judge_model : Optional[ClientBase]
+        The model that judges the responses (optional).
+    num_threads : Optional[int]
+        Number of threads to use for parallel testing.
+    basic_tests : Optional[List[Tuple[str, Dict]]]
+        A list of test code names and a dict of parameters for each test.
+    custom_tests : Optional[List[Tuple[Type[TestBase], Dict]]]
+        A list of custom test classes and parameter dictionaries.
 
     Returns
     -------
@@ -222,24 +225,23 @@ def start_testing(
         else:
             artifacts_run_path = None
 
-    # Setup logging if enabled
     if enable_logging and artifacts_run_path is not None:
         setup_logging(debug_level, artifacts_run_path)
         print(f"{BRIGHT_CYAN}ℹ{RESET} Logging has been set up with debug level: {debug_level}")
 
-    # Print logo
+    # Print the LLAMATOR logo
     print_logo(box_width=80)
 
-    # Print test config info
+    # Print test configuration
     from llamator.format_output.output_helpers import print_testing_configuration
 
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
-    # Validate
+    # Validate models, test codes, and parameters
     if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests, custom_tests):
         return
 
-    # Launch tests
+    # Run tests
     setup_models_and_tests(
         attack_model=attack_model,
         judge_model=judge_model,
@@ -259,14 +261,13 @@ def start_testing(
         if isinstance(handler, RotatingFileHandler):
             handler.close()
 
-    # Generate reports if needed
+    # Generate reports if enabled
     if enable_reports and artifacts_run_path:
         report_language = validate_language(report_language)
         print(
             f"{BRIGHT_RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language. Reader discretion is advised.{RESET}"
         )
 
-        # Вынесение базового имени отчёта в отдельную переменную
         report_base_name = "attacks_report"
 
         print(f"{BRIGHT_CYAN}Generating reports...{RESET}")
@@ -282,7 +283,6 @@ def start_testing(
             language=report_language,
         )
 
-        # Rename all relevant files to include the timestamp
         _rename_reports_with_timestamp(artifacts_run_path, start_timestamp)
 
         print(f"Reports created: {artifacts_run_path}")
@@ -291,7 +291,7 @@ def start_testing(
         print(f"Excel report path: {excel_report_path}")
         print(f"Word report path: {word_report_path}")
 
-    # Decorative border
+    # Decorative border at the end
     box_width = 80
     print(get_top_border(box_width))
     thank_you_text = "Thank you for using LLAMATOR!"
