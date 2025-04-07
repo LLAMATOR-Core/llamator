@@ -1,25 +1,24 @@
 # llamator/src/llamator/attack_provider/work_progress_pool.py
+
 import logging
 import threading
-import sys  # добавлен импорт для вывода в sys.stdout
 from concurrent.futures import ThreadPoolExecutor
 
 from tqdm.auto import tqdm
 
 from llamator.format_output.color_consts import BRIGHT, GREEN, RED, RESET, YELLOW
-from llamator.format_output.box_drawing import strip_ansi  # <-- Импорт функции для удаления ANSI-кодов
+from llamator.format_output.box_drawing import strip_ansi
 
 logger = logging.getLogger(__name__)
 
 
 def _is_notebook_environment() -> bool:
     """
-    Простая проверка на то, запущен ли код в Jupyter Notebook/колабе или нет.
-    Если мы в Jupyter, возвращаем True, иначе False.
+    Check if running in a Jupyter Notebook environment.
+    Returns True if in Jupyter, otherwise False.
     """
     try:
         from IPython import get_ipython
-
         if get_ipython() is not None:
             return True
     except ImportError:
@@ -28,25 +27,49 @@ def _is_notebook_environment() -> bool:
 
 
 class ProgressWorker:
-    def __init__(self, worker_id, progress_bar=False):
-        self.worker_id = worker_id
-        self.progress_bar = None
-        self.breach_count = 0
-        self.resilient_count = 0
-        self.error_count = 0
+    """
+    Manages multiple progress bars for a single worker.
+    Each unique attack (identified by its ID) uses one tqdm progress bar.
+    """
 
-        if progress_bar:
-            self.progress_bar = tqdm(
-                total=1,
-                desc=f"Worker #{worker_id:02}: {'(idle)':50}",
-                position=worker_id,
-                leave=True,
-            )
+    def __init__(self, worker_id, progress_bar=True):
+        """
+        Parameters
+        ----------
+        worker_id : int
+            The worker's ID.
+        progress_bar : bool
+            Whether to enable progress bars.
+        """
+        self.worker_id = worker_id
+        self.enable_progress = progress_bar
+        self.lock = threading.Lock()
+        self.task_bars = {}  # key: attack_id, value: tqdm bar
+        self.position_counter = 0
 
     def shutdown(self):
-        # When worker is destroyed, ensure the corresponding progress bars closes properly.
-        if self.progress_bar:
-            self.progress_bar.close()
+        """
+        Close all progress bars.
+        """
+        with self.lock:
+            for bar in self.task_bars.values():
+                bar.close()
+            self.task_bars.clear()
+
+    def flush(self):
+        """
+        For each progress bar, update it to complete state and then close it.
+        """
+        with self.lock:
+            for bar in self.task_bars.values():
+                try:
+                    if bar.n < bar.total:
+                        bar.update(bar.total - bar.n)
+                    bar.refresh()
+                    bar.close()
+                except Exception as e:
+                    logger.error(f"Error flushing bar: {e}", exc_info=True)
+            self.task_bars.clear()
 
     def update(
         self,
@@ -56,103 +79,103 @@ class ProgressWorker:
         breach_count: int = 0,
         resilient_count: int = 0,
         error_count: int = 0,
-        colour="BLACK",
+        colour: str = "BLACK",
     ):
         """
-        Функция обновляет прогресс-бар и описание задачи.
+        Updates the progress bar for a given attack.
+        The task_name must be in the format "ACTION: ATTACK_ID", where ATTACK_ID is used as key.
 
-        Параметры:
+        Parameters
         ----------
         task_name : str
-            Название задачи, отображаемое пользователю.
+            A string in the format "ACTION: ATTACK_ID" (e.g. "Attacking: RU_ucar").
         progress : float
-            Текущее количество выполненных итераций.
+            Current progress count.
         total : float
-            Общее количество итераций.
+            Total steps.
         breach_count : int
-            Количество успешных взломов (нарушений).
+            Number of breaches.
         resilient_count : int
-            Количество заблокированных атак.
+            Number of resilient (blocked) attempts.
         error_count : int
-            Количество ошибок.
+            Number of errors.
         colour : str
-            Цвет (tqdm позволяет менять цвет прогресс-бара).
+            Colour for the progress bar.
         """
-        if not self.progress_bar:
+        if not self.enable_progress:
             return
 
-        # Update tracking counts
-        self.breach_count = breach_count
-        self.resilient_count = resilient_count
-        self.error_count = error_count
+        try:
+            action, attack_id = task_name.split(":", 1)
+            action = action.strip()
+            attack_id = attack_id.strip()
+        except ValueError:
+            action = ""
+            attack_id = task_name.strip()
 
-        # Format status info
-        status_info = f"[{BRIGHT}{RED}B:{breach_count}{RESET} | {BRIGHT}{GREEN}R:{resilient_count}{RESET} | {BRIGHT}{YELLOW}E:{error_count}{RESET}]"
-
-        # Если в Jupyter, удаляем ANSI-коды из task_name и status_info,
-        # чтобы в прогресс-баре не было «кракозябр».
-        if _is_notebook_environment():
-            task_name = strip_ansi(task_name)
-            status_info = strip_ansi(status_info)
-
-        # Update the progress bar
-        with self.progress_bar.get_lock():  # Ensure thread-safe updates
-            progress_text = f"{task_name + ' ':.<40} [{progress}/{total}] {status_info}"
-            # Если вы хотите совсем убрать цвет из описания даже вне Jupyter, можете также вызвать strip_ansi(progress_text)
-            self.progress_bar.set_description(
-                f"Worker #{self.worker_id:02}: {progress_text}{RESET}",
-                refresh=True,
+        with self.lock:
+            status_info = (
+                f"[{BRIGHT}{RED}B:{breach_count}{RESET} | "
+                f"{BRIGHT}{GREEN}R:{resilient_count}{RESET} | "
+                f"{BRIGHT}{YELLOW}E:{error_count}{RESET}]"
             )
-            self.progress_bar.colour = colour  # valid choices according to tqdm docs: [hex (#00ff00), BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE]
-            self.progress_bar.n = int(progress)  # Directly set progress value
-            self.progress_bar.total = int(total)  # And total value too
-            self.progress_bar.refresh()  # Refresh to update the UI
+            if _is_notebook_environment():
+                action = strip_ansi(action)
+                attack_id = strip_ansi(attack_id)
+                status_info = strip_ansi(status_info)
+
+            if attack_id not in self.task_bars:
+                bar = tqdm(
+                    total=int(total),
+                    desc=f"Worker #{self.worker_id:02}: {action}: {attack_id}",
+                    position=self.position_counter,
+                    leave=True,
+                )
+                self.task_bars[attack_id] = bar
+                self.position_counter += 1
+            else:
+                bar = self.task_bars[attack_id]
+
+            desc_text = f"{action}: {attack_id} [{int(progress)}/{int(total)}] {status_info}"
+            bar.set_description(f"Worker #{self.worker_id:02}: {desc_text}{RESET}", refresh=True)
+            bar.colour = colour
+            bar.total = int(total)
+            bar.n = int(progress)
+            bar.refresh()
+            # Do not close the bar here; flush() will handle closing.
 
 
 class WorkProgressPool:
-    def __init__(self, num_workers):
-        """
-        Параллельный пул для выполнения тестов с отображением прогресса.
+    """
+    A thread pool that executes tasks in parallel, each worker having its own ProgressWorker.
+    """
 
-        Параметры:
+    def __init__(self, num_workers: int):
+        """
+        Parameters
         ----------
         num_workers : int
-            Количество параллельных потоков (воркеров).
+            Number of parallel workers.
         """
-        enable_per_test_progress_bars = True  # Enable detailed progress bars
         self.num_workers = num_workers
         self.progress_workers = [
-            ProgressWorker(worker_id, progress_bar=enable_per_test_progress_bars)
-            for worker_id in range(self.num_workers)
+            ProgressWorker(worker_id, progress_bar=True) for worker_id in range(self.num_workers)
         ]
-        # Remove the queue_progress_bar as we don't want to display overall progress
         self.tasks_count = None
-        self.semaphore = threading.Semaphore(
-            self.num_workers
-        )  # Used to ensure that at most this number of tasks are immediately pending waiting for free worker slot
+        self.semaphore = threading.Semaphore(self.num_workers)
 
-    def worker_function(self, worker_id, tasks):
+    def worker_function(self, worker_id: int, tasks):
         """
-        Цикл для одного воркера:
-        - Получаем задачу из итератора
-        - Выполняем (task) в контексте ProgressWorker
-        - Сигнализируем освобождение
+        Worker loop: execute each task using the assigned ProgressWorker.
         """
         progress_worker = self.progress_workers[worker_id]
-        progress_bar = progress_worker.progress_bar
         for task in tasks:
-            self.semaphore.acquire()  # Wait until a worker slot is available
+            self.semaphore.acquire()
             if task is None:
                 break
             try:
-                if progress_bar:
-                    progress_bar.n = 0
-                    progress_bar.total = 1
-                    progress_bar.refresh()
                 task(progress_worker)
             except Exception as e:
-                # Task caused exception. Мы не можем напрямую распечатать ошибку через print в консоль,
-                # так как это может конфликтовать с выводом tqdm. Используем логгер.
                 logger.error(f"Task caused exception: {e}", exc_info=True)
                 raise
             finally:
@@ -160,37 +183,35 @@ class WorkProgressPool:
 
     def run(self, tasks, tasks_count=None):
         """
-        Запуск пула с воркерами для выполнения списка задач.
+        Start the thread pool to execute a collection of tasks.
 
-        Параметры:
+        Parameters
         ----------
-        tasks : итератор (generator) задач
-        tasks_count : int
-            Количество задач (используется для условного общего прогресс-бара).
+        tasks : iterable
+            An iterator or list of task callables. Each callable accepts a ProgressWorker.
+        tasks_count : int, optional
+            Total number of tasks.
         """
         self.tasks_count = tasks_count
-
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            # Запускаем worker_function в каждом потоке
             futures = [executor.submit(self.worker_function, worker_id, tasks) for worker_id in range(self.num_workers)]
-            # Ждём завершения всех воркеров
-            for future in futures:
-                future.result()
-
-        # Закрываем прогресс-бары корректно
+            for f in futures:
+                f.result()
         for pw in self.progress_workers:
-            pw.shutdown()
+            pw.flush()
 
 
 class ThreadSafeTaskIterator:
-    """Это потокобезопасный итератор для задач."""
+    """
+    A thread-safe iterator for tasks.
+    """
 
     def __init__(self, generator):
         """
-        Параметры:
+        Parameters
         ----------
         generator : iterable
-            Источник задач.
+            The source of tasks.
         """
         self.generator = generator
         self.lock = threading.Lock()
@@ -199,8 +220,5 @@ class ThreadSafeTaskIterator:
         return self
 
     def __next__(self):
-        """
-        Извлекаем задачу из generator в потокобезопасном режиме.
-        """
         with self.lock:
             return next(self.generator)
