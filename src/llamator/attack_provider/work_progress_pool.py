@@ -1,11 +1,12 @@
 import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor
+
 from tqdm import tqdm as console_tqdm
 from tqdm.auto import tqdm as notebook_tqdm
 
-from llamator.format_output.color_consts import BRIGHT, GREEN, RED, RESET, YELLOW
 from llamator.format_output.box_drawing import strip_ansi
+from llamator.format_output.color_consts import BRIGHT, GREEN, RED, RESET, YELLOW
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ def _is_notebook_environment() -> bool:
     """
     try:
         from IPython import get_ipython
+
         if get_ipython() is not None:
             return True
     except ImportError:
@@ -260,10 +262,7 @@ class WorkProgressPool:
         """
         self.tasks_count = tasks_count
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            futures = [
-                executor.submit(self.worker_function, worker_id, tasks)
-                for worker_id in range(self.num_workers)
-            ]
+            futures = [executor.submit(self.worker_function, worker_id, tasks) for worker_id in range(self.num_workers)]
             for f in futures:
                 f.result()
         for pw in self.progress_workers:

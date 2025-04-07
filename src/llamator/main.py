@@ -15,11 +15,11 @@ from .format_output.color_consts import BRIGHT, BRIGHT_CYAN, BRIGHT_GREEN, BRIGH
 from .format_output.logo import print_logo
 from .initial_validation import (
     validate_artifacts_path,
+    validate_basic_tests_params,
     validate_custom_tests,
     validate_language,
     validate_model,
     validate_tests,
-    validate_basic_tests_params,
 )
 from .logging import setup_logging
 from .report_generators.excel_report_generator import create_attack_report_from_artifacts
@@ -272,9 +272,7 @@ def start_testing(
 
         print(f"{BRIGHT_CYAN}Generating reports...{RESET}")
         create_attack_report_from_artifacts(
-            artifacts_dir=artifacts_run_path,
-            csv_folder_name="csv_report",
-            report_file_name=f"{report_base_name}.xlsx"
+            artifacts_dir=artifacts_run_path, csv_folder_name="csv_report", report_file_name=f"{report_base_name}.xlsx"
         )
         create_word_report(
             artifacts_dir=artifacts_run_path,

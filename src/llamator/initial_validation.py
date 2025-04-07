@@ -2,7 +2,7 @@
 
 import logging
 import os
-from typing import List, Type, Tuple, Dict
+from typing import Dict, List, Tuple, Type
 
 from .attack_provider.attack_registry import test_classes
 from .attack_provider.test_base import TestBase
