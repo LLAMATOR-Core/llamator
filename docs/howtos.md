@@ -39,7 +39,7 @@ tested_model = llamator.ClientOpenAI(
 )
 
 # List of basic tests with parameters
-basic_tests_params = [
+basic_tests = [
     ("aim_jailbreak", {"num_attempts": 2}),
     ("base64_injection", {"num_attempts": 2}),
     ("bon", {"num_attempts": 2}),
@@ -62,7 +62,7 @@ llamator.start_testing(
     attack_model=attack_model,
     tested_model=tested_model,
     config=config,
-    basic_tests=basic_tests_params,
+    basic_tests=basic_tests,
 )
 ```
 
