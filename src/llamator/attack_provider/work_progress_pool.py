@@ -1,8 +1,10 @@
+# llamator/src/llamator/attack_provider/work_progress_pool.py
 import logging
 import threading
+import sys  # добавлен импорт для вывода в sys.stdout
 from concurrent.futures import ThreadPoolExecutor
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from llamator.format_output.color_consts import BRIGHT, GREEN, RED, RESET, YELLOW
 
