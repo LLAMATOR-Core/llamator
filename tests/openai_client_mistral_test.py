@@ -61,7 +61,7 @@ def openai_client_mistral_test():
         attack_model=attack_model,
         tested_model=tested_model,
         config=config,
-        basic_tests_params=basic_tests_params,
+        basic_tests=basic_tests_params,
     )
 
 

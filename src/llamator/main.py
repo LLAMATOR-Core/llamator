@@ -154,8 +154,8 @@ def start_testing(
     config: dict,
     judge_model: Optional[ClientBase] = None,
     num_threads: Optional[int] = 1,
-    basic_tests_params: Optional[List[Tuple[str, Dict]]] = None,
-    custom_tests_params: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
+    basic_tests: Optional[List[Tuple[str, Dict]]] = None,
+    custom_tests: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
 ):
     """
     The main entry point for launching tests.
@@ -186,10 +186,10 @@ def start_testing(
             Possible values: 'en', 'ru'.
     num_threads : int, optional
         Number of threads for parallel execution.
-    basic_tests_params : List[Tuple[str, dict]], optional
+    basic_tests : List[Tuple[str, dict]], optional
         List of test names and parameter dictionaries for standard tests (default is None).
         The dictionary keys and values will be passed as keyword arguments to the test class constructor.
-    custom_tests_params : List[Tuple[Type[TestBase], Dict]], optional
+    custom_tests : List[Tuple[Type[TestBase], Dict]], optional
         List of custom test classes and parameter dictionaries (default is None).
 
     Returns
@@ -236,7 +236,7 @@ def start_testing(
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
     # Validate
-    if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests_params, custom_tests_params):
+    if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests, custom_tests):
         return
 
     # Launch tests
@@ -245,8 +245,8 @@ def start_testing(
         judge_model=judge_model,
         tested_model=tested_model,
         num_threads=num_threads,
-        basic_tests_params=basic_tests_params,
-        custom_tests_params=custom_tests_params,
+        basic_tests_params=basic_tests,
+        custom_tests_params=custom_tests,
         artifacts_path=artifacts_run_path if enable_reports else None,
     )
 

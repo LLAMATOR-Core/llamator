@@ -42,8 +42,8 @@ def openai_client_lm_studio_test():
     )
 
     basic_tests_params = [
-        ("aim_jailbreak", {"num_attempts": 1}),
-        ("dan", {"num_attempts": 1}),
+        ("RU_ucar", {"num_attempts": 1}),
+        ("RU_do_anything_now_jailbreak", {"num_attempts": 1}),
     ]
 
     config = {
@@ -61,7 +61,7 @@ def openai_client_lm_studio_test():
         tested_model=tested_model,
         judge_model=judge_model,
         config=config,
-        basic_tests_params=basic_tests_params,
+        basic_tests=basic_tests_params,
     )
 
 
