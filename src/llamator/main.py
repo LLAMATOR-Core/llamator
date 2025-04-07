@@ -266,14 +266,19 @@ def start_testing(
             f"{BRIGHT_RED}DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language. Reader discretion is advised.{RESET}"
         )
 
+        # Вынесение базового имени отчёта в отдельную переменную
+        report_base_name = "attacks_report"
+
         print(f"{BRIGHT_CYAN}Generating reports...{RESET}")
         create_attack_report_from_artifacts(
-            artifacts_dir=artifacts_run_path, csv_folder_name="csv_report", report_file_name="attacks_report.xlsx"
+            artifacts_dir=artifacts_run_path,
+            csv_folder_name="csv_report",
+            report_file_name=f"{report_base_name}.xlsx"
         )
         create_word_report(
             artifacts_dir=artifacts_run_path,
             csv_folder_name="csv_report",
-            docx_file_name="attacks_report.docx",
+            docx_file_name=f"{report_base_name}.docx",
             language=report_language,
         )
 
@@ -281,6 +286,10 @@ def start_testing(
         _rename_reports_with_timestamp(artifacts_run_path, start_timestamp)
 
         print(f"Reports created: {artifacts_run_path}")
+        excel_report_path = os.path.join(artifacts_run_path, f"{report_base_name}_{start_timestamp}.xlsx")
+        word_report_path = os.path.join(artifacts_run_path, f"{report_base_name}_{start_timestamp}.docx")
+        print(f"Excel report path: {excel_report_path}")
+        print(f"Word report path: {word_report_path}")
 
     # Decorative border
     box_width = 80
