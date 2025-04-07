@@ -28,8 +28,9 @@ def _is_notebook_environment() -> bool:
 
 class ProgressWorker:
     """
-    Manages multiple progress bars for a single worker.
-    Each unique attack (identified by its ID) uses one tqdm progress bar.
+    Manages progress display for a single worker.
+    In notebook mode, each unique attack (identified by its ID) is updated in a dynamic tqdm progress bar.
+    In non-notebook mode, only the final status is printed once per attack.
     """
 
     def __init__(self, worker_id, progress_bar=True):
@@ -39,37 +40,41 @@ class ProgressWorker:
         worker_id : int
             The worker's ID.
         progress_bar : bool
-            Whether to enable progress bars.
+            Whether to enable progress display.
         """
         self.worker_id = worker_id
         self.enable_progress = progress_bar
+        self.notebook_mode = _is_notebook_environment()
         self.lock = threading.Lock()
-        self.task_bars = {}  # key: attack_id, value: tqdm bar
-        self.position_counter = 0
+        if self.notebook_mode:
+            self.task_bars = {}  # key: attack_id, value: tqdm bar
+            self.position_counter = 0
+        else:
+            self.final_status = {}  # key: attack_id, value: final printed line
 
     def shutdown(self):
         """
-        Close all progress bars.
+        Close all progress bars (in notebook mode).
         """
         with self.lock:
-            for bar in self.task_bars.values():
-                bar.close()
-            self.task_bars.clear()
+            if self.notebook_mode:
+                for bar in self.task_bars.values():
+                    bar.close()
+                self.task_bars.clear()
 
     def flush(self):
         """
-        For each progress bar, update it to complete state and then close it.
+        In notebook mode, update all progress bars to final state and close them.
+        In non-notebook mode, nothing is required.
         """
-        with self.lock:
-            for bar in self.task_bars.values():
-                try:
+        if self.notebook_mode:
+            with self.lock:
+                for bar in self.task_bars.values():
                     if bar.n < bar.total:
                         bar.update(bar.total - bar.n)
                     bar.refresh()
                     bar.close()
-                except Exception as e:
-                    logger.error(f"Error flushing bar: {e}", exc_info=True)
-            self.task_bars.clear()
+                self.task_bars.clear()
 
     def update(
         self,
@@ -82,7 +87,7 @@ class ProgressWorker:
         colour: str = "BLACK",
     ):
         """
-        Updates the progress bar for a given attack.
+        Updates the progress display for a given attack.
         The task_name must be in the format "ACTION: ATTACK_ID", where ATTACK_ID is used as key.
 
         Parameters
@@ -100,7 +105,7 @@ class ProgressWorker:
         error_count : int
             Number of errors.
         colour : str
-            Colour for the progress bar.
+            Colour for the progress display.
         """
         if not self.enable_progress:
             return
@@ -113,36 +118,49 @@ class ProgressWorker:
             action = ""
             attack_id = task_name.strip()
 
-        with self.lock:
-            status_info = (
-                f"[{BRIGHT}{RED}B:{breach_count}{RESET} | "
-                f"{BRIGHT}{GREEN}R:{resilient_count}{RESET} | "
-                f"{BRIGHT}{YELLOW}E:{error_count}{RESET}]"
-            )
-            if _is_notebook_environment():
-                action = strip_ansi(action)
-                attack_id = strip_ansi(attack_id)
-                status_info = strip_ansi(status_info)
+        # Build status info string
+        status_info = (
+            f"[{BRIGHT}{RED}B:{breach_count}{RESET} | "
+            f"{BRIGHT}{GREEN}R:{resilient_count}{RESET} | "
+            f"{BRIGHT}{YELLOW}E:{error_count}{RESET}]"
+        )
 
-            if attack_id not in self.task_bars:
-                bar = tqdm(
-                    total=int(total),
-                    desc=f"Worker #{self.worker_id:02}: {action}: {attack_id}",
-                    position=self.position_counter,
-                    leave=True,
-                )
-                self.task_bars[attack_id] = bar
-                self.position_counter += 1
-            else:
-                bar = self.task_bars[attack_id]
-
-            desc_text = f"{action}: {attack_id} [{int(progress)}/{int(total)}] {status_info}"
-            bar.set_description(f"Worker #{self.worker_id:02}: {desc_text}{RESET}", refresh=True)
-            bar.colour = colour
-            bar.total = int(total)
-            bar.n = int(progress)
-            bar.refresh()
-            # Do not close the bar here; flush() will handle closing.
+        if self.notebook_mode:
+            with self.lock:
+                if _is_notebook_environment():
+                    action = strip_ansi(action)
+                    attack_id = strip_ansi(attack_id)
+                    status_info = strip_ansi(status_info)
+                if attack_id not in self.task_bars:
+                    bar = tqdm(
+                        total=int(total),
+                        desc=f"Worker #{self.worker_id:02}: {action}: {attack_id}",
+                        position=self.position_counter,
+                        leave=True,
+                    )
+                    self.task_bars[attack_id] = bar
+                    self.position_counter += 1
+                else:
+                    bar = self.task_bars[attack_id]
+                desc_text = f"{action}: {attack_id} [{int(progress)}/{int(total)}] {status_info}"
+                bar.set_description(f"Worker #{self.worker_id:02}: {desc_text}{RESET}", refresh=True)
+                bar.colour = colour
+                bar.total = int(total)
+                bar.n = int(progress)
+                bar.refresh()
+                if progress >= total:
+                    bar.close()
+        else:
+            # In non-notebook mode, print only the final status once.
+            if progress < total:
+                return
+            with self.lock:
+                if attack_id in self.final_status:
+                    return
+                final_status = f"Worker #{self.worker_id:02}: {action}: {attack_id} [{int(progress)}/{int(total)}] " \
+                               f"[B:{breach_count} | R:{resilient_count} | E:{error_count}]"
+                print(final_status)
+                self.final_status[attack_id] = final_status
 
 
 class WorkProgressPool:
@@ -194,7 +212,10 @@ class WorkProgressPool:
         """
         self.tasks_count = tasks_count
         with ThreadPoolExecutor(max_workers=self.num_workers) as executor:
-            futures = [executor.submit(self.worker_function, worker_id, tasks) for worker_id in range(self.num_workers)]
+            futures = [
+                executor.submit(self.worker_function, worker_id, tasks)
+                for worker_id in range(self.num_workers)
+            ]
             for f in futures:
                 f.result()
         for pw in self.progress_workers:
