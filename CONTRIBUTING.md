@@ -155,15 +155,11 @@ from ..attacks import (
 )
 ```
 
-### 4. Update Documentation and Descriptions
-
-Add your attack to `attack_descriptions.json` and `attack_descriptions.md`. Ensure consistency between the class docstring and documentation.
-
-### 5. Test Your Attack
+### 4. Test Your Attack
 
 Run your attack locally using your test setup to verify it works as intended.
 
-### 6. Open a Pull Request
+### 5. Open a Pull Request
 
 Submit your changes for review by opening a pull request to the `main` branch.
 
