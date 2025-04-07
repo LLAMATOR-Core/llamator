@@ -1,7 +1,8 @@
 import logging
 from typing import Dict, List, Optional
 
-from langchain.schema import AIMessage, BaseMessage, HumanMessage
+from langchain.schema import BaseMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.outputs.llm_result import LLMResult
 from openai import OpenAI
 
@@ -63,7 +64,7 @@ class ClientLangChain(ClientBase):
         self.model_description = model_description
 
     @staticmethod
-    def _convert_to_langchain_format(message: Dict[str, str]) -> List[BaseMessage]:
+    def _convert_to_langchain_format(message: Dict[str, str]) -> BaseMessage:
         """
         Converts a message from the base format (Dict) to LangChain's format.
 
@@ -74,15 +75,15 @@ class ClientLangChain(ClientBase):
 
         Returns
         -------
-        List[BaseMessage]
-            The message in LangChain format ([HumanMessage], [AIMessage]).
+        BaseMessage
+            The message in LangChain format (HumanMessage, AIMessage, or SystemMessage).
         """
         if message["role"] == "user":
-            return [HumanMessage(content=message["content"])]
+            return HumanMessage(content=message["content"])
         elif message["role"] == "assistant":
-            return [AIMessage(content=message["content"])]
+            return AIMessage(content=message["content"])
         elif message["role"] == "system":
-            return [AIMessage(content=message["content"])]  # LangChain doesn't have "system", using AIMessage
+            return SystemMessage(content=message["content"])
         else:
             raise ValueError(f"Unsupported role: {message['role']}")
 
@@ -105,10 +106,12 @@ class ClientLangChain(ClientBase):
             role = "user"
         elif isinstance(message, AIMessage):
             role = "assistant"
+        elif isinstance(message, SystemMessage):
+            role = "system"
         else:
             raise ValueError(f"Unsupported message type: {type(message)}")
 
-        return {"role": role, "content": message.content}
+        return {"role": role, "content": str(message.content)}
 
     def interact(self, history: List[Dict[str, str]], messages: List[Dict[str, str]]) -> Dict[str, str]:
         """
@@ -127,19 +130,32 @@ class ClientLangChain(ClientBase):
         Dict[str, str]
             The response from the model in dictionary format with "role" and "content".
         """
-        langchain_history = [ClientLangChain._convert_to_langchain_format(msg) for msg in history]
-        langchain_messages = [ClientLangChain._convert_to_langchain_format(msg) for msg in messages]
+        # Convert history and messages to LangChain format
+        langchain_history = [self._convert_to_langchain_format(msg) for msg in history]
+        langchain_messages = [self._convert_to_langchain_format(msg) for msg in messages]
 
-        langchain_history += langchain_messages
+        # Combine history and messages
+        combined_messages = langchain_history + langchain_messages
 
         try:
-            llm_result: LLMResult = self.client.generate(messages=langchain_history)
-
-            response_message: BaseMessage = AIMessage(content=llm_result.generations[0][0].text)
+            # Use the newer invoke_with_message_history API if available
+            if hasattr(self.client, "invoke"):
+                response = self.client.invoke(combined_messages)
+                if isinstance(response, BaseMessage):
+                    response_message = response
+                else:
+                    # If the response is not a BaseMessage, assume it's content that needs to be wrapped
+                    response_message = AIMessage(content=str(response))
+            # Fall back to generate API for older versions
+            elif hasattr(self.client, "generate"):
+                llm_result: LLMResult = self.client.generate(messages=combined_messages)
+                response_message = AIMessage(content=llm_result.generations[0][0].text)
+            else:
+                raise RuntimeError("LangChain client has no supported method for generating responses")
         except Exception as e:
             raise RuntimeError(f"Chat inference failed with error: {e}")
 
-        return ClientLangChain._convert_to_base_format(response_message)
+        return self._convert_to_base_format(response_message)
 
 
 class ClientOpenAI(ClientBase):
