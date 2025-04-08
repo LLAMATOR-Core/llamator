@@ -7,6 +7,7 @@ import pandas as pd
 
 from ..client.attack_config import AttackConfig
 from ..client.client_config import ClientConfig
+from ..client.judge_config import JudgeConfig
 
 
 class TestLogEntry:
@@ -108,6 +109,7 @@ class TestBase(ABC):
         self,
         client_config: ClientConfig,
         attack_config: AttackConfig,
+        judge_config: JudgeConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         **kwargs,
@@ -115,6 +117,7 @@ class TestBase(ABC):
         self.test_description = self.__doc__
         self.client_config = client_config
         self.attack_config = attack_config
+        self.judge_config = judge_config
         self.status = TestStatus()
         self.artifacts_path = artifacts_path
         self.num_attempts = num_attempts
@@ -191,7 +194,10 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+        min_len = min(len(attack_prompts), len(responses), len(responses))
+        self._prepare_attack_artifacts(
+            attack_prompts=attack_prompts[:min_len], responses=responses[:min_len], statuses=statuses[:min_len]
+        )
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],
