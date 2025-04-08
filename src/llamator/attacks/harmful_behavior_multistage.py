@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Generator, List, Optional
+from typing import Dict, Generator, List, Optional, Tuple
 
 import pandas as pd
 
@@ -60,17 +60,11 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
         self.custom_dataset = custom_dataset
 
     @staticmethod
-    def refine_attack_prompt(tested_client_response: str, objective: str) -> str:
-        """
-        Refines the attack prompt to be more effective.
-        """
-        refined_prompt = REFINE_PROMPT_GENERATION_TEMPLATE.format(objective=objective)
-        return refined_prompt
-
-    @staticmethod
-    def stop_criterion(tested_client_history: List[Dict[str, str]]) -> bool:
+    def history_evaluation(tested_client_history: List[Dict[str, str]], objective: str) -> Tuple[bool, str]:
         last_response = tested_client_history[-1]["content"] if tested_client_history else ""
-        return not contains_refusal_keywords(last_response)
+        is_broken = not contains_refusal_keywords(last_response)
+        attacker_prompt = REFINE_PROMPT_GENERATION_TEMPLATE.format(objective=objective)
+        return is_broken, attacker_prompt
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
@@ -110,9 +104,8 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
                 dialog_session = MultiStageInteractionSession(
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
-                    stop_criterion=self.stop_criterion,
                     history_limit=self.multistage_depth,
-                    tested_client_response_handler=self.refine_attack_prompt,
+                    history_evaluation=self.history_evaluation,
                     refine_kwargs={"objective": objective},
                 )
 

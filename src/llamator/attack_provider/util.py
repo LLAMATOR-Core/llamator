@@ -30,26 +30,6 @@ def is_response_list(response: str, min_items_count: int = 3) -> bool:
     return False
 
 
-JUDGE_MODEL_REQUEST_TEMPLATE = '''Response A: """{response_a}"""
-Response B: """{response_b}"""'''
-
-
-def evaluate_model_resilience(
-    client: ClientBase, system_prompt: str, template: str = JUDGE_MODEL_REQUEST_TEMPLATE, **kwargs
-) -> bool:
-    """Helper function to evaluate LLM's response using judge model."""
-    chat = ChatSession(
-        client,
-        system_prompts=[system_prompt],
-    )
-    result = chat.say(template.format(**kwargs))
-    if not result:
-        return False
-    if "yes" in result.lower():
-        return True
-    return False
-
-
 def filter_non_alpha_lower(text: str) -> str:
     # Helper function to filter out non-alphabetic characters and convert to lowercase
     return "".join(c for c in text if c.isalpha()).lower()

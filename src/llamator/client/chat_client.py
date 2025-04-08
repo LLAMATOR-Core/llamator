@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 from .langchain_integration import get_langchain_chat_models_info
 
@@ -178,18 +178,17 @@ class MultiStageInteractionSession:
         The session for the attacker.
     tested_client_session : ChatSession
         The session for the tested client.
-    stop_criterion : Callable[[List[Dict[str, str]]], bool], optional
-        A function that determines whether to stop the conversation based on the tested client's responses.
-    history_limit : int, optional
+    history_limit : int
         The maximum allowed history length for the attacker.
-    tested_client_response_handler : Callable[..., str], optional
-        A function that handles the tested client's response before passing it to the attacker.
-    current_step : int
-        The current step of the attacker.
+    history_evaluation : Callable[..., Tuple[bool, str]]
+        A function that determines whether to stop the conversation
+        based on the tested client's responses and returns prompt for attacker.
     refine_args : tuple
         Additional positional arguments for tested_client_response_handler.
     refine_kwargs : dict
         Additional keyword arguments for tested_client_response_handler.
+    current_step : int
+        The current step of the attacker.
 
     Methods
     -------
@@ -207,9 +206,8 @@ class MultiStageInteractionSession:
         self,
         attacker_session: ChatSession,
         tested_client_session: ChatSession,
-        stop_criterion: Optional[Callable[[List[Dict[str, str]]], bool]] = None,
         history_limit: Optional[int] = 20,
-        tested_client_response_handler: Optional[Callable[..., str]] = None,
+        history_evaluation: Optional[Callable[[List[Dict[str, str]]], Tuple[bool, str]]] = None,
         refine_args: Optional[tuple] = None,
         refine_kwargs: Optional[dict] = None,
     ):
@@ -222,14 +220,11 @@ class MultiStageInteractionSession:
             The session for the attacker.
         tested_client_session : ChatSession
             The session for the tested client.
-        stop_criterion : Callable[[List[Dict[str, str]]], bool]], optional
-            A function that takes the tested client's history and returns True if the conversation should stop.
-            If None, a default criterion that always returns False is used. (default is None)
         history_limit : int, optional
             The maximum number of messages allowed in the attacker's history. (default is 20)
-        tested_client_response_handler : Callable[..., str], optional
-            A function that handles the tested client's response before passing it to the attacker.
-            If None, a default function that returns the response unchanged is used. (default is None)
+        history_evaluation : Callable[[List[Dict[str, str]]], Tuple[bool, str]]], optional
+            A function that takes the tested client's history and returns stop request and message for attack model.
+            If None, returns False and the last response of Tested model. (default is None)
         refine_args : tuple, optional
             Additional positional arguments for tested_client_response_handler. (default is None)
         refine_kwargs : dict, optional
@@ -237,21 +232,18 @@ class MultiStageInteractionSession:
         """
         self.attacker_session = attacker_session
         self.tested_client_session = tested_client_session
-        self.stop_criterion = stop_criterion if stop_criterion is not None else self.default_stop_criterion
         self.history_limit = history_limit
-        self.tested_client_response_handler = (
-            tested_client_response_handler
-            if tested_client_response_handler is not None
-            else self.default_tested_client_response_handler
+        self.history_evaluation = (
+            history_evaluation if history_evaluation is not None else self.default_history_evaluation
         )
-        self.current_step = 1
         self.refine_args = refine_args if refine_args is not None else ()
         self.refine_kwargs = refine_kwargs if refine_kwargs is not None else {}
+        self.current_step = 1
 
     @staticmethod
-    def default_stop_criterion(tested_client_history: List[Dict[str, str]]) -> bool:
+    def default_history_evaluation(tested_client_history: List[Dict[str, str]], *args, **kwargs) -> Tuple[bool, str]:
         """
-        Default stopping criterion that never stops the conversation.
+        Default history evaluation that never stops the conversation.
 
         Parameters
         ----------
@@ -260,35 +252,11 @@ class MultiStageInteractionSession:
 
         Returns
         -------
-        bool
-            Always returns False.
+        Tuple[bool, str]
+            Always returns False and the last response of Tested client.
         """
-        return False
-
-    @staticmethod
-    def default_tested_client_response_handler(tested_client_response: str, **kwargs) -> str:
-        """
-        Default tested_client_response_handler function that returns the response unchanged.
-
-        Parameters
-        ----------
-        tested_client_response : str
-            The response from the tested client.
-        **kwargs : dict
-            Additional keyword arguments (not used).
-
-        Returns
-        -------
-        str
-            The original tested client's response.
-
-        # Usage Example:
-        # If you have additional variables, they can be accessed via args or kwargs.
-        # For example, to append a suffix from kwargs:
-        # suffix = kwargs.get('suffix', '')
-        # return tested_client_response + suffix
-        """
-        return tested_client_response
+        last_response = tested_client_history[-1]["content"] if tested_client_history else ""
+        return False, last_response
 
     def start_conversation(self, start_prompt: str) -> bool | None:
         """
@@ -319,8 +287,11 @@ class MultiStageInteractionSession:
             if not tested_client_response:
                 return None
 
-            # Check stopping criterion by history
-            if self.stop_criterion(tested_client_history=self.tested_client_session.history):
+            # Evaluate client history (e.g. adding scoring, more instructions for attacker)
+            is_broken, attacker_prompt = self.history_evaluation(
+                tested_client_history=self.tested_client_session.history, *self.refine_args, **self.refine_kwargs
+            )
+            if is_broken:
                 logger.debug("Stopping criterion met.")
                 return True
 
@@ -329,14 +300,10 @@ class MultiStageInteractionSession:
                 logger.debug("History limit exceeded.")
                 return False
 
-            # Handling the tested client's response before passing it to the attacker
-            # (e.g. adding scoring, more instructions for attacker)
-            attacker_prompt = self.tested_client_response_handler(
-                tested_client_response, *self.refine_args, **self.refine_kwargs
-            )
+            # Send the prompt to attacker for refinement and sending next iteration
             logger.debug(f"Step {self.current_step}: Attacker prompt: {attacker_prompt}")
-
-            # Send the handled tested client's response to the attacker for refinement and sending next iteration
+            if not attacker_prompt:
+                return None
             attacker_response = self.attacker_session.say(attacker_prompt)
             logger.debug(f"Step {self.current_step}: Attacker response: {attacker_response}")
             if not attacker_response:
