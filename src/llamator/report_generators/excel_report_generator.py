@@ -111,8 +111,9 @@ def create_attack_report_from_artifacts(
                 worksheet = workbook[safe_sheet_name]
 
                 num_records = len(df.index)
+                num_columns = len(df.columns)
                 for row in range(2, num_records + 2):
-                    status_cell = worksheet[f"C{row}"]
+                    status_cell = worksheet[f"{chr(64+num_columns)}{row}"]
                     fill_color = color_fill_mapping.get(str(status_cell.value).lower())
                     if fill_color:
                         status_cell.fill = PatternFill(start_color=fill_color, end_color=fill_color, fill_type="solid")
@@ -130,6 +131,6 @@ def create_attack_report_from_artifacts(
                     header_cell.alignment = Alignment(horizontal="center", vertical="center")
                     header_cell.border = thin_border
 
-                worksheet.column_dimensions["A"].width = 50
-                worksheet.column_dimensions["B"].width = 50
-                worksheet.column_dimensions["C"].width = len("resilient") + 5
+                for column in range(65, 64 + num_columns):
+                    worksheet.column_dimensions[chr(column)].width = 150 // (num_columns - 1)
+                worksheet.column_dimensions[chr(64 + num_columns)].width = len("resilient") + 5

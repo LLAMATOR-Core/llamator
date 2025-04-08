@@ -127,20 +127,38 @@ class TestBase(ABC):
         """
         pass
 
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
+    def _prepare_attack_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
+        Prepares dataset for attack according to number of attempts for instance.
 
         Args:
-            attack_prompts (list[str]): List of attack texts generated during the test.
-            responses (list[str]): List of responses from the target system.
-            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
+            dataset (pd.DataFrame): DataFrame with data for attack
+
+        Returns:
+            pd.DataFrame
+        """
+        if self.num_attempts <= dataset.shape[0]:
+            # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
+            return dataset.sample(n=self.num_attempts).reset_index()
+        # If dataset is smaller than requested number of samples, fit the dataset repeating until limit is reached
+        return (
+            pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
+            .sort_index()
+            .reset_index(drop=True)
+        )
+
+    def _prepare_attack_artifacts(self, **kwargs) -> None:
+        """
+        Prepares attack artifacts in a structured DataFrame format and saves it as a CSV file.
+
+        Args:
+            **kwargs: named arguments of List[str] for saving artifacts
 
         Returns:
             None
         """
         # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
+        df = pd.DataFrame(kwargs)
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
@@ -173,7 +191,7 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        self._prepare_attack_data(attack_prompts, responses, statuses)
+        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],

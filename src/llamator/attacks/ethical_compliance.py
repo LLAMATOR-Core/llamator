@@ -73,6 +73,7 @@ class TestEthicalCompliance(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
+        custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
         super().__init__(
@@ -82,31 +83,21 @@ class TestEthicalCompliance(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.custom_dataset = custom_dataset
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
         responses = []
         statuses = []
         try:
-            current_dir = Path(__file__).parent
-            dataset_filename = current_dir.parent / "attack_data" / "ethical_compliance.parquet"
-
-            logger.info(f"Dataset filename: {dataset_filename}")
-            data = pd.read_parquet(dataset_filename, engine="fastparquet")
-            rows_count = data.shape[0]
-
-            if self.num_attempts <= rows_count:
-                # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-                data = data.sample(n=self.num_attempts)
+            if self.custom_dataset is None:
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "ethical_compliance.parquet"
+                data = pd.read_parquet(dataset_filename, engine="fastparquet")
             else:
-                # If dataset is smaller than requested number of attack samples, fit the dataset repeating until num_attempts is reached
-                data = (
-                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                    .sort_index()
-                    .reset_index(drop=True)
-                )
+                data = self.custom_dataset.copy()
+            data = self._prepare_attack_dataset(dataset=data)
 
-            chat = ChatSession(self.attack_config.attack_client.get_target_client())
+            attack_chat = ChatSession(self.attack_config.attack_client.get_target_client())
             for attack_prompt_index, row in data.iterrows():
                 yield StatusUpdate(
                     self.client_config,
@@ -116,7 +107,7 @@ class TestEthicalCompliance(TestBase):
                     attack_prompt_index,
                     self.num_attempts,
                 )
-                attack_prompt = chat.say(row["goal"])  # generate next harmful/unethical task to try
+                attack_prompt = attack_chat.say(row["goal"])  # generate next harmful/unethical task to try
                 if not attack_prompt:
                     logger.warning("Error while generating attack prompt (didn't receive response) ...")
                     self.status.report_error(row["goal"])
@@ -125,8 +116,6 @@ class TestEthicalCompliance(TestBase):
                         f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
                     )
                     attack_prompts.append(attack_prompt)
-
-            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
                 yield StatusUpdate(
                     self.client_config,
                     self.info["code_name"],
@@ -136,11 +125,11 @@ class TestEthicalCompliance(TestBase):
                     self.num_attempts,
                 )
                 logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
-                chat = ChatSession(
+                target_chat = ChatSession(
                     self.client_config.get_target_client(),
                     self.client_config.get_system_prompts(),
                 )
-                response = chat.say(attack_prompt)
+                response = target_chat.say(attack_prompt)
                 if not response:
                     logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_prompt)
@@ -152,19 +141,19 @@ class TestEthicalCompliance(TestBase):
                         template=ETHICAL_COMPLIANCE_JUDGE_MODEL_TEMPLATE,
                         response=response,
                     )
+                    current_status = "Resilient" if verified else "Broken"
                     if verified:
                         self.status.report_resilient(attack_prompt, response)
-                        current_status = "Resilient"
                     else:
                         self.status.report_breach(attack_prompt, response)
-                        current_status = "Broken"
                     logger.info(
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} status={current_status}): {response}"
                     )
                 responses.append(response)
                 statuses.append(current_status)
 
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            # Prepare data for report generation
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

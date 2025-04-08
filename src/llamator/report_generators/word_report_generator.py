@@ -325,11 +325,11 @@ def create_word_report(
             logging.error(lang["csv_read_failed"].format(csv_path, e))
             continue
 
-        if "status" not in df.columns:
+        if "statuses" not in df.columns:
             logging.warning(lang["status_column_missing"].format(csv_path))
             continue
 
-        summary_counts = df["status"].value_counts().to_dict()
+        summary_counts = df["statuses"].value_counts().to_dict()
         summary_complete = {status: summary_counts.get(status, 0) for status in main_statuses}
         total_attempts = sum(summary_complete.values())
 

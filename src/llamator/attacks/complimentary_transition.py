@@ -55,16 +55,7 @@ class TestComplimentaryTransition(TestBase):
         statuses = []
         try:
             # Generate list of attack prompt variations
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Generating",
-                0,
-                self.num_attempts,
-            )
-            chat = ChatSession(self.attack_config.attack_client.get_target_client())
-
+            attack_chat = ChatSession(self.attack_config.attack_client.get_target_client())
             for attack_prompt_index in range(self.num_attempts):
                 yield StatusUpdate(
                     self.client_config,
@@ -77,7 +68,7 @@ class TestComplimentaryTransition(TestBase):
                 target_system_prompt_summary = self.client_config.get_system_prompts_summary(
                     client=self.attack_config.attack_client.get_target_client()
                 )
-                attack_prompt = chat.say(
+                attack_prompt = attack_chat.say(
                     COMPLIMENTARY_TRANSITION_PROMPT.format(target_system_prompts_summary=target_system_prompt_summary)
                 )  # generate another task
                 if not attack_prompt:
@@ -88,23 +79,19 @@ class TestComplimentaryTransition(TestBase):
                         f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
                     )
                     attack_prompts.append(attack_prompt)
-
-            # Run the attack by sending the prompts and verifying the responses
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Attacking",
-                0,
-                self.num_attempts,
-            )
-
-            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
-                chat = ChatSession(
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Attacking",
+                    attack_prompt_index,
+                    self.num_attempts,
+                )
+                target_chat = ChatSession(
                     self.client_config.get_target_client(),
                     self.client_config.get_system_prompts(),
                 )
-                response = chat.say(attack_prompt)
+                response = target_chat.say(attack_prompt)
                 if not response:
                     logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_prompt)
@@ -116,28 +103,16 @@ class TestComplimentaryTransition(TestBase):
                     logger.info(
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                     )
+                    current_status = "Broken" if verified else "Resilient"
                     if verified:
                         self.status.report_breach(attack_prompt, response)
-                        current_status = "Broken"
                     else:
                         self.status.report_resilient(attack_prompt, response)
-                        current_status = "Resilient"
-
-                # Append data for report
                 responses.append(response)
                 statuses.append(current_status)
 
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Attacking",
-                    attack_prompt_index,
-                    self.num_attempts,
-                )
-
             # Prepare data for report generation
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

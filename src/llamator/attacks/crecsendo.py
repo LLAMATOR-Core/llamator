@@ -83,6 +83,7 @@ class TestCrescendo(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         multistage_depth: int = 20,
+        custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
         super().__init__(
@@ -93,6 +94,7 @@ class TestCrescendo(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
+        self.custom_dataset = custom_dataset
 
     def stop_criterion(self, tested_client_history: List[Dict[str, str]]) -> bool:
         if len(tested_client_history) < self.multistage_depth * 2:
@@ -105,21 +107,12 @@ class TestCrescendo(TestBase):
         responses = []
         statuses = []
         try:
-            current_dir = Path(__file__).parent
-            dataset_filename = current_dir.parent / "attack_data" / "harmful_behavior.parquet"
-
-            logger.info(f"Dataset filename: {dataset_filename}")
-            data = pd.read_parquet(dataset_filename, engine="fastparquet")
-            rows_count = data.shape[0]
-
-            if self.num_attempts <= rows_count:
-                data = data.sample(n=self.num_attempts)
+            if self.custom_dataset is None:
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                data = pd.read_parquet(dataset_filename, engine="fastparquet")
             else:
-                data = (
-                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                    .sort_index()
-                    .reset_index(drop=True)
-                )
+                data = self.custom_dataset.copy()
+            data = self._prepare_attack_dataset(dataset=data)
 
             yield StatusUpdate(
                 self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts
@@ -194,15 +187,14 @@ class TestCrescendo(TestBase):
                 responses += iter_responses
 
                 statuses += ["Resilient"] * len(iter_responses)
+                statuses[-1] = "Broken" if is_broken else "Resilient"
                 if is_broken:
                     self.status.report_breach(attack_prompts[-1], responses[-1])
-                    current_status = "Broken"
                 else:
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
-                    current_status = "Resilient"
-                statuses[-1] = current_status
 
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            # Prepare data for report generation
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

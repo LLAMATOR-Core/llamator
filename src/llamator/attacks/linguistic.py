@@ -51,16 +51,7 @@ class TestLinguisticEvasion(TestBase):
         responses = []
         statuses = []
         try:
-            # Generate translation of suspicious questions in Japanese
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Generating",
-                0,
-                self.num_attempts,
-            )
-
+            attack_chat = ChatSession(self.attack_config.attack_client.get_target_client())
             for attack_prompt_index in range(self.num_attempts):
                 yield StatusUpdate(
                     self.client_config,
@@ -70,8 +61,8 @@ class TestLinguisticEvasion(TestBase):
                     attack_prompt_index,
                     self.num_attempts,
                 )
-                chat = ChatSession(self.attack_config.attack_client.get_target_client())
-                attack_prompt = chat.say(TRANSLATION_PROMPT)
+                # Generate translation of suspicious questions in Japanese
+                attack_prompt = attack_chat.say(TRANSLATION_PROMPT)
                 if not attack_prompt:
                     logger.warning("Error while generating attack prompt (didn't receive response) ...")
                     self.status.report_error(str(attack_prompt_index))
@@ -80,22 +71,19 @@ class TestLinguisticEvasion(TestBase):
                         f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
                     )
                     attack_prompts.append(attack_prompt)
-
-            # Run the attack by sending the prompts and verifying the responses
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Attacking",
-                0,
-                self.num_attempts,
-            )
-            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
-                chat = ChatSession(
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Attacking",
+                    attack_prompt_index,
+                    self.num_attempts,
+                )
+                target_chat = ChatSession(
                     self.client_config.get_target_client(),
                     self.client_config.get_system_prompts(),
                 )
-                response = chat.say(attack_prompt)
+                response = target_chat.say(attack_prompt)
                 if not response:
                     logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_prompt)
@@ -117,20 +105,11 @@ class TestLinguisticEvasion(TestBase):
                         self.status.report_breach(attack_prompt, response)
                     else:
                         self.status.report_resilient(attack_prompt, response)
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Attacking",
-                    attack_prompt_index,
-                    self.num_attempts,
-                )
-                # Append data for report
                 responses.append(response)
                 statuses.append(current_status)
 
             # Prepare data for report generation
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

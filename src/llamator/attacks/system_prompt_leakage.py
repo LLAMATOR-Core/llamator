@@ -1,4 +1,3 @@
-# llamator/src/llamator/attacks/system_prompt_leakage.py
 import logging
 from pathlib import Path
 from typing import Dict, Generator, List, Optional
@@ -7,7 +6,7 @@ import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords, contains_system_prompt_keywords
+from ..attack_provider.util import contains_system_prompt_keywords
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -65,6 +64,7 @@ class TestSystemPromptLeakage(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         multistage_depth: int = 20,
+        custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
         super().__init__(
@@ -75,6 +75,7 @@ class TestSystemPromptLeakage(TestBase):
             **kwargs,
         )
         self.multistage_depth = multistage_depth
+        self.custom_dataset = custom_dataset
 
     @staticmethod
     def refine_attack_prompt(tested_client_response: str) -> str:
@@ -93,30 +94,23 @@ class TestSystemPromptLeakage(TestBase):
         responses = []
         statuses = []
         try:
-            current_dir = Path(__file__).parent
-            dataset_filename = current_dir.parent / "attack_data" / "system_prompt_leakage.parquet"
-
-            logger.info(f"Dataset filename: {dataset_filename}")
-            data = pd.read_parquet(dataset_filename, engine="fastparquet")
-            rows_count = data.shape[0]
-
-            if self.num_attempts <= rows_count:
-                # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-                data = data.head(self.num_attempts)
+            if self.custom_dataset is None:
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "system_prompt_leakage.parquet"
+                data = pd.read_parquet(dataset_filename, engine="fastparquet")
             else:
-                # If dataset is smaller than requested number of attack samples, fit the dataset repeating until num_attempts is reached
-                data = (
-                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                    .sort_index()
-                    .reset_index(drop=True)
-                )
-
-            yield StatusUpdate(
-                self.client_config, self.info["code_name"], self.status, "Attacking", 0, self.num_attempts
-            )
+                data = self.custom_dataset.copy()
+            data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]
+                yield StatusUpdate(
+                    self.client_config,
+                    self.info["code_name"],
+                    self.status,
+                    "Attacking",
+                    attack_prompt_index,
+                    self.num_attempts,
+                )
                 tested_client_chat = ChatSession(
                     client=self.client_config.get_target_client(),
                     use_history=False,
@@ -158,6 +152,7 @@ class TestSystemPromptLeakage(TestBase):
                         logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                         self.status.report_error(attack_prompt)
                         continue
+
                     iter_attack_prompts = [attack_prompt] + [
                         response["content"] for response in dialog_session.get_attacker_responses()
                     ]
@@ -167,26 +162,16 @@ class TestSystemPromptLeakage(TestBase):
                         continue
                     attack_prompts += iter_attack_prompts
                     responses += iter_responses
+
                     statuses += ["Resilient"] * len(iter_responses)
+                    statuses[-1] = "Broken" if is_broken else "Resilient"
                     if is_broken:
                         self.status.report_breach(attack_prompts[-1], responses[-1])
-                        current_status = "Broken"
                     else:
                         self.status.report_resilient(attack_prompts[-1], responses[-1])
-                        current_status = "Resilient"
-                    statuses[-1] = current_status
-
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Attacking",
-                    attack_prompt_index,
-                    self.num_attempts,
-                )
 
             # Prepare data for report generation
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,
