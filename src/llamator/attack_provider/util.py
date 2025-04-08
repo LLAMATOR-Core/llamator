@@ -107,6 +107,15 @@ def contains_system_prompt_keywords(response: str) -> bool:
     return False
 
 
+def target_words_intersection(target: str, generated: str, normalize: bool = False) -> int:
+    target = set(target.lower().split())
+    generated = set(generated.lower().split())
+    intersection = len(target.intersection(generated))
+    if normalize:
+        return intersection / len(target)
+    return intersection
+
+
 def wrap_text(text: str, width: int = 70) -> str:
     """Wrap text to a specific width for a nice display of potentially long text"""
     # Create a TextWrapper instance specifying the width
