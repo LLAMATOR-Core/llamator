@@ -1,6 +1,6 @@
 """Dialogue injection attack V0.2a
 
-DISCLAIMER: THIS CODE CONTAINS RAW HARMFUL BEHAVIOUR ATTACKS TEXT AND AGRESSIVE LANGUAGE STYLE
+DISCLAIMER: THIS CODE CONTAINS RAW HARMFUL BEHAVIOUR ATTACKS TEXT AND AGGRESSIVE LANGUAGE STYLE
 
 This attack base used with "Developer mode" attack version
 
@@ -107,7 +107,7 @@ class TestDialogueInjection(TestBase):
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
             "ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста, беседы.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/src/dialogue_injection.py",
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/dialogue_injection.py",
     }
 
     def __init__(
