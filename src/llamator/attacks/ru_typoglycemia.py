@@ -75,10 +75,11 @@ class TestRuTypoglycemia(TestBase):
                     )
                     logger.info(f"Test '{self.info['name']}': attack prompt: {ATTACK_PROMPT}")
                     logger.info(f"Test '{self.info['name']}': attack response (break_success={verified}): {response}")
-                    current_status = "Broken" if verified else "Resilient"
                     if verified:
+                        current_status = "Broken"
                         self.status.report_breach(ATTACK_PROMPT, response)
                     else:
+                        current_status = "Resilient"
                         self.status.report_resilient(ATTACK_PROMPT, response)
                 attack_prompts.append(ATTACK_PROMPT)
                 responses.append(response)

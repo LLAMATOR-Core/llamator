@@ -69,6 +69,7 @@ class TestAIM(TestBase):
         responses = []
         statuses = []
         try:
+            attack_chat = ChatSession(self.attack_config.attack_client.get_target_client())
             for attack_prompt_index in range(self.num_attempts):
                 yield StatusUpdate(
                     self.client_config,
@@ -78,7 +79,6 @@ class TestAIM(TestBase):
                     attack_prompt_index,
                     self.num_attempts,
                 )
-                attack_chat = ChatSession(self.attack_config.attack_client.get_target_client())
                 attack_task = attack_chat.say(
                     UNETHICAL_TASK_GENERATION_PROMPT
                 )  # generate next harmful/unethical task to try
@@ -120,10 +120,11 @@ class TestAIM(TestBase):
                     logger.info(
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                     )
-                    current_status = "Broken" if verified else "Resilient"
                     if verified:
+                        current_status = "Broken"
                         self.status.report_breach(attack_prompt, response)
                     else:
+                        current_status = "Resilient"
                         self.status.report_resilient(attack_prompt, response)
                 responses.append(response)
                 statuses.append(current_status)

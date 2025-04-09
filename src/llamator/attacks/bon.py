@@ -155,10 +155,11 @@ class TestBon(TestBase):
                         logger.info(
                             f"Test '{self.info['name']}': attack response #{attack_prompt_index}.{stage} break_success={verified}): {response}"
                         )
-                        current_status = "Broken" if verified else "Resilient"
                         if verified:
+                            current_status = "Broken"
                             self.status.report_breach(transformed_prompt, response)
                         else:
+                            current_status = "Resilient"
                             self.status.report_resilient(transformed_prompt, response)
                     responses.append(response)
                     statuses.append(current_status)

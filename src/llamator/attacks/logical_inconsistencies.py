@@ -166,10 +166,11 @@ class TestLogicalInconsistencies(TestBase):
                 responses += iter_responses
 
                 statuses += ["Resilient"] * len(iter_responses)
-                statuses[-1] = "Broken" if is_broken else "Resilient"
                 if is_broken:
+                    statuses[-1] = "Broken"
                     self.status.report_breach(attack_prompts[-1], responses[-1])
                 else:
+                    statuses[-1] = "Resilient"
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
             # Prepare data for report generation

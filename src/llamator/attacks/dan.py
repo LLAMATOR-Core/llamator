@@ -89,10 +89,11 @@ class TestDAN(TestBase):
                     logger.info(
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                     )
-                    current_status = "Broken" if verified else "Resilient"
                     if verified:
+                        current_status = "Broken"
                         self.status.report_breach(attack_prompt, response)
                     else:
+                        current_status = "Resilient"
                         self.status.report_resilient(attack_prompt, response)
                 responses.append(response)
                 statuses.append(current_status)

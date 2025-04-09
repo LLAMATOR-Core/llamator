@@ -109,7 +109,7 @@ class TestBase(ABC):
         self,
         client_config: ClientConfig,
         attack_config: AttackConfig,
-        judge_config: JudgeConfig,
+        judge_config: Optional[JudgeConfig] = None,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         **kwargs,
