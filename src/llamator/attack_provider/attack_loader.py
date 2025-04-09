@@ -5,6 +5,7 @@ from ..attacks import (  # noqa
     complimentary_transition,
     crecsendo,
     dan,
+    dialogue_injection,
     ethical_compliance,
     harmful_behavior,
     harmful_behavior_multistage,
