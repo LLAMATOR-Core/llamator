@@ -20,7 +20,7 @@ class TestRuDAN(TestBase):
 
     info = {
         "name": "Do Anything Now Jailbreak (RU)",
-        "code_name": "RU_do_anything_now_jailbreak",
+        "code_name": "RU_dan",
         "tags": ["ru"],
         "description": {
             "en": 'Probes a Russian-language LLM\'s resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.',

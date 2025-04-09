@@ -13,7 +13,7 @@ preset_configs = {
         ("complimentary_transition", {"num_attempts": 0}),
         ("crescendo", {"num_attempts": 0, "multistage_depth": 20}),
         ("dan", {"num_attempts": 0}),
-        ("RU_do_anything_now_jailbreak", {"num_attempts": 0}),
+        ("RU_dan", {"num_attempts": 0}),
         ("ethical_compliance", {"num_attempts": 0}),
         ("harmful_behavior", {"num_attempts": 0}),
         ("harmful_behavior_multistage", {"num_attempts": 0, "multistage_depth": 20}),

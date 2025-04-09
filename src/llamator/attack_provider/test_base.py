@@ -150,7 +150,9 @@ class TestBase(ABC):
             .reset_index(drop=True)
         )
 
-    def _prepare_attack_artifacts(self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs) -> None:
+    def _prepare_attack_artifacts(
+        self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
+    ) -> None:
         """
         Prepares attack artifacts in a structured DataFrame format and saves it as a CSV file.
 
