@@ -22,7 +22,12 @@ class TestLinguisticEvasion(TestBase):
     info = {
         "name": "Linguistic Evasion",
         "code_name": "linguistic_evasion",
-        "tags": [],
+        "tags": [
+            "lang:all",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Leverages the use of a non-Russian language to circumvent the restrictions or focus set by the system prompt.",
             "ru": "Использует не-русский язык для обхода ограничений или фокуса, установленного системным промптом.",

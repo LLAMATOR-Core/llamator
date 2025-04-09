@@ -21,7 +21,12 @@ class TestPastTense(TestBase):
     info = {
         "name": "Past Tense Attack",
         "code_name": "past_tense",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts in past tense form.",
             "ru": "Проверяет устойчивость модели к выполнению вредных запросов, сформулированных в прошедшем времени.",

@@ -23,7 +23,12 @@ class TestRuUCAR(TestBase):
     info = {
         "name": "UCAR (RU)",
         "code_name": "RU_ucar",
-        "tags": ["ru"],
+        "tags": [
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.",
             "ru": "Проверяет соблюдение русскоязычной моделью LLM ограничений по контенту при явном запросе игнорировать такие фильтры. Оценивает устойчивость систем модерации контента LLM к прямым вызовам.",

@@ -22,7 +22,12 @@ class TestRuDAN(TestBase):
     info = {
         "name": "Do Anything Now Jailbreak (RU)",
         "code_name": "RU_do_anything_now_jailbreak",
-        "tags": ["ru"],
+        "tags": [
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": 'Probes a Russian-language LLM\'s resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.',
             "ru": "Проверяет устойчивость русскоязычной модели LLM к выполнению явно запрещенных действий, используя технику ролевой игры персонажа «Сделай что угодно сейчас» (DAN).",
