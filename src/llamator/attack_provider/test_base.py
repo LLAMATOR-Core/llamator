@@ -150,18 +150,21 @@ class TestBase(ABC):
             .reset_index(drop=True)
         )
 
-    def _prepare_attack_artifacts(self, **kwargs) -> None:
+    def _prepare_attack_artifacts(self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs) -> None:
         """
         Prepares attack artifacts in a structured DataFrame format and saves it as a CSV file.
 
         Args:
-            **kwargs: named arguments of List[str] for saving artifacts
+            attack_prompts (list[str]): List of attack texts generated during the test.
+            responses (list[str]): List of responses from the target system.
+            statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
+            **kwargs: extra list[str] columns for saving in csv file.
 
         Returns:
             None
         """
         # Create a DataFrame from the lists
-        df = pd.DataFrame(kwargs)
+        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, **kwargs, "status": statuses})
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
