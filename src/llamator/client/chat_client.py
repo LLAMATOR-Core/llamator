@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional
 
 from .langchain_integration import get_langchain_chat_models_info
 
@@ -178,18 +178,18 @@ class MultiStageInteractionSession:
         The session for the attacker.
     tested_client_session : ChatSession
         The session for the tested client.
-    history_limit : int
+    stop_criterion : Callable[[List[Dict[str, str]]], bool], optional
+        A function that determines whether to stop the conversation based on the tested client's responses.
+    history_limit : int, optional
         The maximum allowed history length for the attacker.
-    tested_client_responses_evaluation : Callable[..., Tuple[bool, str]]
-        A function that evaluates whether to continue a multi-step LLM attack based on response history and attack progress.
-        Analyzes patterns in the LLM's responses to determine attack success, failure, or need for adaptation.
-        Provides True if status is BROKEN, otherwise false and string guidance to the attacking agent about next steps.
+    tested_client_response_handler : Callable[..., str], optional
+        A function that handles the tested client's response before passing it to the attacker.
+    current_step : int
+        The current step of the attacker.
     refine_args : tuple
         Additional positional arguments for tested_client_response_handler.
     refine_kwargs : dict
         Additional keyword arguments for tested_client_response_handler.
-    current_step : int
-        The current step of the attacker.
 
     Methods
     -------
@@ -207,8 +207,9 @@ class MultiStageInteractionSession:
         self,
         attacker_session: ChatSession,
         tested_client_session: ChatSession,
+        stop_criterion: Optional[Callable[[List[Dict[str, str]]], bool]] = None,
         history_limit: Optional[int] = 20,
-        tested_client_responses_evaluation: Optional[Callable[[List[Dict[str, str]]], Tuple[bool, str]]] = None,
+        tested_client_response_handler: Optional[Callable[..., str]] = None,
         refine_args: Optional[tuple] = None,
         refine_kwargs: Optional[dict] = None,
     ):
@@ -221,12 +222,14 @@ class MultiStageInteractionSession:
             The session for the attacker.
         tested_client_session : ChatSession
             The session for the tested client.
+        stop_criterion : Callable[[List[Dict[str, str]]], bool]], optional
+            A function that takes the tested client's history and returns True if the conversation should stop.
+            If None, a default criterion that always returns False is used. (default is None)
         history_limit : int, optional
             The maximum number of messages allowed in the attacker's history. (default is 20)
-        tested_client_responses_evaluation : Callable[[List[Dict[str, str]]], Tuple[bool, str]]], optional
-            A function that evaluates whether to continue a multi-step LLM attack based on response history and attack progress.
-            Analyzes patterns in the LLM's responses to determine attack success, failure, or need for adaptation.
-            Provides True if status is BROKEN, otherwise false and string guidance to the attacking agent about next steps. (default is None)
+        tested_client_response_handler : Callable[..., str], optional
+            A function that handles the tested client's response before passing it to the attacker.
+            If None, a default function that returns the response unchanged is used. (default is None)
         refine_args : tuple, optional
             Additional positional arguments for tested_client_response_handler. (default is None)
         refine_kwargs : dict, optional
@@ -234,20 +237,21 @@ class MultiStageInteractionSession:
         """
         self.attacker_session = attacker_session
         self.tested_client_session = tested_client_session
+        self.stop_criterion = stop_criterion if stop_criterion is not None else self.default_stop_criterion
         self.history_limit = history_limit
-        self.tested_client_responses_evaluation = (
-            tested_client_responses_evaluation
-            if tested_client_responses_evaluation is not None
-            else self.default_tested_client_responses_evaluation
+        self.tested_client_response_handler = (
+            tested_client_response_handler
+            if tested_client_response_handler is not None
+            else self.default_tested_client_response_handler
         )
+        self.current_step = 1
         self.refine_args = refine_args if refine_args is not None else ()
         self.refine_kwargs = refine_kwargs if refine_kwargs is not None else {}
-        self.current_step = 1
 
     @staticmethod
-    def default_tested_client_responses_evaluation(tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
+    def default_stop_criterion(tested_client_history: List[Dict[str, str]]) -> bool:
         """
-        Default tested client's responses evaluation that never stops the conversation and provides empty string to attacker.
+        Default stopping criterion that never stops the conversation.
 
         Parameters
         ----------
@@ -256,10 +260,35 @@ class MultiStageInteractionSession:
 
         Returns
         -------
-        Tuple[bool, str]
-            Always returns False and empty string.
+        bool
+            Always returns False.
         """
-        return False, ""
+        return False
+
+    @staticmethod
+    def default_tested_client_response_handler(tested_client_response: str, **kwargs) -> str:
+        """
+        Default tested_client_response_handler function that returns the response unchanged.
+
+        Parameters
+        ----------
+        tested_client_response : str
+            The response from the tested client.
+        **kwargs : dict
+            Additional keyword arguments (not used).
+
+        Returns
+        -------
+        str
+            The original tested client's response.
+
+        # Usage Example:
+        # If you have additional variables, they can be accessed via args or kwargs.
+        # For example, to append a suffix from kwargs:
+        # suffix = kwargs.get('suffix', '')
+        # return tested_client_response + suffix
+        """
+        return tested_client_response
 
     def start_conversation(self, start_prompt: str) -> bool | None:
         """
@@ -290,11 +319,8 @@ class MultiStageInteractionSession:
             if not tested_client_response:
                 return None
 
-            # Evaluate client history (e.g. adding scoring, more instructions for attacker)
-            is_broken, attacker_prompt = self.tested_client_responses_evaluation(
-                tested_client_history=self.tested_client_session.history, *self.refine_args, **self.refine_kwargs
-            )
-            if is_broken:
+            # Check stopping criterion by history
+            if self.stop_criterion(tested_client_history=self.tested_client_session.history):
                 logger.debug("Stopping criterion met.")
                 return True
 
@@ -303,10 +329,14 @@ class MultiStageInteractionSession:
                 logger.debug("History limit exceeded.")
                 return False
 
-            # Send the prompt to attacker for refinement and sending next iteration
+            # Handling the tested client's response before passing it to the attacker
+            # (e.g. adding scoring, more instructions for attacker)
+            attacker_prompt = self.tested_client_response_handler(
+                tested_client_response, *self.refine_args, **self.refine_kwargs
+            )
             logger.debug(f"Step {self.current_step}: Attacker prompt: {attacker_prompt}")
-            if not attacker_prompt:
-                return None
+
+            # Send the handled tested client's response to the attacker for refinement and sending next iteration
             attacker_response = self.attacker_session.say(attacker_prompt)
             logger.debug(f"Step {self.current_step}: Attacker response: {attacker_response}")
             if not attacker_response:

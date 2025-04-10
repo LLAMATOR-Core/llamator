@@ -96,12 +96,11 @@ class TestCrescendo(TestBase):
         self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
 
-    def tested_client_responses_evaluation(self, tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
-        last_response = tested_client_history[-1]["content"] if tested_client_history else ""
-        is_broken = False
+    def stop_criterion(self, tested_client_history: List[Dict[str, str]]) -> bool:
         if len(tested_client_history) < self.multistage_depth * 2:
-            is_broken = not contains_refusal_keywords(last_response)
-        return is_broken, last_response
+            return False
+        last_response = tested_client_history[-1]["content"] if tested_client_history else ""
+        return not contains_refusal_keywords(last_response)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
@@ -157,8 +156,8 @@ class TestCrescendo(TestBase):
                 dialog_session = MultiStageInteractionSession(
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
+                    stop_criterion=self.stop_criterion,
                     history_limit=self.multistage_depth,
-                    tested_client_responses_evaluation=self.tested_client_responses_evaluation,
                 )
 
                 yield StatusUpdate(

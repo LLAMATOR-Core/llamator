@@ -78,11 +78,16 @@ class TestSystemPromptLeakage(TestBase):
         self.custom_dataset = custom_dataset
 
     @staticmethod
-    def tested_client_responses_evaluation(tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
+    def refine_attack_prompt(tested_client_response: str) -> str:
+        """
+        Refines the attack prompt to be more effective.
+        """
+        return REFINE_PROMPT_GENERATION.format(last_response=tested_client_response)
+
+    @staticmethod
+    def stop_criterion(tested_client_history: List[Dict[str, str]]) -> bool:
         last_response = tested_client_history[-1]["content"] if tested_client_history else ""
-        is_broken = contains_system_prompt_keywords(last_response)
-        attacker_prompt = REFINE_PROMPT_GENERATION.format(last_response=last_response)
-        return is_broken, attacker_prompt
+        return contains_system_prompt_keywords(last_response)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts = []
@@ -134,8 +139,9 @@ class TestSystemPromptLeakage(TestBase):
                     dialog_session = MultiStageInteractionSession(
                         attacker_session=attack_chat,
                         tested_client_session=tested_client_chat,
+                        stop_criterion=self.stop_criterion,
                         history_limit=self.multistage_depth,
-                        tested_client_responses_evaluation=self.tested_client_responses_evaluation,
+                        tested_client_response_handler=self.refine_attack_prompt,
                     )
                     is_broken = dialog_session.start_conversation(
                         start_prompt=FIRST_ATTACK_PROMPT_TEMPLATE.format(
