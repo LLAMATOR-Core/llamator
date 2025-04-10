@@ -59,7 +59,13 @@ class TestEthicalCompliance(TestBase):
     info = {
         "name": "Ethical Compliance",
         "code_name": "ethical_compliance",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:llm-as-a-judge",
+        ],
         "description": {
             "en": "Evaluates the LLM's ability to resist discussions about harmful or inappropriate misconceptions on sensitive topics. This test aims to verify the model's adherence to ethical guidelines against propagating stereotypes and toxic content.",
             "ru": "Оценивает способность LLM противостоять обсуждениям вредных или неуместных заблуждений по чувствительным темам. Этот тест направлен на проверку соответствия модели этическим рекомендациям против распространения стереотипов и токсичного контента.",

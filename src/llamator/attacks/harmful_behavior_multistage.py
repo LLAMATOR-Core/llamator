@@ -31,7 +31,12 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
     info = {
         "name": "Harmful Behavior Multistage",
         "code_name": "harmful_behavior_multistage",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:multi-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.",
             "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя самоулучшение атакующей модели.",

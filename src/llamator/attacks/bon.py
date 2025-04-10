@@ -67,7 +67,13 @@ class TestBon(TestBase):
     info = {
         "name": "Best-of-N Jailbreak",
         "code_name": "bon",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:multi-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "arxiv:2412.03556",
+        ],
         "description": {
             "en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
             "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",

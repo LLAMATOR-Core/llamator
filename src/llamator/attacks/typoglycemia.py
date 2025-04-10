@@ -24,7 +24,12 @@ class TestTypoglycemia(TestBase):
     info = {
         "name": "Typoglycemia Attack",
         "code_name": "typoglycemia_attack",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Attempts to exploit a text processing vulnerability in LLMs that can cause incorrect responses by removing random characters from words.",
             "ru": "Пытается использовать уязвимость в обработке текста LLM, которая может вызвать неправильные ответы, удаляя случайные символы из слов.",

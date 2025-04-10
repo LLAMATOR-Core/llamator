@@ -62,7 +62,12 @@ class TestLogicalInconsistencies(TestBase):
     info = {
         "name": "Logical Inconsistencies Test",
         "code_name": "logical_inconsistencies",
-        "tags": [],
+        "tags": [
+            "lang:any",
+            "dialog:multi-stage",
+            "owasp:llm09",
+            "eval:llm-as-a-judge",
+        ],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain.",
             "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием перефразирования и отрицания.",

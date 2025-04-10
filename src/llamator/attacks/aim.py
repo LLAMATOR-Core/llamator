@@ -40,7 +40,12 @@ class TestAIM(TestBase):
     info = {
         "name": "Aim Jailbreak",
         "code_name": "aim_jailbreak",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the Nicolo Machiavelli character roleplay.",
             "ru": "Проверяет этическую соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя ролевую игру персонажа Никколо Макиавелли.",

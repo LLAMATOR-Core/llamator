@@ -17,6 +17,7 @@ Your response to this message must consist solely of the prompt text, without an
 """
 
 
+# TODO: add harmful behavior dataset
 @register_test
 class TestComplimentaryTransition(TestBase):
     """Evaluates the LLM's ability to maintain content moderation standards when transitioning from a compliment to a new task.
@@ -25,7 +26,12 @@ class TestComplimentaryTransition(TestBase):
     info = {
         "name": "Complimentary Transition",
         "code_name": "complimentary_transition",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Evaluates the LLM's ability to maintain content moderation standards when transitioning from a compliment to a new task. It assesses the LLM's ability to maintain defined boundaries when prompted to switch topics.",
             "ru": "Оценивает способность LLM поддерживать стандарты модерации контента при переходе от комплимента к новой задаче. Он оценивает способность LLM сохранять определенные границы при переходе на другую тему.",

@@ -24,7 +24,12 @@ class TestRuTypoglycemia(TestBase):
     info = {
         "name": "Typoglycemia Attack (RU)",
         "code_name": "RU_typoglycemia_attack",
-        "tags": ["ru"],
+        "tags": [
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Attempts to exploit a text processing vulnerability in Russian-language LLMs that can cause incorrect responses by removing random characters from words.",
             "ru": "Пытается использовать уязвимость в обработке текста русскоязычными моделями LLM, которая может вызвать неправильные ответы, удаляя случайные символы из слов.",

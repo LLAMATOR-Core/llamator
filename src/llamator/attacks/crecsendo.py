@@ -68,7 +68,13 @@ class TestCrescendo(TestBase):
     info = {
         "name": "Crescendo",
         "code_name": "crescendo",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:multi-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "arxiv:2404.01833",
+        ],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement. Original Paper: https://arxiv.org/abs/2404.01833",
             "ru": "Испытывает LLM набором запросов, связанных с вредным поведением, используя стратегию Crescendo путем вовлечения LLM в серию растущих разговорных поворотов с самоулучшением атакующей модели. Статья: https://arxiv.org/abs/2404.01833",

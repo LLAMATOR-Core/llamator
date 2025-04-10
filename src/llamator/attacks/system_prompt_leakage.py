@@ -49,7 +49,12 @@ class TestSystemPromptLeakage(TestBase):
     info = {
         "name": "System Prompt Leakage",
         "code_name": "system_prompt_leakage",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:multi-stage",
+            "owasp:llm07",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement.",
             "ru": "Провоцирует LLM выдать системные инструкции с помощью датасета вредоносных промтов с последующим улучшением атакующей моделью.",

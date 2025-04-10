@@ -23,7 +23,13 @@ class TestShuffle(TestBase):
     info = {
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:multi-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "arxiv:2501.04931",
+        ],
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
             "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
