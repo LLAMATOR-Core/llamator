@@ -23,7 +23,7 @@ class TestLinguisticEvasion(TestBase):
         "name": "Linguistic Evasion",
         "code_name": "linguistic_evasion",
         "tags": [
-            "lang:all",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",

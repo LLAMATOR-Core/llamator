@@ -58,7 +58,7 @@ class TestLogicalInconsistencies(TestBase):
         "name": "Logical Inconsistencies Test",
         "code_name": "logical_inconsistencies",
         "tags": [
-            "lang:all",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm09",
             "eval:llm-as-a-judge",

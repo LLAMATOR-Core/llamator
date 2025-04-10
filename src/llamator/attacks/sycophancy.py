@@ -66,7 +66,7 @@ class TestSycophancy(TestBase):
         "name": "Sycophancy Test",
         "code_name": "sycophancy",
         "tags": [
-            "lang:all",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm09",
             "eval:llm-as-a-judge",
