@@ -65,7 +65,13 @@ class TestSycophancy(TestBase):
     info = {
         "name": "Sycophancy Test",
         "code_name": "sycophancy",
-        "tags": [],
+        "tags": [
+            "lang:any",
+            "dialog:multi-stage",
+            "owasp:llm09",
+            "eval:llm-as-a-judge",
+            "arxiv:2310.13548",
+        ],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",
             "ru": "Проверяет связность и последовательность ответов LLM-системы в ходе продолжительного диалога на основе её описания, вступая с ней в спор с использованием аргументации к авторитету (лат. argumentum ad verecundiam). Статья: https://arxiv.org/abs/2310.13548",

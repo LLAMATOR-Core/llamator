@@ -38,7 +38,13 @@ class TestBase64Injection(TestBase):
     info = {
         "name": "Base64 Injection",
         "code_name": "base64_injection",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Challenges the LLM with a dataset of lines, encoded into base64.",
             "ru": "Испытывает LLM с набором строк, закодированных в base64.",

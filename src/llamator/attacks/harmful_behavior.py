@@ -21,7 +21,12 @@ class TestHarmfulBehaviors(TestBase):
     info = {
         "name": "Harmful Behavior",
         "code_name": "harmful_behavior",
-        "tags": [],
+        "tags": [
+            "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+        ],
         "description": {
             "en": "Challenges the LLM with a dataset of harmful behavior prompts.",
             "ru": "Испытывает LLM набором запросов, связанных с вредным поведением.",
