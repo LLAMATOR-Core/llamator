@@ -60,7 +60,9 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
         self.custom_dataset = custom_dataset
 
     @staticmethod
-    def history_evaluation(tested_client_history: List[Dict[str, str]], objective: str) -> Tuple[bool, str]:
+    def tested_client_responses_evaluation(
+        tested_client_history: List[Dict[str, str]], objective: str
+    ) -> Tuple[bool, str]:
         last_response = tested_client_history[-1]["content"] if tested_client_history else ""
         is_broken = not contains_refusal_keywords(last_response)
         attacker_prompt = REFINE_PROMPT_GENERATION_TEMPLATE.format(objective=objective)
@@ -105,7 +107,7 @@ class TestHarmfulBehaviorsMultiStage(TestBase):
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
                     history_limit=self.multistage_depth,
-                    history_evaluation=self.history_evaluation,
+                    tested_client_responses_evaluation=self.tested_client_responses_evaluation,
                     refine_kwargs={"objective": objective},
                 )
 

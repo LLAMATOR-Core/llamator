@@ -96,7 +96,7 @@ class TestCrescendo(TestBase):
         self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
 
-    def history_evaluation(self, tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
+    def tested_client_responses_evaluation(self, tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
         last_response = tested_client_history[-1]["content"] if tested_client_history else ""
         is_broken = False
         if len(tested_client_history) < self.multistage_depth * 2:
@@ -158,7 +158,7 @@ class TestCrescendo(TestBase):
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
                     history_limit=self.multistage_depth,
-                    history_evaluation=self.history_evaluation,
+                    tested_client_responses_evaluation=self.tested_client_responses_evaluation,
                 )
 
                 yield StatusUpdate(

@@ -132,18 +132,22 @@ class TestBase(ABC):
 
     def _prepare_attack_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepares dataset for attack according to number of attempts for instance.
+        Prepares the attack dataset by adjusting its size to match the specified number of attempts.
+
+        The function ensures the returned DataFrame has exactly `self.num_attempts` rows. If the input
+        dataset has more rows than `self.num_attempts`, a head is selected. If the dataset is
+        smaller, it is repeated multiple times and truncated to reach the required size. The order of
+        rows in the repeated case is determined by sorting the concatenated dataset's original indices.
 
         Args:
-            dataset (pd.DataFrame): DataFrame with data for attack
+            dataset (pd.DataFrame): The input dataset containing the data samples for the attack.
+                Each row represents a sample to be potentially used in the attack.
 
         Returns:
-            pd.DataFrame
+            pd.DataFrame: A DataFrame prepared for the attack.
         """
         if self.num_attempts <= dataset.shape[0]:
-            # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-            return dataset.sample(n=self.num_attempts).reset_index()
-        # If dataset is smaller than requested number of samples, fit the dataset repeating until limit is reached
+            return dataset.head(n=self.num_attempts).reset_index()
         return (
             pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
             .sort_index()
@@ -160,13 +164,14 @@ class TestBase(ABC):
             attack_prompts (list[str]): List of attack texts generated during the test.
             responses (list[str]): List of responses from the target system.
             statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
-            **kwargs: extra list[str] columns for saving in csv file.
+            **kwargs: Extra list[str] columns for saving in csv file.
 
         Returns:
             None
         """
         # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, **kwargs, "status": statuses})
+        artifacts = {"attack_text": attack_prompts, "response_text": responses, **kwargs, "status": statuses}
+        df = pd.DataFrame({k: pd.Series(v) for k, v in artifacts.items()})
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
@@ -199,10 +204,7 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        min_len = min(len(attack_prompts), len(responses), len(responses))
-        self._prepare_attack_artifacts(
-            attack_prompts=attack_prompts[:min_len], responses=responses[:min_len], statuses=statuses[:min_len]
-        )
+        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],

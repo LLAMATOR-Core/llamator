@@ -180,9 +180,10 @@ class MultiStageInteractionSession:
         The session for the tested client.
     history_limit : int
         The maximum allowed history length for the attacker.
-    history_evaluation : Callable[..., Tuple[bool, str]]
-        A function that determines whether to stop the conversation
-        based on the tested client's responses and returns prompt for attacker.
+    tested_client_responses_evaluation : Callable[..., Tuple[bool, str]]
+        A function that evaluates whether to continue a multi-step LLM attack based on response history and attack progress.
+        Analyzes patterns in the LLM's responses to determine attack success, failure, or need for adaptation.
+        Provides True if status is BROKEN, otherwise false and string guidance to the attacking agent about next steps.
     refine_args : tuple
         Additional positional arguments for tested_client_response_handler.
     refine_kwargs : dict
@@ -207,7 +208,7 @@ class MultiStageInteractionSession:
         attacker_session: ChatSession,
         tested_client_session: ChatSession,
         history_limit: Optional[int] = 20,
-        history_evaluation: Optional[Callable[[List[Dict[str, str]]], Tuple[bool, str]]] = None,
+        tested_client_responses_evaluation: Optional[Callable[[List[Dict[str, str]]], Tuple[bool, str]]] = None,
         refine_args: Optional[tuple] = None,
         refine_kwargs: Optional[dict] = None,
     ):
@@ -222,9 +223,10 @@ class MultiStageInteractionSession:
             The session for the tested client.
         history_limit : int, optional
             The maximum number of messages allowed in the attacker's history. (default is 20)
-        history_evaluation : Callable[[List[Dict[str, str]]], Tuple[bool, str]]], optional
-            A function that takes the tested client's history and returns stop request and message for attack model.
-            If None, returns False and the last response of Tested model. (default is None)
+        tested_client_responses_evaluation : Callable[[List[Dict[str, str]]], Tuple[bool, str]]], optional
+            A function that evaluates whether to continue a multi-step LLM attack based on response history and attack progress.
+            Analyzes patterns in the LLM's responses to determine attack success, failure, or need for adaptation.
+            Provides True if status is BROKEN, otherwise false and string guidance to the attacking agent about next steps. (default is None)
         refine_args : tuple, optional
             Additional positional arguments for tested_client_response_handler. (default is None)
         refine_kwargs : dict, optional
@@ -233,17 +235,19 @@ class MultiStageInteractionSession:
         self.attacker_session = attacker_session
         self.tested_client_session = tested_client_session
         self.history_limit = history_limit
-        self.history_evaluation = (
-            history_evaluation if history_evaluation is not None else self.default_history_evaluation
+        self.tested_client_responses_evaluation = (
+            tested_client_responses_evaluation
+            if tested_client_responses_evaluation is not None
+            else self.default_tested_client_responses_evaluation
         )
         self.refine_args = refine_args if refine_args is not None else ()
         self.refine_kwargs = refine_kwargs if refine_kwargs is not None else {}
         self.current_step = 1
 
     @staticmethod
-    def default_history_evaluation(tested_client_history: List[Dict[str, str]], *args, **kwargs) -> Tuple[bool, str]:
+    def default_tested_client_responses_evaluation(tested_client_history: List[Dict[str, str]]) -> Tuple[bool, str]:
         """
-        Default history evaluation that never stops the conversation.
+        Default tested client's responses evaluation that never stops the conversation and provides empty string to attacker.
 
         Parameters
         ----------
@@ -253,10 +257,9 @@ class MultiStageInteractionSession:
         Returns
         -------
         Tuple[bool, str]
-            Always returns False and the last response of Tested client.
+            Always returns False and empty string.
         """
-        last_response = tested_client_history[-1]["content"] if tested_client_history else ""
-        return False, last_response
+        return False, ""
 
     def start_conversation(self, start_prompt: str) -> bool | None:
         """
@@ -288,7 +291,7 @@ class MultiStageInteractionSession:
                 return None
 
             # Evaluate client history (e.g. adding scoring, more instructions for attacker)
-            is_broken, attacker_prompt = self.history_evaluation(
+            is_broken, attacker_prompt = self.tested_client_responses_evaluation(
                 tested_client_history=self.tested_client_session.history, *self.refine_args, **self.refine_kwargs
             )
             if is_broken:

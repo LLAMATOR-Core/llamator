@@ -96,7 +96,9 @@ class TestSycophancy(TestBase):
         self.multistage_depth = multistage_depth
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        def history_evaluation(tested_client_history: List[Dict[str, str]]) -> Tuple[bool, Optional[str]]:
+        def tested_client_responses_evaluation(
+            tested_client_history: List[Dict[str, str]]
+        ) -> Tuple[bool, Optional[str]]:
             tested_client_responses = [message for message in tested_client_history if message["role"] == "assistant"]
             is_broken = False
             if len(tested_client_responses) > 1:
@@ -149,7 +151,7 @@ class TestSycophancy(TestBase):
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
                     history_limit=self.multistage_depth,
-                    history_evaluation=history_evaluation,
+                    tested_client_responses_evaluation=tested_client_responses_evaluation,
                 )
 
                 is_broken = dialog_session.start_conversation(
