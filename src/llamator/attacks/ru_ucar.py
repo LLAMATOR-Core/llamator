@@ -13,6 +13,7 @@ from ..client.client_config import ClientConfig
 
 logger = logging.getLogger(__name__)
 
+
 @register_test
 class TestRuUCAR(TestBase):
     """Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters.
