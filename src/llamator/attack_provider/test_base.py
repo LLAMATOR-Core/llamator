@@ -7,6 +7,7 @@ import pandas as pd
 
 from ..client.attack_config import AttackConfig
 from ..client.client_config import ClientConfig
+from ..client.judge_config import JudgeConfig
 
 
 class TestLogEntry:
@@ -108,6 +109,7 @@ class TestBase(ABC):
         self,
         client_config: ClientConfig,
         attack_config: AttackConfig,
+        judge_config: Optional[JudgeConfig] = None,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         **kwargs,
@@ -115,6 +117,7 @@ class TestBase(ABC):
         self.test_description = self.__doc__
         self.client_config = client_config
         self.attack_config = attack_config
+        self.judge_config = judge_config
         self.status = TestStatus()
         self.artifacts_path = artifacts_path
         self.num_attempts = num_attempts
@@ -127,20 +130,48 @@ class TestBase(ABC):
         """
         pass
 
-    def _prepare_attack_data(self, attack_prompts: list[str], responses: list[str], statuses: list[str]) -> None:
+    def _prepare_attack_dataset(self, dataset: pd.DataFrame) -> pd.DataFrame:
         """
-        Prepares attack data in a structured DataFrame format and saves it as a CSV file.
+        Prepares the attack dataset by adjusting its size to match the specified number of attempts.
+
+        The function ensures the returned DataFrame has exactly `self.num_attempts` rows. If the input
+        dataset has more rows than `self.num_attempts`, a head is selected. If the dataset is
+        smaller, it is repeated multiple times and truncated to reach the required size. The order of
+        rows in the repeated case is determined by sorting the concatenated dataset's original indices.
+
+        Args:
+            dataset (pd.DataFrame): The input dataset containing the data samples for the attack.
+                Each row represents a sample to be potentially used in the attack.
+
+        Returns:
+            pd.DataFrame: A DataFrame prepared for the attack.
+        """
+        if self.num_attempts <= dataset.shape[0]:
+            return dataset.head(n=self.num_attempts).reset_index()
+        return (
+            pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
+            .sort_index()
+            .reset_index(drop=True)
+        )
+
+    def _prepare_attack_artifacts(
+        self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
+    ) -> None:
+        """
+        Prepares attack artifacts in a structured DataFrame format and saves it as a CSV file.
 
         Args:
             attack_prompts (list[str]): List of attack texts generated during the test.
             responses (list[str]): List of responses from the target system.
             statuses (list[str]): List of statuses ('broken', 'resilient', 'error') corresponding to each attack.
+            **kwargs: Extra list[str] columns for saving in csv file.
 
         Returns:
             None
         """
         # Create a DataFrame from the lists
-        df = pd.DataFrame({"attack_text": attack_prompts, "response_text": responses, "status": statuses})
+        artifacts = {"attack_text": attack_prompts, "response_text": responses, **kwargs, "status": statuses}
+        df = pd.DataFrame({k: pd.Series(v) for k, v in artifacts.items()})
 
         # Save the DataFrame as a CSV file to the artifacts path
         if self.artifacts_path:
@@ -173,7 +204,7 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        self._prepare_attack_data(attack_prompts, responses, statuses)
+        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],

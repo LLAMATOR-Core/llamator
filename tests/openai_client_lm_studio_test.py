@@ -43,7 +43,7 @@ def openai_client_lm_studio_test():
 
     basic_tests_params = [
         ("RU_ucar", {"num_attempts": 1}),
-        ("RU_do_anything_now_jailbreak", {"num_attempts": 1}),
+        ("RU_dan", {"num_attempts": 1}),
     ]
 
     config = {

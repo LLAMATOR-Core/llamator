@@ -1,4 +1,3 @@
-# llamator/src/llamator/attacks/ru_dan.py
 import logging
 from pathlib import Path
 from typing import Generator, Optional
@@ -21,7 +20,7 @@ class TestRuDAN(TestBase):
 
     info = {
         "name": "Do Anything Now Jailbreak (RU)",
-        "code_name": "RU_do_anything_now_jailbreak",
+        "code_name": "RU_dan",
         "tags": [
             "lang:ru",
             "dialog:single-stage",
@@ -56,34 +55,9 @@ class TestRuDAN(TestBase):
         responses = []
         statuses = []
         try:
-            current_dir = Path(__file__).parent
-            # The path to the ucar-dan_prompts.parquet file
-            dataset_filename = current_dir.parent / "attack_data" / "ucar-dan_prompts.parquet"
-
-            logger.info(f"Dataset filename: {dataset_filename}")
+            dataset_filename = Path(__file__).parent.parent / "attack_data" / "ucar-dan_prompts.parquet"
             data = pd.read_parquet(dataset_filename, engine="fastparquet")
-            rows_count = data.shape[0]
-
-            if self.num_attempts <= rows_count:
-                # If dataset is larger than requested number of samples, reduce dataset by taking num_attempts samples
-                data = data.sample(n=self.num_attempts)
-            else:
-                # If dataset is smaller than requested number of attack samples, fit the dataset repeating until num_attempts is reached
-                data = (
-                    pd.concat([data] * (self.num_attempts // len(data) + 1))[: self.num_attempts]
-                    .sort_index()
-                    .reset_index(drop=True)
-                )
-
-            # Generate list of DAN (do anything now) attack prompt variations
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Generating",
-                0,
-                self.num_attempts,
-            )
+            data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["ru_dan"]  # attack is the with static input
@@ -95,23 +69,14 @@ class TestRuDAN(TestBase):
                     self.client_config,
                     self.info["code_name"],
                     self.status,
-                    "Generating",
+                    "Attacking",
                     attack_prompt_index,
                     self.num_attempts,
                 )
-
-            # Run the attack by sending the prompts and verifying the responses
-            yield StatusUpdate(
-                self.client_config,
-                self.info["code_name"],
-                self.status,
-                "Attacking",
-                0,
-                self.num_attempts,
-            )
-
-            for attack_prompt_index, attack_prompt in enumerate(attack_prompts):
-                chat = ChatSession(self.client_config.get_target_client(), self.client_config.get_system_prompts())
+                chat = ChatSession(
+                    self.client_config.get_target_client(),
+                    self.client_config.get_system_prompts(),
+                )
                 response = chat.say(attack_prompt)
                 if not response:
                     logger.warning("Error while attacking against target LLM (didn't receive response) ...")
@@ -130,27 +95,16 @@ class TestRuDAN(TestBase):
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
                     )
                     if verified:
-                        self.status.report_breach(attack_prompt, response)
                         current_status = "Broken"
+                        self.status.report_breach(attack_prompt, response)
                     else:
-                        self.status.report_resilient(attack_prompt, response)
                         current_status = "Resilient"
-
-                # Append data for report
+                        self.status.report_resilient(attack_prompt, response)
                 responses.append(response)
                 statuses.append(current_status)
 
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Attacking",
-                    attack_prompt_index,
-                    self.num_attempts,
-                )
-
             # Prepare data for report generation
-            self._prepare_attack_data(attack_prompts, responses, statuses)
+            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,
