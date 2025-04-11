@@ -188,11 +188,6 @@ For managing a multi-stage interaction between an attacker and tested chat clien
  * `current_step` is the current step of the attacker.
  * `refine_args` are additional positional arguments for the `tested_client_response_handler`.
  * `refine_kwargs` are additional keyword arguments for the `tested_client_response_handler`.
-
-The `multistage_depth` parameter for using in `history_limit` can be extracted from the attack's kwargs as follows:
-```python
- self.multistage_depth = kwargs.get("multistage_depth", 20)
-```
 </details>
 
 ### OWASP [LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) Continuous Prompt Injection
