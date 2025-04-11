@@ -36,6 +36,7 @@ openpyxl==3.1.5
 python-docx==1.1.2
 datetime==5.5
 jupyter==1.1.1
+pillow==11.1.0
 
 # Publish package
 build==1.2.2
