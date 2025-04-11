@@ -36,6 +36,8 @@ openpyxl==3.1.5
 python-docx==1.1.2
 datetime==5.5
 jupyter==1.1.1
+huggingface_hub==0.30.1
+datasets==3.5.0
 
 # Publish package
 build==1.2.2
