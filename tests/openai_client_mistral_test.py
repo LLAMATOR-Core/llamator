@@ -9,12 +9,8 @@ def openai_client_mistral_test():
 
     Environment variables
     ----------
-    OPENAI_CLIENT_API_KEY : str
-        API key for OpenAI compatible API
-    OPENAI_CLIENT_BASEURL : str
-        URL of OpenAI compatible API
-    OPENAI_CLIENT_MODEL : str
-        Type of model
+    MISTRAL_API_KEY : str
+        API key for MistralAI API
     """
     load_dotenv()
 

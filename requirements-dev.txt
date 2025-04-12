@@ -38,5 +38,6 @@ jupyter==1.1.1
 
 # Publish package
 build==1.2.2
-twine==5.1.1
+twine==6.1.0
 furo==2024.8.6
+pkginfo==1.12.1.2
