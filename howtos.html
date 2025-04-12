@@ -285,12 +285,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/RomiconEZ/llamator/blob/release/src/howtos.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/howtos.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/RomiconEZ/llamator/edit/release/src/howtos.md" title="Edit this page">
+  <a class="muted-link" href="https://github.com/LLAMATOR-Core/llamator/edit/release/src/howtos.md" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -314,17 +314,17 @@
 <section id="notebooks-examples">
 <h2>Notebooks Examples<a class="headerlink" href="#notebooks-examples" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>📄 <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-api.ipynb">RAG bot testing via REST API</a></p></li>
-<li><p>🧙‍♂️ <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-selenium.ipynb">Gandalf web bot testing via Selenium</a></p></li>
-<li><p>💬 <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-telegram.ipynb">Telegram bot testing via Telethon</a></p></li>
-<li><p>📱 <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-whatsapp.ipynb">WhatsApp bot testing via Selenium</a></p></li>
-<li><p>🔗 <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb">LangChain client testing with custom attack</a></p></li>
-<li><p>🐋 <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/docker">Running LLAMATOR in Docker</a></p></li>
+<li><p>📄 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-api.ipynb">RAG bot testing via REST API</a></p></li>
+<li><p>🧙‍♂️ <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-selenium.ipynb">Gandalf web bot testing via Selenium</a></p></li>
+<li><p>💬 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb">Telegram bot testing via Telethon</a></p></li>
+<li><p>📱 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb">WhatsApp bot testing via Selenium</a></p></li>
+<li><p>🔗 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb">LangChain client testing with custom attack</a></p></li>
+<li><p>🐋 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/docker">Running LLAMATOR in Docker</a></p></li>
 </ul>
 </section>
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">2</span>.3.1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">3</span>.0.0
 </pre></div>
 </div>
 </section>
@@ -350,38 +350,23 @@
     <span class="n">model_description</span><span class="o">=</span><span class="s2">&quot;Model description&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># List of tests with the number of attempts</span>
-<span class="n">tests_with_attempts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">(</span><span class="s2">&quot;aim_jailbreak&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;base64_injection&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;bon&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;complimentary_transition&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="p">(</span><span class="s2">&quot;crescendo&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-    <span class="c1"># Uncomment the following lines to include additional tests</span>
-    <span class="c1"># (&quot;do_anything_now_jailbreak&quot;, 2),</span>
-    <span class="c1"># (&quot;RU_do_anything_now_jailbreak&quot;, 2),</span>
-    <span class="c1"># (&quot;ethical_compliance&quot;, 2),</span>
-    <span class="c1"># (&quot;harmful_behavior&quot;, 2),</span>
-    <span class="c1"># (&quot;harmful_behavior_multistage&quot;, 2),</span>
-    <span class="c1"># (&quot;linguistic_evasion&quot;, 2),</span>
-    <span class="c1"># (&quot;logical_inconsistencies&quot;, 2),</span>
-    <span class="c1"># (&quot;past_tense&quot;, 2),</span>
-    <span class="c1"># (&quot;suffix&quot;, 2),</span>
-    <span class="c1"># (&quot;sycophancy&quot;, 2),</span>
-    <span class="c1"># (&quot;system_prompt_leakage&quot;, 2),</span>
-    <span class="c1"># (&quot;typoglycemia_attack&quot;, 2),</span>
-    <span class="c1"># (&quot;RU_typoglycemia_attack&quot;, 2),</span>
-    <span class="c1"># (&quot;ucar&quot;, 2),</span>
-    <span class="c1"># (&quot;RU_ucar&quot;, 2),</span>
+<span class="c1"># List of basic tests with parameters</span>
+<span class="n">basic_tests</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s2">&quot;aim_jailbreak&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;num_attempts&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;base64_injection&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;num_attempts&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;bon&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;num_attempts&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;complimentary_transition&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;num_attempts&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+    <span class="p">(</span><span class="s2">&quot;crescendo&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;num_attempts&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}),</span>
+    <span class="c1"># Add other tests as needed</span>
 <span class="p">]</span>
 
 <span class="c1"># Configuration for testing</span>
 <span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;enable_logging&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable logging</span>
-    <span class="s2">&quot;enable_reports&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Enable report generation</span>
-    <span class="s2">&quot;artifacts_path&quot;</span><span class="p">:</span> <span class="s2">&quot;./artifacts&quot;</span><span class="p">,</span>  <span class="c1"># Path to save artifacts</span>
-    <span class="s2">&quot;debug_level&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># Logging level: 0 - WARNING, 1 - INFO, 2 - DEBUG</span>
-    <span class="s2">&quot;report_language&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>  <span class="c1"># Report language: &#39;en&#39;, &#39;ru&#39;</span>
+    <span class="s2">&quot;enable_logging&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;enable_reports&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;artifacts_path&quot;</span><span class="p">:</span> <span class="s2">&quot;./artifacts&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;debug_level&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;report_language&quot;</span><span class="p">:</span> <span class="s2">&quot;en&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># Start testing</span>
@@ -389,11 +374,59 @@
     <span class="n">attack_model</span><span class="o">=</span><span class="n">attack_model</span><span class="p">,</span>
     <span class="n">tested_model</span><span class="o">=</span><span class="n">tested_model</span><span class="p">,</span>
     <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-    <span class="n">tests_with_attempts</span><span class="o">=</span><span class="n">tests_with_attempts</span><span class="p">,</span>
-    <span class="n">multistage_depth</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+    <span class="n">basic_tests</span><span class="o">=</span><span class="n">basic_tests</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
+</section>
+<hr class="docutils" />
+<section id="helper-functions">
+<h2>Helper Functions<a class="headerlink" href="#helper-functions" title="Link to this heading">¶</a></h2>
+<section id="print-preset-tests-params-example">
+<h3><code class="docutils literal notranslate"><span class="pre">print_preset_tests_params_example</span></code><a class="headerlink" href="#print-preset-tests-params-example" title="Link to this heading">¶</a></h3>
+<p>Prints example configuration for presets to the console.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_preset_tests_params_example</span>
+
+<span class="c1"># Print configuration for &#39;standard&#39; preset</span>
+<span class="n">print_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+
+<span class="c1"># Print configuration for all available tests</span>
+<span class="n">print_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="get-preset-tests-params-example">
+<h3><code class="docutils literal notranslate"><span class="pre">get_preset_tests_params_example</span></code><a class="headerlink" href="#get-preset-tests-params-example" title="Link to this heading">¶</a></h3>
+<p>Returns a string containing example configurations for presets.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_preset_tests_params_example</span>
+
+<span class="c1"># Get example for &#39;standard&#39; preset</span>
+<span class="n">standard_preset</span> <span class="o">=</span> <span class="n">get_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">standard_preset</span><span class="p">)</span>
+
+<span class="c1"># Get example for all available tests</span>
+<span class="n">all_tests_preset</span> <span class="o">=</span> <span class="n">get_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">all_tests_preset</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="print-chat-models-info">
+<h3><code class="docutils literal notranslate"><span class="pre">print_chat_models_info</span></code><a class="headerlink" href="#print-chat-models-info" title="Link to this heading">¶</a></h3>
+<p>Displays information about available LangChain chat models, including parameters.</p>
+<p><strong>Usage:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_chat_models_info</span>
+
+<span class="c1"># Print basic model info</span>
+<span class="n">print_chat_models_info</span><span class="p">()</span>
+
+<span class="c1"># Print detailed model info with parameters</span>
+<span class="n">print_chat_models_info</span><span class="p">(</span><span class="n">detailed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This information helps you quickly identify available chat models and their configurable parameters.</p>
+</section>
 </section>
 </section>
 
@@ -435,7 +468,7 @@
           </div>
           <div class="right-details">
             <div class="icons">
-              <a class="muted-link " href="https://github.com/RomiconEZ/llamator" aria-label="GitHub">
+              <a class="muted-link " href="https://github.com/LLAMATOR-Core/llamator" aria-label="GitHub">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
                 </svg>
@@ -463,6 +496,12 @@
 <li><a class="reference internal" href="#notebooks-examples">Notebooks Examples</a></li>
 <li><a class="reference internal" href="#installation-guide">Installation Guide</a></li>
 <li><a class="reference internal" href="#usage-guide-using-lm-studio">Usage Guide (using LM Studio)</a></li>
+<li><a class="reference internal" href="#helper-functions">Helper Functions</a><ul>
+<li><a class="reference internal" href="#print-preset-tests-params-example"><code class="docutils literal notranslate"><span class="pre">print_preset_tests_params_example</span></code></a></li>
+<li><a class="reference internal" href="#get-preset-tests-params-example"><code class="docutils literal notranslate"><span class="pre">get_preset_tests_params_example</span></code></a></li>
+<li><a class="reference internal" href="#print-chat-models-info"><code class="docutils literal notranslate"><span class="pre">print_chat_models_info</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

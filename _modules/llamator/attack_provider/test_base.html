@@ -299,11 +299,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for llamator.attack_provider.test_base</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..client.attack_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">AttackConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..client.client_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..client.judge_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">JudgeConfig</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestLogEntry</span><span class="p">:</span>
@@ -312,7 +317,7 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">additional_info</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="n">prompt</span>  <span class="c1"># The prompt sent to the LLM model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span>  <span class="c1"># The response from the LLM model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="n">success</span>  <span class="c1"># True if the attack was successful (this means system prompt was weak), False otherwise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">success</span> <span class="o">=</span> <span class="n">success</span>  <span class="c1"># True if the attack was successful (system prompt was weak), False otherwise</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_info</span> <span class="o">=</span> <span class="n">additional_info</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -321,7 +326,7 @@
 
 <span class="k">class</span><span class="w"> </span><span class="nc">TestStatus</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Keeps track of the successful and failed prompts, as well as the log of all interactions with the target LLM model.</span>
+<span class="sd">    Keeps track of successful and failed prompts, as well as the log of all interactions with the target LLM model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -329,7 +334,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">resilient_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># This test is finished and the results are final</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">finished</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Indicates the test is finished and the results are final</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TestLogEntry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -339,9 +344,9 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">response</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">additional_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Attack succesfully broke system prompt protection&quot;</span><span class="p">,</span>
+        <span class="n">additional_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Attack successfully broke system prompt protection&quot;</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reports a succesful breach of the system prompt&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reports a successful breach of the system prompt&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">breach_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TestLogEntry</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">additional_info</span><span class="p">))</span>
@@ -358,7 +363,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TestLogEntry</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">additional_info</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">report_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">additional_info</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Error&quot;</span><span class="p">):</span>
-        <span class="s2">&quot;Reports an error during the test&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reports an error during the test&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">error_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_count</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TestLogEntry</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">additional_info</span><span class="p">))</span>
@@ -389,23 +394,33 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">TestBase</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A base class for test classes. Each test represents a different kind of attack against the target LLM model.</span>
-<span class="sd">    The test sends a sequence of prompts and evaluate the responses while updating the status.</span>
+<span class="sd">    The test sends a sequence of prompts and evaluates the responses while updating the status.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">test_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Test Name&quot;</span><span class="p">,)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Test Name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;code_name&quot;</span><span class="p">:</span> <span class="s2">&quot;test_name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;en&quot;</span><span class="p">:</span> <span class="s2">&quot;Description in english&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ru&quot;</span><span class="p">:</span> <span class="s2">&quot;Описание на русском&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;github_link&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">client_config</span><span class="p">:</span> <span class="n">ClientConfig</span><span class="p">,</span>
         <span class="n">attack_config</span><span class="p">:</span> <span class="n">AttackConfig</span><span class="p">,</span>
+        <span class="n">judge_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JudgeConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">artifacts_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">test_description</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span> <span class="o">=</span> <span class="n">client_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">attack_config</span> <span class="o">=</span> <span class="n">attack_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">judge_config</span> <span class="o">=</span> <span class="n">judge_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">TestStatus</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">artifacts_path</span> <span class="o">=</span> <span class="n">artifacts_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span> <span class="o">=</span> <span class="n">num_attempts</span>
@@ -416,7 +431,91 @@
 <span class="sd">        An abstract method to be implemented by subclasses to run the test.</span>
 <span class="sd">        This method is iterable. It yields StatusUpdate objects to report progress.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_attack_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares the attack dataset by adjusting its size to match the specified number of attempts.</span>
+
+<span class="sd">        The function ensures the returned DataFrame has exactly `self.num_attempts` rows. If the input</span>
+<span class="sd">        dataset has more rows than `self.num_attempts`, a head is selected. If the dataset is</span>
+<span class="sd">        smaller, it is repeated multiple times and truncated to reach the required size. The order of</span>
+<span class="sd">        rows in the repeated case is determined by sorting the concatenated dataset&#39;s original indices.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset (pd.DataFrame): The input dataset containing the data samples for the attack.</span>
+<span class="sd">                Each row represents a sample to be potentially used in the attack.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: A DataFrame prepared for the attack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span> <span class="o">&lt;=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataset</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span> <span class="o">//</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span><span class="p">]</span>
+            <span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_attack_artifacts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">attack_prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">responses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">statuses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares attack artifacts in a structured DataFrame format and saves it as a CSV file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            attack_prompts (list[str]): List of attack texts generated during the test.</span>
+<span class="sd">            responses (list[str]): List of responses from the target system.</span>
+<span class="sd">            statuses (list[str]): List of statuses (&#39;broken&#39;, &#39;resilient&#39;, &#39;error&#39;) corresponding to each attack.</span>
+<span class="sd">            **kwargs: Extra list[str] columns for saving in csv file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create a DataFrame from the lists</span>
+        <span class="n">artifacts</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;attack_text&quot;</span><span class="p">:</span> <span class="n">attack_prompts</span><span class="p">,</span> <span class="s2">&quot;response_text&quot;</span><span class="p">:</span> <span class="n">responses</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">statuses</span><span class="p">}</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">artifacts</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+
+        <span class="c1"># Save the DataFrame as a CSV file to the artifacts path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">artifacts_path</span><span class="p">:</span>
+            <span class="n">csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">artifacts_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;code_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">csv_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> attack report saved to </span><span class="si">{</span><span class="n">csv_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_exception</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">attack_prompts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">responses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">statuses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusUpdate</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes an exception by logging remaining attempts as errors, recording error information,</span>
+<span class="sd">        preparing data for the report, and returning the final test status.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        e : Exception</span>
+<span class="sd">            The exception that occurred.</span>
+<span class="sd">        attack_prompts : list[str]</span>
+<span class="sd">            List of generated attack prompts.</span>
+<span class="sd">        responses : list[str]</span>
+<span class="sd">            List of responses to the attacks.</span>
+<span class="sd">        statuses : list[str]</span>
+<span class="sd">            List of statuses for each attack.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        StatusUpdate</span>
+<span class="sd">            Final status update with test completion information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception occurred during test </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> execution&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">report_error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">additional_info</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Exception during test </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> execution&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_attack_artifacts</span><span class="p">(</span><span class="n">attack_prompts</span><span class="o">=</span><span class="n">attack_prompts</span><span class="p">,</span> <span class="n">responses</span><span class="o">=</span><span class="n">responses</span><span class="p">,</span> <span class="n">statuses</span><span class="o">=</span><span class="n">statuses</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StatusUpdate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">client_config</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;code_name&quot;</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="s2">&quot;Finished&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">num_attempts</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 </pre></div>
         </article>
@@ -439,7 +538,7 @@
           </div>
           <div class="right-details">
             <div class="icons">
-              <a class="muted-link " href="https://github.com/RomiconEZ/llamator" aria-label="GitHub">
+              <a class="muted-link " href="https://github.com/LLAMATOR-Core/llamator" aria-label="GitHub">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
                 </svg>

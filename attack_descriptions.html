@@ -285,12 +285,12 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="https://github.com/RomiconEZ/llamator/blob/release/src/attack_descriptions.md?plain=true" title="View this page">
+  <a class="muted-link" href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/attack_descriptions.md?plain=true" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
 </div><div class="edit-this-page">
-  <a class="muted-link" href="https://github.com/RomiconEZ/llamator/edit/release/src/attack_descriptions.md" title="Edit this page">
+  <a class="muted-link" href="https://github.com/LLAMATOR-Core/llamator/edit/release/src/attack_descriptions.md" title="Edit this page">
     <svg><use href="#svg-pencil"></use></svg>
     <span class="visually-hidden">Edit this page</span>
   </a>
@@ -317,96 +317,89 @@
 <section id="owasp-llm01-2025-prompt-injection">
 <h3>OWASP <a class="reference external" href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/">LLM01:2025</a> Prompt Injection<a class="headerlink" href="#owasp-llm01-2025-prompt-injection" title="Link to this heading">¶</a></h3>
 <details>
-<summary><strong>Adversarial suffix</strong></summary>
+<summary><strong>Adversarial Suffix</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">suffix</span></code></p>
 <p>Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model’s vulnerability to input data manipulation.</p>
-<p><em>Original Paper <a class="reference external" href="https://arxiv.org/abs/2307.15043">https://arxiv.org/abs/2307.15043</a>, Code <a class="reference external" href="https://github.com/llm-attacks/llm-attacks">https://github.com/llm-attacks/llm-attacks</a></em></p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/suffix.py">View code on GitHub</a></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2307.15043">https://arxiv.org/abs/2307.15043</a>, Original Code: <a class="reference external" href="https://github.com/llm-attacks/llm-attacks">https://github.com/llm-attacks/llm-attacks</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/suffix.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Aim Jailbreak</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">aim_jailbreak</span></code></p>
 <p>Probes an LLM’s ethical compliance by eliciting detailed instructions on illegal activities, using the Nicolo Machiavelli character roleplay.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/aim.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/aim.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Base64 Injection</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">base64_injection</span></code></p>
 <p>Challenges the LLM with a dataset of lines, encoded into base64.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/base64_injection.py">View code on GitHub</a></p>
-</details>
-<details>
-<summary><strong>Best-of-N Jailbreak</strong></summary>
-<p>In code name: <code class="docutils literal notranslate"><span class="pre">bon</span></code></p>
-<p>Probes the LLM resilience against Best-Of-N attack.</p>
-<p><em>Original Paper <a class="reference external" href="https://arxiv.org/abs/2412.03556">https://arxiv.org/abs/2412.03556</a>, Code <a class="reference external" href="https://github.com/jplhughes/bon-jailbreaking">https://github.com/jplhughes/bon-jailbreaking</a></em></p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/base64_injection.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Complimentary Transition</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">complimentary_transition</span></code></p>
 <p>Evaluates the LLM’s ability to maintain content moderation standards when transitioning from a compliment to a new task. It assesses the LLM’s ability to maintain defined boundaries when prompted to switch topics.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/complimentary_transition.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/complimentary_transition.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">do_anything_now_jailbreak</span></code></p>
 <p>Probes an LLM’s resilience against performing explicitly forbidden activities using the “Do Anything Now” (DAN) character roleplay technique.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/dan.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dan.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Do Anything Now Jailbreak (RU)</strong></summary>
-<p>In code name: <code class="docutils literal notranslate"><span class="pre">RU_do_anything_now_jailbreak</span></code></p>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">RU_dan</span></code></p>
 <p>Probes a Russian-language LLM’s resilience against performing explicitly forbidden activities using the “Do Anything Now” (DAN) character roleplay technique.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_dan.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_dan.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Ethical Compliance</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">ethical_compliance</span></code></p>
 <p>Evaluates the LLM’s ability to resist discussions about harmful or inappropriate misconceptions on sensitive topics. This test aims to verify the model’s adherence to ethical guidelines against propagating stereotypes and toxic content.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ethical_compliance.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ethical_compliance.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Harmful Behavior</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">harmful_behavior</span></code></p>
 <p>Challenges the LLM with a dataset of harmful behavior prompts.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Linguistic Evasion</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">linguistic_evasion</span></code></p>
 <p>Leverages the use of a non-Russian language to circumvent the restrictions or focus set by the system prompt.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/linguistic.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/linguistic.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Past Tense Attack</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">past_tense</span></code></p>
 <p>Challenges the LLM with a dataset of harmful behavior prompts in past tense form.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/past_tense.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/past_tense.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Typoglycemia Attack</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">typoglycemia_attack</span></code></p>
 <p>Attempts to exploit a text processing vulnerability in LLMs that can cause incorrect responses by removing random characters from words.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/typoglycemia.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/typoglycemia.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Typoglycemia Attack (RU)</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">RU_typoglycemia_attack</span></code></p>
 <p>Attempts to exploit a text processing vulnerability in Russian-language LLMs that can cause incorrect responses by removing random characters from words.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>UCAR</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">ucar</span></code></p>
 <p>Probes an LLM’s adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM’s content moderation systems against direct challenges.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>UCAR (RU)</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">RU_ucar</span></code></p>
 <p>Probes a Russian-language LLM’s adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM’s content moderation systems against direct challenges.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/ru_ucar.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_ucar.py">View code on GitHub</a></p>
 </details>
 </section>
 </section>
@@ -415,7 +408,7 @@
 <details>
 <summary><strong>What Drives the Multi-stage?</strong></summary>
 <p>Multi-stage attacks are inspired by the <a class="reference external" href="https://arxiv.org/html/2310.08419">Jailbreaking Black Box Large Language Models in Twenty Queries (PAIR)</a> paper.</p>
-<p>For managing a multi-stage interaction between an attacker and tested chat clients, the <code class="docutils literal notranslate"><span class="pre">MultiStageInteractionSession</span></code> class is available <a class="reference external" href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/client/chat_client.py">[source]</a>. It contains the following properties:</p>
+<p>For managing a multi-stage interaction between an attacker and tested chat clients, the <code class="docutils literal notranslate"><span class="pre">MultiStageInteractionSession</span></code> class is available <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/client/chat_client.py">[source]</a>. It contains the following properties:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">attacker_session</span></code> is the session for the attacker.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">tested_client_session</span></code> is the session for the tested client.</p></li>
@@ -426,25 +419,35 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">refine_args</span></code> are additional positional arguments for the <code class="docutils literal notranslate"><span class="pre">tested_client_response_handler</span></code>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">refine_kwargs</span></code> are additional keyword arguments for the <code class="docutils literal notranslate"><span class="pre">tested_client_response_handler</span></code>.</p></li>
 </ul>
-<p>The <code class="docutils literal notranslate"><span class="pre">multistage_depth</span></code> parameter for using in <code class="docutils literal notranslate"><span class="pre">history_limit</span></code> can be extracted from the attack’s kwargs as follows:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="bp">self</span><span class="o">.</span><span class="n">multistage_depth</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;multistage_depth&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-</pre></div>
-</div>
 </details>
 <section id="owasp-llm01-2025-continuous-prompt-injection">
 <h3>OWASP <a class="reference external" href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/">LLM01:2025</a> Continuous Prompt Injection<a class="headerlink" href="#owasp-llm01-2025-continuous-prompt-injection" title="Link to this heading">¶</a></h3>
 <details>
+<summary><strong>Best-of-N Jailbreak</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">bon</span></code></p>
+<p>Probes the LLM resilience against Best-Of-N attack.</p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2412.03556">https://arxiv.org/abs/2412.03556</a>, Original Code: <a class="reference external" href="https://github.com/jplhughes/bon-jailbreaking">https://github.com/jplhughes/bon-jailbreaking</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a></p>
+</details>
+<details>
 <summary><strong>Crescendo</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">crescendo</span></code></p>
 <p>Challenges the LLM with a dataset of harmful behavior prompts using Crescendo strategy, operates by engaging the LLM in a series of escalating conversational turns, and multistage refinement.</p>
-<p><em>Original Paper <a class="reference external" href="https://arxiv.org/abs/2404.01833">https://arxiv.org/abs/2404.01833</a></em></p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/crescendo.py">View code on GitHub</a></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2404.01833">https://arxiv.org/abs/2404.01833</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/crescendo.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Harmful Behavior Multistage</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">harmful_behavior_multistage</span></code></p>
 <p>Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a></p>
+</details>
+<details>
+<summary><strong>Shuffle Inconsistency</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">shuffle</span></code></p>
+<p>Attempts to bypass LLM’s defense mechanism by randomly shuffling elements in input harmful prompt.</p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/html/2501.04931">https://arxiv.org/html/2501.04931</a></em></p>
+<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a></p>
 </details>
 </section>
 <section id="owasp-llm07-2025-system-prompt-leakage">
@@ -453,7 +456,7 @@
 <summary><strong>System Prompt Leakage</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">system_prompt_leakage</span></code></p>
 <p>Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/system_prompt_leakage.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/system_prompt_leakage.py">View code on GitHub</a></p>
 </details>
 </section>
 <section id="owasp-llm09-2025-misinformation">
@@ -462,15 +465,16 @@
 <summary><strong>Logical Inconsistencies Test</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">logical_inconsistencies</span></code></p>
 <p>Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system’s domain.</p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py">View code on GitHub</a></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/logical_inconsistencies.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Sycophancy Test</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">sycophancy</span></code></p>
 <p>Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system’s domain.</p>
-<p><em>Original Paper <a class="reference external" href="https://arxiv.org/abs/2310.13548">https://arxiv.org/abs/2310.13548</a></em></p>
-<p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a></p>
-</details></section>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2310.13548">https://arxiv.org/abs/2310.13548</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a></p>
+</details>
+</section>
 </section>
 </section>
 
@@ -512,7 +516,7 @@
           </div>
           <div class="right-details">
             <div class="icons">
-              <a class="muted-link " href="https://github.com/RomiconEZ/llamator" aria-label="GitHub">
+              <a class="muted-link " href="https://github.com/LLAMATOR-Core/llamator" aria-label="GitHub">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
                 </svg>

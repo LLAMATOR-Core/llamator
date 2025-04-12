@@ -299,22 +299,24 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for llamator.main</h1><div class="highlight"><pre>
-<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span></span><span class="c1"># llamator/src/llamator/main.py</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">colorama</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.attack_provider.run_tests</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_models_and_tests</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.attack_provider.test_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.client.chat_client</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClientBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.format_output.box_drawing</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_centered_line</span><span class="p">,</span> <span class="n">get_bottom_border</span><span class="p">,</span> <span class="n">get_top_border</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.format_output.color_consts</span><span class="w"> </span><span class="kn">import</span> <span class="n">BRIGHT</span><span class="p">,</span> <span class="n">BRIGHT_CYAN</span><span class="p">,</span> <span class="n">BRIGHT_GREEN</span><span class="p">,</span> <span class="n">BRIGHT_RED</span><span class="p">,</span> <span class="n">RESET</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.format_output.logo</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_logo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.initial_validation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">validate_artifacts_path</span><span class="p">,</span>
+    <span class="n">validate_basic_tests_params</span><span class="p">,</span>
     <span class="n">validate_custom_tests</span><span class="p">,</span>
     <span class="n">validate_language</span><span class="p">,</span>
     <span class="n">validate_model</span><span class="p">,</span>
@@ -324,14 +326,135 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.report_generators.excel_report_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_attack_report_from_artifacts</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.report_generators.word_report_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_word_report</span>
 
-<span class="c1"># At this stage, the api keys that the user sets are loaded</span>
+<span class="c1"># Load user-defined environment variables</span>
 <span class="n">dotenv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="s2">&quot;.env&quot;</span><span class="p">)</span>
 <span class="n">load_dotenv</span><span class="p">(</span><span class="n">dotenv_path</span><span class="p">)</span>
-<span class="n">colorama</span><span class="o">.</span><span class="n">init</span><span class="p">()</span>
 
-<span class="c1"># Defining constants for text reset and brightness</span>
-<span class="n">RESET</span> <span class="o">=</span> <span class="n">colorama</span><span class="o">.</span><span class="n">Style</span><span class="o">.</span><span class="n">RESET_ALL</span>
-<span class="n">BRIGHT</span> <span class="o">=</span> <span class="n">colorama</span><span class="o">.</span><span class="n">Style</span><span class="o">.</span><span class="n">BRIGHT</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_models_and_tests</span><span class="p">(</span>
+    <span class="n">attack_model</span><span class="p">:</span> <span class="n">ClientBase</span><span class="p">,</span>
+    <span class="n">judge_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClientBase</span><span class="p">],</span>
+    <span class="n">tested_model</span><span class="p">:</span> <span class="n">ClientBase</span><span class="p">,</span>
+    <span class="n">basic_tests_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]],</span>
+    <span class="n">custom_tests_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TestBase</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates the provided models and test configurations.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    attack_model : ClientBase</span>
+<span class="sd">        The model that will be used to generate attacks.</span>
+<span class="sd">    judge_model : Optional[ClientBase]</span>
+<span class="sd">        The model that will judge the responses.</span>
+<span class="sd">    tested_model : ClientBase</span>
+<span class="sd">        The model being tested.</span>
+<span class="sd">    basic_tests_params : Optional[List[Tuple[str, Dict]]]</span>
+<span class="sd">        A list of basic tests with parameter dictionaries.</span>
+<span class="sd">    custom_tests_params : Optional[List[Tuple[Type[TestBase], Dict]]]</span>
+<span class="sd">        A list of custom test classes with parameter dictionaries.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        True if all validations succeed, otherwise False.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">Validating models...</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">attack_model</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Attack model failed validation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Attack model validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">judge_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">judge_model</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Judge model failed validation.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Judge model validated successfully.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">ℹ</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> No judge model specified.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">tested_model</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Tested model failed validation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Tested model validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">basic_tests_params</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> The test list contains invalid code names.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Test code names validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_basic_tests_params</span><span class="p">(</span><span class="n">basic_tests_params</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more test parameters are invalid.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">basic_tests_params</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Basic test parameters validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">custom_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_custom_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">custom_tests_params</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more custom tests failed validation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">custom_tests_params</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Custom tests validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_rename_reports_with_timestamp</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_timestamp</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renames the &#39;csv_report&#39; folder and its CSV files, as well as the Word/Excel reports</span>
+<span class="sd">    and the main log file, appending a unique timestamp.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    artifacts_run_path : str</span>
+<span class="sd">        The path to the artifacts directory (for example: logs, CSV reports).</span>
+<span class="sd">    start_timestamp : str</span>
+<span class="sd">        The timestamp string (e.g. &#39;2025-04-05_16-02-18&#39;) to be appended to file names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">csv_folder_name</span> <span class="o">=</span> <span class="s2">&quot;csv_report&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 1) Rename the csv_report folder</span>
+        <span class="n">old_csv_folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="n">csv_folder_name</span><span class="p">)</span>
+        <span class="n">csv_folder_timestamped</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">csv_folder_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">new_csv_folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="n">csv_folder_timestamped</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">old_csv_folder_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">old_csv_folder_path</span><span class="p">,</span> <span class="n">new_csv_folder_path</span><span class="p">)</span>
+
+            <span class="c1"># 2) Append the timestamp to each CSV file inside the renamed folder</span>
+            <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">new_csv_folder_path</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+                    <span class="n">old_csv_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_csv_folder_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                    <span class="n">base_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                    <span class="n">new_csv_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">new_csv_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_csv_folder_path</span><span class="p">,</span> <span class="n">new_csv_name</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">old_csv_file</span><span class="p">,</span> <span class="n">new_csv_file</span><span class="p">)</span>
+
+        <span class="c1"># 3) Rename Excel and Word report files</span>
+        <span class="n">old_xlsx_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="s2">&quot;attacks_report.xlsx&quot;</span><span class="p">)</span>
+        <span class="n">new_xlsx_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;attacks_report_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">.xlsx&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">old_xlsx_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">old_xlsx_path</span><span class="p">,</span> <span class="n">new_xlsx_path</span><span class="p">)</span>
+
+        <span class="n">old_docx_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="s2">&quot;attacks_report.docx&quot;</span><span class="p">)</span>
+        <span class="n">new_docx_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;attacks_report_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">.docx&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">old_docx_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">old_docx_path</span><span class="p">,</span> <span class="n">new_docx_path</span><span class="p">)</span>
+
+        <span class="c1"># 4) Rename log file</span>
+        <span class="n">old_log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="s2">&quot;LLAMATOR_runtime.log&quot;</span><span class="p">)</span>
+        <span class="n">new_log_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;LLAMATOR_runtime_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">.log&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">old_log_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">old_log_path</span><span class="p">,</span> <span class="n">new_log_path</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to rename reports or files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="start_testing">
@@ -340,74 +463,45 @@
     <span class="n">attack_model</span><span class="p">:</span> <span class="n">ClientBase</span><span class="p">,</span>
     <span class="n">tested_model</span><span class="p">:</span> <span class="n">ClientBase</span><span class="p">,</span>
     <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">judge_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ClientBase</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">num_threads</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">tests_with_attempts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">custom_tests_with_attempts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TestBase</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">multistage_depth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">basic_tests</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">custom_tests</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">TestBase</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Start testing.</span>
+<span class="sd">    The main entry point for launching tests.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    attack_model : ClientBase</span>
-<span class="sd">        The attacking model used to generate tests.</span>
+<span class="sd">        The model that generates attacks.</span>
 <span class="sd">    tested_model : ClientBase</span>
-<span class="sd">        The model being tested against the attacks.</span>
+<span class="sd">        The model to be tested for vulnerabilities.</span>
 <span class="sd">    config : dict</span>
-<span class="sd">        Configuration dictionary with the following keys:</span>
-
+<span class="sd">        Configuration dictionary with keys:</span>
 <span class="sd">        - &#39;enable_logging&#39; : bool</span>
 <span class="sd">            Whether to enable logging.</span>
 <span class="sd">        - &#39;enable_reports&#39; : bool</span>
-<span class="sd">            Whether to generate xlsx reports.</span>
+<span class="sd">            Whether to generate Excel/Word reports.</span>
 <span class="sd">        - &#39;artifacts_path&#39; : Optional[str]</span>
-<span class="sd">            Path to the folder for saving artifacts.</span>
+<span class="sd">            Path to the folder for saving artifacts (logs, CSV, etc.).</span>
 <span class="sd">        - &#39;debug_level&#39; : int</span>
-<span class="sd">            Level of logging verbosity (default is 1).</span>
-<span class="sd">            debug_level = 0 - WARNING.</span>
-<span class="sd">            debug_level = 1 - INFO.</span>
-<span class="sd">            debug_level = 2 - DEBUG.</span>
+<span class="sd">            Logging level (0=WARNING, 1=INFO, 2=DEBUG).</span>
 <span class="sd">        - &#39;report_language&#39; : str</span>
-<span class="sd">            Language for the report (default is &#39;en&#39;).</span>
-<span class="sd">            Possible values: &#39;en&#39;, &#39;ru&#39;.</span>
-
-<span class="sd">    num_threads : int, optional</span>
-<span class="sd">        Number of threads for parallel test execution (default is 1).</span>
-<span class="sd">    tests_with_attempts : List[Tuple[str, int]], optional</span>
-<span class="sd">        List of test names and their corresponding number of attempts.</span>
-<span class="sd">        Available tests:</span>
-<span class="sd">        - aim_jailbreak</span>
-<span class="sd">        - base64_injection</span>
-<span class="sd">        - bon</span>
-<span class="sd">        - complimentary_transition</span>
-<span class="sd">        - crescendo</span>
-<span class="sd">        - do_anything_now_jailbreak</span>
-<span class="sd">        - ethical_compliance</span>
-<span class="sd">        - harmful_behavior</span>
-<span class="sd">        - harmful_behavior_multistage</span>
-<span class="sd">        - linguistic_evasion</span>
-<span class="sd">        - logical_inconsistencies</span>
-<span class="sd">        - past_tense</span>
-<span class="sd">        - RU_do_anything_now_jailbreak</span>
-<span class="sd">        - RU_typoglycemia_attack</span>
-<span class="sd">        - RU_ucar</span>
-<span class="sd">        - suffix</span>
-<span class="sd">        - sycophancy</span>
-<span class="sd">        - system_prompt_leakage</span>
-<span class="sd">        - typoglycemia_attack</span>
-<span class="sd">        - ucar</span>
-<span class="sd">    custom_tests_with_attempts : List[Tuple[Type[TestBase], int]], optional</span>
-<span class="sd">        List of custom test instances and their corresponding number of attempts.</span>
-<span class="sd">    multistage_depth : int, optional</span>
-<span class="sd">        The maximum allowed history length that can be passed to multi-stage interactions (default is 20).</span>
+<span class="sd">            Language code for the final report (&#39;en&#39; or &#39;ru&#39;).</span>
+<span class="sd">    judge_model : Optional[ClientBase]</span>
+<span class="sd">        The model that judges the responses (optional).</span>
+<span class="sd">    num_threads : Optional[int]</span>
+<span class="sd">        Number of threads to use for parallel testing.</span>
+<span class="sd">    basic_tests : Optional[List[Tuple[str, Dict]]]</span>
+<span class="sd">        A list of test code names and a dict of parameters for each test.</span>
+<span class="sd">    custom_tests : Optional[List[Tuple[Type[TestBase], Dict]]]</span>
+<span class="sd">        A list of custom test classes and parameter dictionaries.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="c1"># Extract values from the config dictionary</span>
     <span class="n">enable_logging</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enable_logging&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
     <span class="n">enable_reports</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;enable_reports&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
     <span class="n">artifacts_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;artifacts_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -420,94 +514,90 @@
         <span class="n">enable_logging</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">enable_reports</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">artifacts_run_path</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logging and reports have been disabled.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">ℹ</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Logging and reports have been disabled.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Validate the artifacts path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_artifacts_path</span><span class="p">(</span><span class="n">artifacts_path</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid artifacts path.&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Invalid artifacts path.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">elif</span> <span class="n">enable_reports</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">or</span> <span class="n">enable_logging</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="c1"># Create a new folder named &#39;LLAMATOR_run_{start_timestamp}&#39; inside artifacts_path</span>
+        <span class="k">elif</span> <span class="n">enable_reports</span> <span class="ow">or</span> <span class="n">enable_logging</span><span class="p">:</span>
             <span class="n">run_folder_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;LLAMATOR_run_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">run_folder_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_path</span><span class="p">,</span> <span class="n">run_folder_name</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">run_folder_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-            <span class="c1"># Update artifacts_path to point to the new run folder</span>
             <span class="n">artifacts_run_path</span> <span class="o">=</span> <span class="n">run_folder_path</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">ℹ</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Artifacts will be saved to: </span><span class="si">{</span><span class="n">artifacts_run_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">artifacts_run_path</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="c1"># Setup logging if enabled</span>
-    <span class="k">if</span> <span class="n">enable_logging</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">enable_logging</span> <span class="ow">and</span> <span class="n">artifacts_run_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">setup_logging</span><span class="p">(</span><span class="n">debug_level</span><span class="p">,</span> <span class="n">artifacts_run_path</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">ℹ</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Logging has been set up with debug level: </span><span class="si">{</span><span class="n">debug_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Program logo output</span>
-    <span class="n">print_logo</span><span class="p">()</span>
+    <span class="c1"># Print the LLAMATOR logo</span>
+    <span class="n">print_logo</span><span class="p">(</span><span class="n">box_width</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
 
-    <span class="c1"># Validate attack model</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">attack_model</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Attack model failed validation.&quot;</span><span class="p">)</span>
+    <span class="c1"># Print test configuration</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">llamator.format_output.output_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_testing_configuration</span>
+
+    <span class="n">print_testing_configuration</span><span class="p">(</span><span class="n">num_threads</span><span class="p">,</span> <span class="n">enable_logging</span><span class="p">,</span> <span class="n">enable_reports</span><span class="p">,</span> <span class="n">report_language</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+
+    <span class="c1"># Validate models, test codes, and parameters</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_models_and_tests</span><span class="p">(</span><span class="n">attack_model</span><span class="p">,</span> <span class="n">judge_model</span><span class="p">,</span> <span class="n">tested_model</span><span class="p">,</span> <span class="n">basic_tests</span><span class="p">,</span> <span class="n">custom_tests</span><span class="p">):</span>
         <span class="k">return</span>
 
-    <span class="c1"># Validate tested model</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">tested_model</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Tested model failed validation.&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
+    <span class="c1"># Run tests</span>
+    <span class="n">setup_models_and_tests</span><span class="p">(</span>
+        <span class="n">attack_model</span><span class="o">=</span><span class="n">attack_model</span><span class="p">,</span>
+        <span class="n">judge_model</span><span class="o">=</span><span class="n">judge_model</span><span class="p">,</span>
+        <span class="n">tested_model</span><span class="o">=</span><span class="n">tested_model</span><span class="p">,</span>
+        <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">,</span>
+        <span class="n">basic_tests_params</span><span class="o">=</span><span class="n">basic_tests</span><span class="p">,</span>
+        <span class="n">custom_tests_params</span><span class="o">=</span><span class="n">custom_tests</span><span class="p">,</span>
+        <span class="n">artifacts_path</span><span class="o">=</span><span class="n">artifacts_run_path</span> <span class="k">if</span> <span class="n">enable_reports</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="c1"># Validate the test list</span>
-    <span class="k">if</span> <span class="n">tests_with_attempts</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">tests_with_attempts</span><span class="p">]):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The test list contains invalid values.&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completion of testing.&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Validate custom tests</span>
-    <span class="k">if</span> <span class="n">custom_tests_with_attempts</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_custom_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">custom_tests_with_attempts</span><span class="p">]):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;One or more custom tests failed validation.&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
-
-    <span class="k">if</span> <span class="n">enable_reports</span><span class="p">:</span>
-        <span class="c1"># Running tests with the specified parameters</span>
-        <span class="n">setup_models_and_tests</span><span class="p">(</span>
-            <span class="n">attack_model</span><span class="p">,</span>
-            <span class="n">tested_model</span><span class="p">,</span>
-            <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">,</span>
-            <span class="n">tests_with_attempts</span><span class="o">=</span><span class="n">tests_with_attempts</span><span class="p">,</span>
-            <span class="n">custom_tests_with_attempts</span><span class="o">=</span><span class="n">custom_tests_with_attempts</span><span class="p">,</span>
-            <span class="n">artifacts_path</span><span class="o">=</span><span class="n">artifacts_run_path</span><span class="p">,</span>
-            <span class="n">multistage_depth</span><span class="o">=</span><span class="n">multistage_depth</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">setup_models_and_tests</span><span class="p">(</span>
-            <span class="n">attack_model</span><span class="p">,</span>
-            <span class="n">tested_model</span><span class="p">,</span>
-            <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">,</span>
-            <span class="n">tests_with_attempts</span><span class="o">=</span><span class="n">tests_with_attempts</span><span class="p">,</span>
-            <span class="n">custom_tests_with_attempts</span><span class="o">=</span><span class="n">custom_tests_with_attempts</span><span class="p">,</span>
-            <span class="n">artifacts_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">multistage_depth</span><span class="o">=</span><span class="n">multistage_depth</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Completion of testing&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Explicitly close log files at the end of the program</span>
+    <span class="c1"># Close log file handlers</span>
     <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
+
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">RotatingFileHandler</span><span class="p">):</span>
             <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">enable_reports</span><span class="p">:</span>
+    <span class="c1"># Generate reports if enabled</span>
+    <span class="k">if</span> <span class="n">enable_reports</span> <span class="ow">and</span> <span class="n">artifacts_run_path</span><span class="p">:</span>
         <span class="n">report_language</span> <span class="o">=</span> <span class="n">validate_language</span><span class="p">(</span><span class="n">report_language</span><span class="p">)</span>
-        <span class="n">csv_folder_name</span> <span class="o">=</span> <span class="s2">&quot;csv_report&quot;</span>
         <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">colorama</span><span class="o">.</span><span class="n">Fore</span><span class="o">.</span><span class="n">RED</span><span class="si">}</span><span class="s2">DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language, reader discretion is recommended.</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">DISCLAIMER: Report may contain HARMFUL and OFFENSIVE language. Reader discretion is advised.</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
+
+        <span class="n">report_base_name</span> <span class="o">=</span> <span class="s2">&quot;attacks_report&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">Generating reports...</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">create_attack_report_from_artifacts</span><span class="p">(</span>
-            <span class="n">artifacts_dir</span><span class="o">=</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="n">csv_folder_name</span><span class="o">=</span><span class="n">csv_folder_name</span><span class="p">,</span> <span class="n">report_file_name</span><span class="o">=</span><span class="s2">&quot;attacks_report.xlsx&quot;</span>
+            <span class="n">artifacts_dir</span><span class="o">=</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="n">csv_folder_name</span><span class="o">=</span><span class="s2">&quot;csv_report&quot;</span><span class="p">,</span> <span class="n">report_file_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">report_base_name</span><span class="si">}</span><span class="s2">.xlsx&quot;</span>
         <span class="p">)</span>
         <span class="n">create_word_report</span><span class="p">(</span>
             <span class="n">artifacts_dir</span><span class="o">=</span><span class="n">artifacts_run_path</span><span class="p">,</span>
-            <span class="n">csv_folder_name</span><span class="o">=</span><span class="n">csv_folder_name</span><span class="p">,</span>
-            <span class="n">docx_file_name</span><span class="o">=</span><span class="s2">&quot;attacks_report.docx&quot;</span><span class="p">,</span>
+            <span class="n">csv_folder_name</span><span class="o">=</span><span class="s2">&quot;csv_report&quot;</span><span class="p">,</span>
+            <span class="n">docx_file_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">report_base_name</span><span class="si">}</span><span class="s2">.docx&quot;</span><span class="p">,</span>
             <span class="n">language</span><span class="o">=</span><span class="n">report_language</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT</span><span class="si">}{</span><span class="n">colorama</span><span class="o">.</span><span class="n">Fore</span><span class="o">.</span><span class="n">CYAN</span><span class="si">}</span><span class="s2">Thank you for using LLAMATOR!</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">_rename_reports_with_timestamp</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="n">start_timestamp</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reports created: </span><span class="si">{</span><span class="n">artifacts_run_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">excel_report_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">report_base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">.xlsx&quot;</span><span class="p">)</span>
+        <span class="n">word_report_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">artifacts_run_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">report_base_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">start_timestamp</span><span class="si">}</span><span class="s2">.docx&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Excel report path: </span><span class="si">{</span><span class="n">excel_report_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Word report path: </span><span class="si">{</span><span class="n">word_report_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Decorative border at the end</span>
+    <span class="n">box_width</span> <span class="o">=</span> <span class="mi">80</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">get_top_border</span><span class="p">(</span><span class="n">box_width</span><span class="p">))</span>
+    <span class="n">thank_you_text</span> <span class="o">=</span> <span class="s2">&quot;Thank you for using LLAMATOR!&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">format_centered_line</span><span class="p">(</span><span class="n">thank_you_text</span><span class="p">,</span> <span class="n">box_width</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">get_bottom_border</span><span class="p">(</span><span class="n">box_width</span><span class="p">))</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span></div>
 
 </pre></div>
@@ -531,7 +621,7 @@
           </div>
           <div class="right-details">
             <div class="icons">
-              <a class="muted-link " href="https://github.com/RomiconEZ/llamator" aria-label="GitHub">
+              <a class="muted-link " href="https://github.com/LLAMATOR-Core/llamator" aria-label="GitHub">
                 <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
                 </svg>
