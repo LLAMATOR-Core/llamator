@@ -1,15 +1,6 @@
 def openai_client_lm_studio_test():
     """
     Tests OpenAI client from local llamator lib.
-
-    Environment variables
-    ----------
-    OPENAI_CLIENT_API_KEY : str
-        API key for OpenAI compatible API
-    OPENAI_CLIENT_BASEURL : str
-        URL of OpenAI compatible API
-    OPENAI_CLIENT_MODEL : str
-        Type of model
     """
     from llamator.client.specific_chat_clients import ClientOpenAI
 

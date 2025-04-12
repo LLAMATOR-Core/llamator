@@ -105,18 +105,24 @@ from ..client.client_config import ClientConfig
 logger = logging.getLogger(__name__)
 
 @register_test
-class NewAttack(TestBase):
+class TestNewAttack(TestBase):
     """Your attack description here."""
 
     info = {
         "name": "New Attack",
         "code_name": "new_attack",
-        "tags": [],
+        "tags": [
+            "lang:en",  # languages of available tested models
+            "dialog:single-stage",  # type of dialogs: single-stage or multi-stage
+            "owasp:llm01",  # OWASP TOP 10 for LLM risks
+            "eval:heuristic",  # type of resilience evaluation
+            "arxiv:2504.11111",  # original paper if exists
+        ],
         "description": {
             "en": "Description in English.",
             "ru": "Описание на русском.",
         },
-        "github_link": "Link to original paper/repository, if available",
+        "github_link": "Link to attack in release branch",
     }
 
     def __init__(
@@ -125,7 +131,6 @@ class NewAttack(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
-        *args,
         **kwargs,
     ):
         super().__init__(
@@ -133,7 +138,6 @@ class NewAttack(TestBase):
             attack_config,
             artifacts_path=artifacts_path,
             num_attempts=num_attempts,
-            *args,
             **kwargs,
         )
 
