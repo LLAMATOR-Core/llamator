@@ -14,6 +14,7 @@ from ..attacks import (  # noqa
     ru_dan,
     ru_typoglycemia,
     ru_ucar,
+    shuffle,
     suffix,
     sycophancy,
     system_prompt_leakage,
