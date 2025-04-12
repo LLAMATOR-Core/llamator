@@ -5,10 +5,10 @@ LLAMATOR - Red Teaming python-framework for testing chatbots and LLM systems
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/llamator)](https://pypi.org/project/llamator)
 [![PyPI](https://badge.fury.io/py/llamator.svg)](https://badge.fury.io/py/llamator)
-[![Docker](https://img.shields.io/badge/dockerfile-gray.svg?logo=docker)](https://github.com/RomiconEZ/llamator/blob/release/docker)
+[![Docker](https://img.shields.io/badge/dockerfile-gray.svg?logo=docker)](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 [![Downloads](https://pepy.tech/badge/llamator)](https://pepy.tech/project/llamator)
 [![Downloads](https://pepy.tech/badge/llamator/month)](https://pepy.tech/project/llamator)
-[![GitHub Repo stars](https://img.shields.io/github/stars/RomiconEZ/llamator)](https://github.com/RomiconEZ/llamator/stargazers)
+[![GitHub Repo stars](https://img.shields.io/github/stars/LLAMATOR-Core/llamator)](https://github.com/LLAMATOR-Core/llamator/stargazers)
 
 ## Supported Clients
 
@@ -45,6 +45,6 @@ LLAMATOR - Red Teaming python-framework for testing chatbots and LLM systems
 
 © Roman Neronov, Timur Nizamov, Nikita Ivanov
 
-This project is licensed under the terms of the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International** license. See the [LICENSE](https://github.com/RomiconEZ/llamator/blob/release/LICENSE.md) file for details.
+This project is licensed under the terms of the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International** license. See the [LICENSE](https://github.com/LLAMATOR-Core/llamator/blob/release/LICENSE.md) file for details.
 
 [![Creative Commons License](https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
