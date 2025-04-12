@@ -108,18 +108,89 @@ def get_langchain_chat_models_info() -> Dict[str, Dict[str, Any]]:
         if model_cls and isinstance(model_cls, type) and issubclass(model_cls, BaseChatModel):
             model_short_name = camel_to_snake(model_cls.__name__).replace("_chat", "").replace("chat_", "")
 
-            # Introspect supported model parameters
+            # Introspect supported model parameters - for newer langchain versions
             params: Dict[str, ChatModelParams] = {}
-            for param_name, field in model_cls.__fields__.items():
-                if param_name in CHAT_MODEL_EXCLUDED_PARAMS:
-                    continue
-                typ = field.outer_type_
-                if typ not in [str, float, int, bool] and get_origin(typ) not in [str, float, int, bool]:
-                    continue
-                doc_lines = _get_class_member_doc(model_cls, param_name)
-                description = "".join(doc_lines) if doc_lines else None
-                params[param_name] = ChatModelParams(typ=typ, default=field.default, description=description)
 
-            models[model_short_name] = ChatModelInfo(model_cls=model_cls, doc=model_cls.__doc__, params=params)
+            # Check if the class has __annotations__ for newer versions of langchain
+            if hasattr(model_cls, "__annotations__"):
+                for param_name, typ in model_cls.__annotations__.items():
+                    if param_name in CHAT_MODEL_EXCLUDED_PARAMS:
+                        continue
+
+                    # Try to get default value
+                    default = getattr(model_cls, param_name, None) if hasattr(model_cls, param_name) else None
+
+                    # Try to get documentation
+                    doc_lines = _get_class_member_doc(model_cls, param_name)
+                    description = "".join(doc_lines) if doc_lines else None
+
+                    params[param_name] = ChatModelParams(typ=typ, default=default, description=description)
+
+            # For older versions with __fields__
+            elif hasattr(model_cls, "__fields__"):
+                for param_name, field in model_cls.__fields__.items():
+                    if param_name in CHAT_MODEL_EXCLUDED_PARAMS:
+                        continue
+                    typ = field.outer_type_
+                    if typ not in [str, float, int, bool] and get_origin(typ) not in [str, float, int, bool]:
+                        continue
+                    doc_lines = _get_class_member_doc(model_cls, param_name)
+                    description = "".join(doc_lines) if doc_lines else None
+                    params[param_name] = ChatModelParams(typ=typ, default=field.default, description=description)
+
+            models[model_short_name] = ChatModelInfo(model_cls=model_cls, doc=model_cls.__doc__ or "", params=params)
 
     return models
+
+
+def print_chat_models_info(detailed: bool = False) -> None:
+    """
+    Print information about LangChain chat models in a well-formatted way.
+
+    Args:
+        detailed: Whether to print detailed information including parameter descriptions
+    """
+    # Get models information
+    models = get_langchain_chat_models_info()
+
+    print(f"{'=' * 80}")
+    print(f"AVAILABLE LANGCHAIN CHAT MODELS: {len(models)} models")
+    print(f"{'=' * 80}")
+
+    for model_name, model_info in sorted(models.items()):
+        # Print model name and class
+        print(f"\n{model_name} ({model_info.model_cls.__name__})")
+        print(f"{'-' * 60}")
+
+        # Print short documentation
+        if model_info.doc:
+            doc = model_info.doc.strip()
+            print(f"Description: {model_info.short_doc}")
+
+        # Print parameters
+        if model_info.params:
+            print("\nParameters:")
+            for param_name, param in sorted(model_info.params.items()):
+                type_name = getattr(param.typ, "__name__", str(param.typ))
+                default_value = (
+                    "None"
+                    if param.default is None
+                    else f"'{param.default}'"
+                    if isinstance(param.default, str)
+                    else str(param.default)
+                )
+
+                print(f"  • {param_name} ({type_name}, default={default_value})")
+
+                # Print parameter description if detailed mode is enabled
+                if detailed and param.description:
+                    description = param.description.strip()
+                    # Format the description with proper indentation for multiline descriptions
+                    formatted_desc = "\n    ".join(description.split("\n"))
+                    print(f"    {formatted_desc}")
+        else:
+            print("\nNo specific parameters documented.")
+
+        # Add a visual separator between models
+        if detailed:
+            print("\n" + "-" * 60)
