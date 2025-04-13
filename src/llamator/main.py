@@ -3,9 +3,12 @@
 import logging
 import os
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from typing import Dict, List, Optional, Tuple, Type
 
 from dotenv import load_dotenv
+
+from llamator.format_output.output_helpers import print_testing_configuration
 
 from .attack_provider.run_tests import setup_models_and_tests
 from .attack_provider.test_base import TestBase
@@ -59,27 +62,7 @@ def validate_models_and_tests(
     bool
         True if all validations succeed, otherwise False.
     """
-    print(f"{BRIGHT_CYAN}Validating models...{RESET}")
-    if not validate_model(attack_model):
-        print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
-        return False
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Attack model validated successfully.")
-
-    if judge_model is not None:
-        if not validate_model(judge_model):
-            print(f"{BRIGHT_RED}✘{RESET} Judge model failed validation.")
-            return False
-        else:
-            print(f"{BRIGHT_GREEN}✓{RESET} Judge model validated successfully.")
-    else:
-        print(f"{BRIGHT_CYAN}ℹ{RESET} No judge model specified.")
-
-    if not validate_model(tested_model):
-        print(f"{BRIGHT_RED}✘{RESET} Tested model failed validation.")
-        return False
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
+    print(f"{BRIGHT_CYAN}Validating models and tests...{RESET}")
 
     if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
         print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid code names.")
@@ -108,6 +91,27 @@ def validate_models_and_tests(
     ):
         print(f"{BRIGHT_RED}✘{RESET} Judge model is required for tests that specify 'judge_config'.")
         return False
+
+    if not validate_model(attack_model):
+        print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
+        return False
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Attack model validated successfully.")
+
+    if judge_model is not None:
+        if not validate_model(judge_model):
+            print(f"{BRIGHT_RED}✘{RESET} Judge model failed validation.")
+            return False
+        else:
+            print(f"{BRIGHT_GREEN}✓{RESET} Judge model validated successfully.")
+    else:
+        print(f"{BRIGHT_CYAN}ℹ{RESET} No judge model specified.")
+
+    if not validate_model(tested_model):
+        print(f"{BRIGHT_RED}✘{RESET} Tested model failed validation.")
+        return False
+    else:
+        print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
 
     print()
     return True
@@ -244,8 +248,6 @@ def start_testing(
     print_logo(box_width=80)
 
     # Print test configuration
-    from llamator.format_output.output_helpers import print_testing_configuration
-
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
     # Validate models, test codes, and parameters
@@ -267,8 +269,6 @@ def start_testing(
 
     # Close log file handlers
     for handler in logging.getLogger().handlers:
-        from logging.handlers import RotatingFileHandler
-
         if isinstance(handler, RotatingFileHandler):
             handler.close()
 
