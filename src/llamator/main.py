@@ -20,6 +20,7 @@ from .initial_validation import (
     validate_language,
     validate_model,
     validate_tests,
+    check_judge_config_usage,
 )
 from .logging import setup_logging
 from .report_generators.excel_report_generator import create_attack_report_from_artifacts
@@ -84,7 +85,8 @@ def validate_models_and_tests(
         print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid code names.")
         return False
     else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Test code names validated successfully.")
+        if basic_tests_params:
+            print(f"{BRIGHT_GREEN}✓{RESET} Test code names validated successfully.")
 
     if basic_tests_params and not validate_basic_tests_params(basic_tests_params):
         print(f"{BRIGHT_RED}✘{RESET} One or more test parameters are invalid.")
@@ -98,6 +100,14 @@ def validate_models_and_tests(
         return False
     elif custom_tests_params:
         print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
+
+    if not check_judge_config_usage(
+        basic_tests_params if basic_tests_params else [],
+        custom_tests_params if custom_tests_params else [],
+        judge_model
+    ):
+        print(f"{BRIGHT_RED}✘{RESET} Judge model is required for tests that specify 'judge_config'.")
+        return False
 
     print()
     return True

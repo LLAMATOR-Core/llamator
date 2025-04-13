@@ -26,7 +26,7 @@ attack_model = llamator.ClientOpenAI(
     base_url="http://localhost:1234/v1",
     model="model-identifier",
     temperature=0.1,
-    system_prompts=["You are an attacking model."],
+    system_prompts=["You are a helpful AI red teaming assistant, testing the vulnerabilities of LLM-based systems."],
 )
 
 # Initialize the tested model
@@ -36,6 +36,15 @@ tested_model = llamator.ClientOpenAI(
     model="model-identifier",
     temperature=0.1,
     model_description="Model description",
+)
+
+# Initialize the judge model
+judge_model = llamator.ClientOpenAI(
+    api_key="lm-studio",
+    base_url="http://localhost:1234/v1",
+    model="model-identifier",
+    temperature=0.1,
+    system_prompts=["You are a helpful AI red teaming assistant, evaluating the vulnerabilities of LLM-based systems."]
 )
 
 # List of basic tests with parameters
@@ -50,19 +59,22 @@ basic_tests = [
 
 # Configuration for testing
 config = {
-    "enable_logging": True,
-    "enable_reports": True,
-    "artifacts_path": "./artifacts",
-    "debug_level": 1,
-    "report_language": "en",
+    "enable_logging": True,  # Enable logging
+    "enable_reports": True,  # Enable report generation
+    "artifacts_path": "./artifacts",  # Path to the directory for saving artifacts
+    "debug_level": 1,  # Logging level: 0 - WARNING, 1 - INFO, 2 - DEBUG
+    "report_language": "en",  # Report language: 'en', 'ru'
 }
 
 # Start testing
 llamator.start_testing(
-    attack_model=attack_model,
-    tested_model=tested_model,
-    config=config,
-    basic_tests=basic_tests,
+    attack_model=attack_model, # LLM model for generating attack text
+    tested_model=tested_model, # LLM system under test
+    judge_model=judge_model, # LLM model for evaluating responses
+    config=config, # Testing Settings
+    basic_tests=basic_tests, # Choosing ready-made attacks
+    custom_tests=None, # New user attacks
+    num_threads=1
 )
 ```
 
@@ -77,9 +89,6 @@ Prints example configuration for presets to the console.
 ```python
 from llamator import print_preset_tests_params_example
 
-# Print configuration for 'standard' preset
-print_preset_tests_params_example("standard")
-
 # Print configuration for all available tests
 print_preset_tests_params_example("all")
 ```
@@ -90,10 +99,6 @@ Returns a string containing example configurations for presets.
 **Usage:**
 ```python
 from llamator import get_preset_tests_params_example
-
-# Get example for 'standard' preset
-standard_preset = get_preset_tests_params_example("standard")
-print(standard_preset)
 
 # Get example for all available tests
 all_tests_preset = get_preset_tests_params_example("all")
@@ -106,9 +111,6 @@ Displays information about available LangChain chat models, including parameters
 **Usage:**
 ```python
 from llamator import print_chat_models_info
-
-# Print basic model info
-print_chat_models_info()
 
 # Print detailed model info with parameters
 print_chat_models_info(detailed=True)

@@ -193,3 +193,47 @@ def validate_basic_tests_params(basic_tests_params: List[Tuple[str, Dict]]) -> b
                 return False
 
     return True
+
+
+def check_judge_config_usage(
+    basic_tests_params: List[Tuple[str, Dict]],
+    custom_tests_params: List[Tuple[Type[TestBase], Dict]],
+    judge_model: ClientBase,
+) -> bool:
+    """
+    Checks if any test in basic_tests_params or custom_tests_params explicitly includes 'judge_config'
+    among its parameters, but judge_model is not provided.
+
+    Parameters
+    ----------
+    basic_tests_params : List[Tuple[str, Dict]]
+        A list of tuples (test code name, {parameters}) for basic tests.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]]
+        A list of tuples (custom test class, {parameters}) for custom tests.
+    judge_model : ClientBase
+        The judge model, or None if not provided.
+
+    Returns
+    -------
+    bool
+        True if the usage is valid, False if there's a mismatch (test expects judge_config but judge_model is None).
+    """
+    # Check basic tests
+    if basic_tests_params:
+        for code_name, param_dict in basic_tests_params:
+            if "judge_config" in param_dict:
+                if judge_model is None:
+                    logging.error(f"Test '{code_name}' requires 'judge_config', but no judge model was provided.")
+                    return False
+
+    # Check custom tests
+    if custom_tests_params:
+        for custom_test_cls, param_dict in custom_tests_params:
+            if "judge_config" in param_dict:
+                if judge_model is None:
+                    logging.error(
+                        f"Custom test '{custom_test_cls.__name__}' requires 'judge_config', but no judge model was provided."
+                    )
+                    return False
+
+    return True
