@@ -32,8 +32,9 @@ LLAMATOR - Red Teaming python-framework for testing chatbots and LLM systems
 
 ## Community
 
-* 📣 [Telegram Channel — AI Security Lab](https://t.me/aisecuritylab)
 * 💬 [Telegram Chat — LLAMATOR | AI Red Team Community](https://t.me/llamator)
+* 📣 [Telegram Channel — AI Security Lab](https://t.me/aisecuritylab)
+
 
 ## Supported by
 
