@@ -14,13 +14,13 @@ from .format_output.box_drawing import format_centered_line, get_bottom_border, 
 from .format_output.color_consts import BRIGHT, BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_RED, RESET
 from .format_output.logo import print_logo
 from .initial_validation import (
+    check_judge_config_usage,
     validate_artifacts_path,
     validate_basic_tests_params,
     validate_custom_tests,
     validate_language,
     validate_model,
     validate_tests,
-    check_judge_config_usage,
 )
 from .logging import setup_logging
 from .report_generators.excel_report_generator import create_attack_report_from_artifacts
@@ -104,7 +104,7 @@ def validate_models_and_tests(
     if not check_judge_config_usage(
         basic_tests_params if basic_tests_params else [],
         custom_tests_params if custom_tests_params else [],
-        judge_model
+        judge_model,
     ):
         print(f"{BRIGHT_RED}✘{RESET} Judge model is required for tests that specify 'judge_config'.")
         return False
@@ -186,6 +186,7 @@ def start_testing(
         The model to be tested for vulnerabilities.
     config : dict
         Configuration dictionary with keys:
+
         - 'enable_logging' : bool
             Whether to enable logging.
         - 'enable_reports' : bool
