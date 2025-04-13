@@ -9,6 +9,7 @@ Red Teaming python-framework for testing chatbots and LLM systems
 [![Downloads](https://pepy.tech/badge/llamator)](https://pepy.tech/project/llamator)
 [![Downloads](https://pepy.tech/badge/llamator/month)](https://pepy.tech/project/llamator)
 [![GitHub Repo stars](https://img.shields.io/github/stars/LLAMATOR-Core/llamator)](https://github.com/LLAMATOR-Core/llamator/stargazers)
+[![Chat](https://img.shields.io/badge/chat-gray.svg?logo=telegram)](https://t.me/llamator)
 
 ## Install 🚀
 
