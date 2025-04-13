@@ -3,9 +3,12 @@
 import logging
 import os
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
 from typing import Dict, List, Optional, Tuple, Type
 
 from dotenv import load_dotenv
+
+from llamator.format_output.output_helpers import print_testing_configuration
 
 from .attack_provider.run_tests import setup_models_and_tests
 from .attack_provider.test_base import TestBase
@@ -14,6 +17,7 @@ from .format_output.box_drawing import format_centered_line, get_bottom_border, 
 from .format_output.color_consts import BRIGHT, BRIGHT_CYAN, BRIGHT_GREEN, BRIGHT_RED, RESET
 from .format_output.logo import print_logo
 from .initial_validation import (
+    check_judge_config_usage,
     validate_artifacts_path,
     validate_basic_tests_params,
     validate_custom_tests,
@@ -58,7 +62,36 @@ def validate_models_and_tests(
     bool
         True if all validations succeed, otherwise False.
     """
-    print(f"{BRIGHT_CYAN}Validating models...{RESET}")
+    print(f"{BRIGHT_CYAN}Validating models and tests...{RESET}")
+
+    if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
+        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid code names.")
+        return False
+    else:
+        if basic_tests_params:
+            print(f"{BRIGHT_GREEN}✓{RESET} Test code names validated successfully.")
+
+    if basic_tests_params and not validate_basic_tests_params(basic_tests_params):
+        print(f"{BRIGHT_RED}✘{RESET} One or more test parameters are invalid.")
+        return False
+    else:
+        if basic_tests_params:
+            print(f"{BRIGHT_GREEN}✓{RESET} Basic test parameters validated successfully.")
+
+    if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
+        print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
+        return False
+    elif custom_tests_params:
+        print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
+
+    if not check_judge_config_usage(
+        basic_tests_params if basic_tests_params else [],
+        custom_tests_params if custom_tests_params else [],
+        judge_model,
+    ):
+        print(f"{BRIGHT_RED}✘{RESET} Judge model is required for tests that specify 'judge_config'.")
+        return False
+
     if not validate_model(attack_model):
         print(f"{BRIGHT_RED}✘{RESET} Attack model failed validation.")
         return False
@@ -79,25 +112,6 @@ def validate_models_and_tests(
         return False
     else:
         print(f"{BRIGHT_GREEN}✓{RESET} Tested model validated successfully.")
-
-    if basic_tests_params and not validate_tests([test[0] for test in basic_tests_params]):
-        print(f"{BRIGHT_RED}✘{RESET} The test list contains invalid code names.")
-        return False
-    else:
-        print(f"{BRIGHT_GREEN}✓{RESET} Test code names validated successfully.")
-
-    if basic_tests_params and not validate_basic_tests_params(basic_tests_params):
-        print(f"{BRIGHT_RED}✘{RESET} One or more test parameters are invalid.")
-        return False
-    else:
-        if basic_tests_params:
-            print(f"{BRIGHT_GREEN}✓{RESET} Basic test parameters validated successfully.")
-
-    if custom_tests_params and not validate_custom_tests([test[0] for test in custom_tests_params]):
-        print(f"{BRIGHT_RED}✘{RESET} One or more custom tests failed validation.")
-        return False
-    elif custom_tests_params:
-        print(f"{BRIGHT_GREEN}✓{RESET} Custom tests validated successfully.")
 
     print()
     return True
@@ -176,6 +190,7 @@ def start_testing(
         The model to be tested for vulnerabilities.
     config : dict
         Configuration dictionary with keys:
+
         - 'enable_logging' : bool
             Whether to enable logging.
         - 'enable_reports' : bool
@@ -233,8 +248,6 @@ def start_testing(
     print_logo(box_width=80)
 
     # Print test configuration
-    from llamator.format_output.output_helpers import print_testing_configuration
-
     print_testing_configuration(num_threads, enable_logging, enable_reports, report_language, 80)
 
     # Validate models, test codes, and parameters
@@ -256,8 +269,6 @@ def start_testing(
 
     # Close log file handlers
     for handler in logging.getLogger().handlers:
-        from logging.handlers import RotatingFileHandler
-
         if isinstance(handler, RotatingFileHandler):
             handler.close()
 

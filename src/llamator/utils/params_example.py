@@ -1,15 +1,15 @@
 # File: llamator/src/llamator/utils/params_example.py
 import inspect
-import re
 from typing import Dict, Literal
 
 from ..attack_provider.attack_registry import test_classes
-from .test_presets import preset_configs  # Import preset configurations
+from .test_presets import preset_configs
 
 
 def _get_class_init_params(cls) -> Dict[str, str]:
     """
-    Extract initialization parameters from a class's __init__ method.
+    Extracts all initialization parameters from a class's __init__ method,
+    excluding 'self', 'args' and 'kwargs'.
 
     Parameters
     ----------
@@ -20,33 +20,62 @@ def _get_class_init_params(cls) -> Dict[str, str]:
     -------
     Dict[str, str]
         Dictionary mapping parameter names to their default values as strings.
+        If a parameter has no default value, it is represented by "<no default>".
     """
     try:
-        source = inspect.getsource(cls.__init__)
-        # Find the parameter list
-        param_match = re.search(r"def __init__\s*\(\s*(.*?)\):", source, re.DOTALL)
-        if not param_match:
-            return {}
-        param_text = param_match.group(1)
-        # Remove common parameters we don't want to include
-        excluded_params = [
+        sig = inspect.signature(cls.__init__)
+        params_dict = {}
+        for param_name, param_obj in sig.parameters.items():
+            if param_name in ("self", "args", "kwargs"):
+                continue
+            if param_obj.default is inspect.Parameter.empty:
+                params_dict[param_name] = "<no default>"
+            else:
+                params_dict[param_name] = repr(param_obj.default)
+        return params_dict
+    except (OSError, TypeError):
+        return {}
+
+
+def _get_attack_params(cls) -> Dict[str, str]:
+    """
+    Extracts initialization parameters from a class's __init__ method
+    but excludes the parameters commonly used for configuration in TestBase:
+    'self', 'args', 'kwargs', 'client_config', 'attack_config', 'judge_config',
+    'artifacts_path'.
+
+    Parameters
+    ----------
+    cls : type
+        The class to inspect.
+
+    Returns
+    -------
+    Dict[str, str]
+        Dictionary mapping parameter names to their default values as strings,
+        excluding the parameters above. If a parameter has no default value,
+        it is represented by "<no default>".
+    """
+    try:
+        excluded_params = {
             "self",
-            "client_config: ClientConfig",
-            "attack_config: AttackConfig",
-            "judge_config: JudgeConfig",
-            "artifacts_path: Optional[str]",
-            "**kwargs",
-        ]
-        for param in excluded_params:
-            param_text = param_text.replace(param, "")
-        # Extract remaining parameters with defaults
-        params = {}
-        param_matches = re.finditer(r"(\w+)(?:\s*:\s*[^=]+)?\s*=\s*([^,]+)", param_text)
-        for match in param_matches:
-            param_name = match.group(1)
-            default_value = match.group(2).strip()
-            params[param_name] = default_value
-        return params
+            "args",
+            "kwargs",
+            "client_config",
+            "attack_config",
+            "judge_config",
+            "artifacts_path",
+        }
+        sig = inspect.signature(cls.__init__)
+        params_dict = {}
+        for param_name, param_obj in sig.parameters.items():
+            if param_name in excluded_params:
+                continue
+            if param_obj.default is inspect.Parameter.empty:
+                params_dict[param_name] = "<no default>"
+            else:
+                params_dict[param_name] = repr(param_obj.default)
+        return params_dict
     except (OSError, TypeError):
         return {}
 
@@ -62,16 +91,14 @@ def get_basic_tests_params_example() -> str:
         A code snippet showing how to configure basic_tests_params.
     """
     test_configs = []
-    # Sort test classes by name for consistent output
     sorted_test_classes = sorted(
         test_classes, key=lambda cls: cls.info["name"] if hasattr(cls, "info") else cls.__name__
     )
     for test_cls in sorted_test_classes:
         if hasattr(test_cls, "info") and "code_name" in test_cls.info:
             code_name = test_cls.info["code_name"]
-            params = _get_class_init_params(test_cls)
+            params = _get_attack_params(test_cls)
             if params:
-                # Use proper dictionary syntax: "key": value
                 param_str = ", ".join([f'"{k}": {v}' for k, v in params.items()])
                 test_configs.append(f'    ("{code_name}", {{{param_str}}}),')
             else:
@@ -97,7 +124,6 @@ def get_preset_tests_params_example(preset_name: Literal["all", "standard"] = "a
     """
     if preset_name.lower() == "all":
         return get_basic_tests_params_example()
-    # preset_name is "standard"
     preset = preset_configs.get(preset_name)
     if preset is None:
         return f"# Preset '{preset_name}' not found. Allowed presets: 'all', 'standard'."
