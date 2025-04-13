@@ -50,7 +50,7 @@ class TestVlmMAttack(TestBase):
         self.dataset = dataset
 
         self.load_parquet = False # NOTE: Ideally this should be passed as a parameter
-        self.parquet_path = Path(__file__).parents[1] / "attack_data" / "llm_m_attack_prepared.parquet"
+        self.parquet_path = Path(__file__).parents[1] / "attack_data" / "vlm_m_attack_prepared.parquet"
 
     def _prepare_attack_data(self, attack_df: pd.DataFrame, responses: list[str], statuses: list[str]) -> None:
         df = attack_df.copy().drop(["image_encoded"], axis=1, errors="ignore")
