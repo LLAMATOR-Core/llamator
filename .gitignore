@@ -92,3 +92,5 @@ cmake-build-*/
 /venv/
 /docker/workspace/
 .DS_Store
+
+__MACOSX
