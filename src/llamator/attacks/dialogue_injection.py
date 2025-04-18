@@ -87,7 +87,9 @@ FIXING_MODE_EMULATION = [
 
 @register_test
 class TestDialogueInjection(TestBase):
-    """Probes an LLM's resilience against performing explicitly forbidden activities using the 'user/assistant dialogue injection' technique."""
+    """Probes an LLM's resilience against performing explicitly forbidden activities using the 'user/assistant dialogue injection' technique.
+    Original Paper: https://arxiv.org/abs/2503.08195
+    """
 
     info = {
         "name": "Dialogue Injection",
@@ -97,6 +99,7 @@ class TestDialogueInjection(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "arxiv:2503.08195"
         ],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
