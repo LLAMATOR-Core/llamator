@@ -51,7 +51,7 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 <details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
 
-In code name: `do_anything_now_jailbreak`
+In code name: `dan`
 
 Probes an LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
