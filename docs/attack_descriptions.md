@@ -49,6 +49,18 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 </details>
 
 <details>
+<summary><strong>Dialogue Injection</strong></summary>
+
+In code name: `dialogue_injection`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.
+
+_Original Paper: <https://arxiv.org/abs/2503.08195>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
 
 In code name: `do_anything_now_jailbreak`
