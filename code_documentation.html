@@ -322,12 +322,13 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>attack_model</strong> (<a class="reference internal" href="#llamator.ClientBase" title="llamator.ClientBase"><em>ClientBase</em></a>) – The model that generates attacks.</p></li>
 <li><p><strong>tested_model</strong> (<a class="reference internal" href="#llamator.ClientBase" title="llamator.ClientBase"><em>ClientBase</em></a>) – The model to be tested for vulnerabilities.</p></li>
-<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – <p>Configuration dictionary with keys:
-- ‘enable_logging’ : bool</p>
-<blockquote>
-<div><p>Whether to enable logging.</p>
-</div></blockquote>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a>) – <p>Configuration dictionary with keys:</p>
 <ul>
+<li><dl class="simple">
+<dt>’enable_logging’<span class="classifier">bool</span></dt><dd><p>Whether to enable logging.</p>
+</dd>
+</dl>
+</li>
 <li><dl class="simple">
 <dt>’enable_reports’<span class="classifier">bool</span></dt><dd><p>Whether to generate Excel/Word reports.</p>
 </dd>
@@ -515,6 +516,70 @@ This client can be used to interact with any language model that supports the Op
 <p>ClientOpenAI is a client implementation for OpenAI-based services.</p>
 </div>
 </section>
+<section id="additional-utility-functions">
+<h2>Additional Utility Functions<a class="headerlink" href="#additional-utility-functions" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_preset_tests_params_example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'standard'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><span class="pre">str</span></a></span></span><a class="reference internal" href="_modules/llamator/utils/params_example.html#get_preset_tests_params_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Generate example code for configuring basic_tests_params based on a preset configuration.
+If preset_name is “all”, returns configuration for all tests (as in get_basic_tests_params_example).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>preset_name</strong> (<em>Literal</em><em>[</em><em>&quot;all&quot;</em><em>, </em><em>&quot;standard&quot;</em><em>]</em>) – The name of the preset configuration to use.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A code snippet showing the configuration for the given preset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function generates an example code snippet for configuring basic_tests_params based on a preset configuration.
+It returns a code snippet as a string.</p>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">print_preset_tests_params_example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preset_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.13)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'all'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'standard'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/llamator/utils/params_example.html#print_preset_tests_params_example"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Print an example configuration for basic_tests_params based on a preset to the console.
+If preset_name is “all”, prints configuration for all tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>preset_name</strong> (<em>Literal</em><em>[</em><em>&quot;all&quot;</em><em>, </em><em>&quot;standard&quot;</em><em>]</em>) – The name of the preset configuration to print.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function prints an example configuration for basic_tests_params based on a preset to the console.</p>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">print_chat_models_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detailed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><span class="pre">None</span></a></span></span><a class="reference internal" href="_modules/llamator/client/langchain_integration.html#print_chat_models_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dd><p>Print information about LangChain chat models in a well-formatted way.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>detailed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – Whether to print detailed information including parameter descriptions</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This function prints information about LangChain chat models in a well-formatted manner.
+It displays details such as the model name, a short description, and its supported parameters.</p>
+</div>
+</section>
 </section>
 
         </article>
@@ -592,6 +657,7 @@ This client can be used to interact with any language model that supports the Op
 </ul>
 </li>
 <li><a class="reference internal" href="#available-clients">Available Clients</a></li>
+<li><a class="reference internal" href="#additional-utility-functions">Additional Utility Functions</a></li>
 </ul>
 </li>
 </ul>

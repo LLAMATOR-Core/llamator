@@ -304,9 +304,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dotenv</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dotenv</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">llamator.format_output.output_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_testing_configuration</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.attack_provider.run_tests</span><span class="w"> </span><span class="kn">import</span> <span class="n">setup_models_and_tests</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.attack_provider.test_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestBase</span>
@@ -315,6 +318,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.format_output.color_consts</span><span class="w"> </span><span class="kn">import</span> <span class="n">BRIGHT</span><span class="p">,</span> <span class="n">BRIGHT_CYAN</span><span class="p">,</span> <span class="n">BRIGHT_GREEN</span><span class="p">,</span> <span class="n">BRIGHT_RED</span><span class="p">,</span> <span class="n">RESET</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.format_output.logo</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_logo</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.initial_validation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_judge_config_usage</span><span class="p">,</span>
     <span class="n">validate_artifacts_path</span><span class="p">,</span>
     <span class="n">validate_basic_tests_params</span><span class="p">,</span>
     <span class="n">validate_custom_tests</span><span class="p">,</span>
@@ -359,7 +363,36 @@
 <span class="sd">    bool</span>
 <span class="sd">        True if all validations succeed, otherwise False.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">Validating models...</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_CYAN</span><span class="si">}</span><span class="s2">Validating models and tests...</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">basic_tests_params</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> The test list contains invalid code names.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">basic_tests_params</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Test code names validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_basic_tests_params</span><span class="p">(</span><span class="n">basic_tests_params</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more test parameters are invalid.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">basic_tests_params</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Basic test parameters validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">custom_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_custom_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">custom_tests_params</span><span class="p">]):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more custom tests failed validation.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="n">custom_tests_params</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Custom tests validated successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">check_judge_config_usage</span><span class="p">(</span>
+        <span class="n">basic_tests_params</span> <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="k">else</span> <span class="p">[],</span>
+        <span class="n">custom_tests_params</span> <span class="k">if</span> <span class="n">custom_tests_params</span> <span class="k">else</span> <span class="p">[],</span>
+        <span class="n">judge_model</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Judge model is required for tests that specify &#39;judge_config&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">validate_model</span><span class="p">(</span><span class="n">attack_model</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Attack model failed validation.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
@@ -380,25 +413,6 @@
         <span class="k">return</span> <span class="kc">False</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Tested model validated successfully.&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">basic_tests_params</span><span class="p">]):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> The test list contains invalid code names.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Test code names validated successfully.&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">basic_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_basic_tests_params</span><span class="p">(</span><span class="n">basic_tests_params</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more test parameters are invalid.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">basic_tests_params</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Basic test parameters validated successfully.&quot;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">custom_tests_params</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">validate_custom_tests</span><span class="p">([</span><span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">custom_tests_params</span><span class="p">]):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_RED</span><span class="si">}</span><span class="s2">✘</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> One or more custom tests failed validation.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">False</span>
-    <span class="k">elif</span> <span class="n">custom_tests_params</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BRIGHT_GREEN</span><span class="si">}</span><span class="s2">✓</span><span class="si">{</span><span class="n">RESET</span><span class="si">}</span><span class="s2"> Custom tests validated successfully.&quot;</span><span class="p">)</span>
 
     <span class="nb">print</span><span class="p">()</span>
     <span class="k">return</span> <span class="kc">True</span>
@@ -479,6 +493,7 @@
 <span class="sd">        The model to be tested for vulnerabilities.</span>
 <span class="sd">    config : dict</span>
 <span class="sd">        Configuration dictionary with keys:</span>
+
 <span class="sd">        - &#39;enable_logging&#39; : bool</span>
 <span class="sd">            Whether to enable logging.</span>
 <span class="sd">        - &#39;enable_reports&#39; : bool</span>
@@ -536,8 +551,6 @@
     <span class="n">print_logo</span><span class="p">(</span><span class="n">box_width</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
 
     <span class="c1"># Print test configuration</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">llamator.format_output.output_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_testing_configuration</span>
-
     <span class="n">print_testing_configuration</span><span class="p">(</span><span class="n">num_threads</span><span class="p">,</span> <span class="n">enable_logging</span><span class="p">,</span> <span class="n">enable_reports</span><span class="p">,</span> <span class="n">report_language</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
 
     <span class="c1"># Validate models, test codes, and parameters</span>
@@ -559,8 +572,6 @@
 
     <span class="c1"># Close log file handlers</span>
     <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">logging.handlers</span><span class="w"> </span><span class="kn">import</span> <span class="n">RotatingFileHandler</span>
-
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">RotatingFileHandler</span><span class="p">):</span>
             <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 

@@ -342,8 +342,15 @@
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/complimentary_transition.py">View code on GitHub</a></p>
 </details>
 <details>
+<summary><strong>Dialogue Injection</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">dialogue_injection</span></code></p>
+<p>Probes an LLM’s ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.</p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2503.08195">https://arxiv.org/abs/2503.08195</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a></p>
+</details>
+<details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
-<p>In code name: <code class="docutils literal notranslate"><span class="pre">do_anything_now_jailbreak</span></code></p>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">dan</span></code></p>
 <p>Probes an LLM’s resilience against performing explicitly forbidden activities using the “Do Anything Now” (DAN) character roleplay technique.</p>
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dan.py">View code on GitHub</a></p>
 </details>
@@ -422,6 +429,13 @@
 </details>
 <section id="owasp-llm01-2025-continuous-prompt-injection">
 <h3>OWASP <a class="reference external" href="https://genai.owasp.org/llmrisk/llm01-prompt-injection/">LLM01:2025</a> Continuous Prompt Injection<a class="headerlink" href="#owasp-llm01-2025-continuous-prompt-injection" title="Link to this heading">¶</a></h3>
+<details>
+<summary><strong>AutoDAN-Turbo</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">autodan_turbo</span></code></p>
+<p>Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.</p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2410.05295v3">https://arxiv.org/abs/2410.05295v3</a>, Original Code: <a class="reference external" href="https://github.com/SaFoLab-WISC/AutoDAN-Turbo">https://github.com/SaFoLab-WISC/AutoDAN-Turbo</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py">View code on GitHub</a></p>
+</details>
 <details>
 <summary><strong>Best-of-N Jailbreak</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">bon</span></code></p>
