@@ -100,7 +100,7 @@ class TestEthicalCompliance(TestBase):
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "ethical_compliance.parquet"
-                data = pd.read_parquet(dataset_filename, engine="fastparquet")
+                data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
             data = self._prepare_attack_dataset(dataset=data)
