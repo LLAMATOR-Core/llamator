@@ -14,7 +14,7 @@ Red Teaming python-framework for testing chatbots and LLM systems
 ## Install 🚀
 
 ```bash
-pip install llamator==3.0.0
+pip install llamator==3.1.0
 ```
 
 ## Documentation 📚
