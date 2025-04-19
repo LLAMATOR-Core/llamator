@@ -59,7 +59,7 @@ class TestPastTense(TestBase):
             # TODO: add attack model for changing verb tenses in prompts (past and future)
             # based on custom or default harmful dataset with present form
             dataset_filename = Path(__file__).parent.parent / "attack_data" / "past_tense.parquet"
-            data = pd.read_parquet(dataset_filename, engine="fastparquet")
+            data = pd.read_parquet(dataset_filename, engine="pyarrow")
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():

@@ -37,7 +37,6 @@ def validate_model(client_model: ClientBase) -> bool:
         True if the model responded with content, otherwise False.
     """
     try:
-        # Test message to check model functionality
         history = []
         message = [{"role": "user", "content": "Test message"}]
         response = client_model.interact(history, message)
@@ -164,32 +163,75 @@ def validate_basic_tests_params(basic_tests_params: List[Tuple[str, Dict]]) -> b
     bool
         True if all parameters match the corresponding test class's constructor, otherwise False.
     """
-    # Build a mapping from test code_name to its class
     code_name_to_class = {}
     for cls in test_classes:
         if hasattr(cls, "info") and "code_name" in cls.info:
             code_name = cls.info["code_name"]
             code_name_to_class[code_name] = cls
 
-    # Validate the parameters for each test
     for test_code_name, param_dict in basic_tests_params:
         if test_code_name not in code_name_to_class:
-            # This is also checked in validate_tests, but handle it if it appears here
             logging.error(f"Test '{test_code_name}' is not registered.")
             return False
 
         cls = code_name_to_class[test_code_name]
-
-        # Get the constructor parameters using the existing function
         init_params = _get_class_init_params(cls)
         recognized_param_names = set(init_params.keys())
 
-        # Ensure all passed keys are recognized in the constructor
         for param_key in param_dict.keys():
             if param_key not in recognized_param_names:
                 logging.error(
                     f"Test '{test_code_name}' has an unrecognized parameter '{param_key}' in basic_tests_params."
                 )
                 return False
+
+    return True
+
+
+def check_judge_config_usage(
+    basic_tests_params: List[Tuple[str, Dict]],
+    custom_tests_params: List[Tuple[Type[TestBase], Dict]],
+    judge_model: ClientBase,
+) -> bool:
+    """
+    Checks if any test class among basic_tests_params or custom_tests_params requires 'judge_config'
+    in its constructor, but judge_model is not provided (None).
+
+    Parameters
+    ----------
+    basic_tests_params : List[Tuple[str, Dict]]
+        A list of tuples (test code name, {parameters}) for basic tests.
+    custom_tests_params : List[Tuple[Type[TestBase], Dict]]
+        A list of tuples (custom test class, {parameters}) for custom tests.
+    judge_model : ClientBase
+        The judge model, or None if not provided.
+
+    Returns
+    -------
+    bool
+        True if the usage is valid, False if there's a mismatch (the test class expects 'judge_config'
+        but judge_model is None).
+    """
+    code_name_to_class = {}
+    for cls in test_classes:
+        if hasattr(cls, "info") and "code_name" in cls.info:
+            code_name = cls.info["code_name"]
+            code_name_to_class[code_name] = cls
+
+    for code_name, _ in basic_tests_params:
+        cls = code_name_to_class.get(code_name)
+        if cls:
+            init_params = _get_class_init_params(cls)
+            if "judge_config" in init_params and judge_model is None:
+                logging.error(f"Test '{code_name}' requires 'judge_config', but no judge model was provided.")
+                return False
+
+    for custom_test_cls, _ in custom_tests_params:
+        init_params = _get_class_init_params(custom_test_cls)
+        if "judge_config" in init_params and judge_model is None:
+            logging.error(
+                f"Custom test '{custom_test_cls.__name__}' requires 'judge_config', " "but no judge model was provided."
+            )
+            return False
 
     return True

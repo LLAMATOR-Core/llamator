@@ -49,9 +49,21 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 </details>
 
 <details>
+<summary><strong>Dialogue Injection</strong></summary>
+
+In code name: `dialogue_injection`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.
+
+_Original Paper: <https://arxiv.org/abs/2503.08195>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
 
-In code name: `do_anything_now_jailbreak`
+In code name: `dan`
 
 Probes an LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
@@ -167,6 +179,18 @@ For managing a multi-stage interaction between an attacker and tested chat clien
 </details>
 
 ### OWASP [LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) Continuous Prompt Injection
+
+<details>
+<summary><strong>AutoDAN-Turbo</strong></summary>
+
+In code name: `autodan_turbo`
+
+Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.
+
+_Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://github.com/SaFoLab-WISC/AutoDAN-Turbo>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py">View code on GitHub</a>
+</details>
 
 <details>
 <summary><strong>Best-of-N Jailbreak</strong></summary>

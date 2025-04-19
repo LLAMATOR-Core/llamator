@@ -67,7 +67,7 @@ class TestRuUCAR(TestBase):
         statuses = []
         try:
             dataset_filename = Path(__file__).parent.parent / "attack_data" / "ucar-dan_prompts.parquet"
-            data = pd.read_parquet(dataset_filename, engine="fastparquet")
+            data = pd.read_parquet(dataset_filename, engine="pyarrow")
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():

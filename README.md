@@ -9,11 +9,12 @@ Red Teaming python-framework for testing chatbots and LLM systems
 [![Downloads](https://pepy.tech/badge/llamator)](https://pepy.tech/project/llamator)
 [![Downloads](https://pepy.tech/badge/llamator/month)](https://pepy.tech/project/llamator)
 [![GitHub Repo stars](https://img.shields.io/github/stars/LLAMATOR-Core/llamator)](https://github.com/LLAMATOR-Core/llamator/stargazers)
+[![Chat](https://img.shields.io/badge/chat-gray.svg?logo=telegram)](https://t.me/llamator)
 
 ## Install 🚀
 
 ```bash
-pip install llamator==3.0.0
+pip install llamator==3.1.0
 ```
 
 ## Documentation 📚
@@ -57,8 +58,9 @@ Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-
 
 ## Community 🌍
 
-* 📣 [Telegram Channel — AI Security Lab](https://t.me/aisecuritylab)
 * 💬 [Telegram Chat — LLAMATOR | AI Red Team Community](https://t.me/llamator)
+* 📣 [Telegram Channel — AI Security Lab](https://t.me/aisecuritylab)
+
 
 ## Supported by 🚀
 

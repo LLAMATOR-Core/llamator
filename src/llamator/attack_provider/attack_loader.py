@@ -1,10 +1,12 @@
 from ..attacks import (  # noqa
     aim,
+    autodan_turbo,
     base64_injection,
     bon,
     complimentary_transition,
     crecsendo,
     dan,
+    dialogue_injection,
     ethical_compliance,
     harmful_behavior,
     harmful_behavior_multistage,
