@@ -193,11 +193,11 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://g
 </details>
 
 <details>
-<summary><strong>Best-of-N Jailbreak</strong></summary>
+<summary><strong>Best-of-N (BoN) Jailbreak</strong></summary>
 
 In code name: `bon`
 
-Probes the LLM resilience against Best-Of-N attack.
+Probes the LLM resilience against Best-Of-N (BoN) attack.
 
 _Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
 
