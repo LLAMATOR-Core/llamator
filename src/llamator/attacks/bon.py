@@ -65,7 +65,7 @@ class TestBon(TestBase):
     Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking"""
 
     info = {
-        "name": "Best-of-N Jailbreak",
+        "name": "Best-of-N Jailbreak (BoN)",
         "code_name": "bon",
         "tags": [
             "lang:en",

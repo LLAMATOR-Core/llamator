@@ -217,13 +217,14 @@ _Original Paper: <https://arxiv.org/abs/2404.01833>_
 </details>
 
 <details>
-<summary><strong>Harmful Behavior Multistage</strong></summary>
+<summary><strong>Prompt Automatic Iterative Refinement (PAIR)</strong></summary>
 
-In code name: `harmful_behavior_multistage`
+In code name: `pair`
 
-Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.
+Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+    Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a>
 </details>
 
 <details>
