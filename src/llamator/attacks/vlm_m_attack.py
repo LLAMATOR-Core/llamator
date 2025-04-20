@@ -174,7 +174,6 @@ class TestVlmMAttack(TestBase):
             raise e
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-
         match self.attack_source:
             case VlmAttackSource.HUGGINGFACE.value:
                 df_attack = self._load_huggingface()
@@ -187,7 +186,7 @@ class TestVlmMAttack(TestBase):
                     f"Unknown attack source: {self.attack_source}, choose one of {VlmAttackSource.__members__}"
                 )
 
-        df_attack = df_attack.head(self.num_attempts)
+        df_attack = self._prepare_attack_dataset(df_attack)
 
         responses = []
         statuses = []
