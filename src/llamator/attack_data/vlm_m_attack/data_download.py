@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class MAttackDataPreparator:
     def __init__(
-        self, base_path: str = "attack_data/M-Attack-VLM", dataset: str = "bigscale_100", target_subfolder: str = "1"
+        self, base_path: str = "attack_data/vlm_m_attack", dataset: str = "bigscale_100", target_subfolder: str = "1"
     ):
         self.base_path = Path(base_path)
         self.dataset = dataset
@@ -23,12 +23,10 @@ class MAttackDataPreparator:
         self.github_repo = "https://github.com/VILA-Lab/M-Attack.git"
         self.clone_path = Path(base_path) / "test_repo"
 
-        self.google_url = "https://drive.google.com/file/d//view?usp=share_link"
-
-        # self.gdrive_file_id = ""
-        # self.gdrive_zip_path = Path(base_path) /"xxx"
-
     def prepare(self, variations=["4", "8", "16"], limit: int = -1):
+        if os.path.exists(self.dataset_path):
+            logger.warning("Images already downloaded.")
+            return
         self._download_images(variations, limit)
         try:
             self._download_from_github()
