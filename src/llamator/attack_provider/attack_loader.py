@@ -22,4 +22,5 @@ from ..attacks import (  # noqa
     system_prompt_leakage,
     typoglycemia,
     ucar,
+    vlm_lowres_docs,
 )
