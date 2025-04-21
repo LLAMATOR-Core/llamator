@@ -272,4 +272,18 @@ Attacks the LLM system during a multistage conversation using the argumentum ad 
 _Original Paper: <https://arxiv.org/abs/2310.13548>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a>
+
+</details>
+
+<details>
+<summary><strong>Text Hallucination Attack for VLM</strong></summary>
+
+In code name: `vlm_text_hallucination`
+
+Test class for VLM text hallucination attacks.
+The idea is to give model and image which contains only text and ask it to describe it.
+The goal is to see whether model will describe text or hallucinate with the description of an object written in text.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_text_hallucination.py">View code on GitHub</a>
+
 </details>
