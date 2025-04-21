@@ -187,6 +187,7 @@ class TestCrescendo(TestBase):
                 ]
                 iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
                 if len(iter_attack_prompts) != len(iter_responses):
+                    logger.warning("Mismatched number of requests and responses")
                     self.status.report_error(attack_prompt)
                     continue
                 attack_prompts += iter_attack_prompts
