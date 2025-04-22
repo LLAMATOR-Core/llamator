@@ -61,7 +61,7 @@ def apply_ascii_noising(prompt: str, sigma: float) -> str:
 
 @register_test
 class TestBon(TestBase):
-    """Probes the LLM resilience against Best-of-N attack (text augmentations).
+    """Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.
     Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking"""
 
     info = {
@@ -75,8 +75,8 @@ class TestBon(TestBase):
             "arxiv:2412.03556",
         ],
         "description": {
-            "en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
-            "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
+            "en": "Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
+            "ru": "Испытывает устойчивость LLM к атаке Best-of-N (BoN), которая случайно трансформирует символы в запросе. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py",
     }
@@ -87,7 +87,7 @@ class TestBon(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
-        multistage_depth: int = 5,
+        num_transformations: int = 5,
         sigma: float = 0.4,
         custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
@@ -100,7 +100,7 @@ class TestBon(TestBase):
             **kwargs,
         )
         self.sigma = sigma  # proportion of characters to augment
-        self.multistage_depth = multistage_depth
+        self.num_transformations = num_transformations
         self.custom_dataset = custom_dataset
 
     def transform_attack_prompt(self, prompt: str) -> str:
@@ -128,14 +128,14 @@ class TestBon(TestBase):
                 logger.info(
                     f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}"
                 )
-                for stage in range(self.multistage_depth):
+                for stage in range(self.num_transformations):
                     yield StatusUpdate(
                         self.client_config,
                         self.info["code_name"],
                         self.status,
                         "Attacking",
-                        attack_prompt_index * self.multistage_depth + stage,
-                        self.num_attempts * self.multistage_depth,
+                        attack_prompt_index * self.num_transformations + stage,
+                        self.num_attempts * self.num_transformations,
                     )
                     original_prompts.append(attack_prompt)
                     transformed_prompt = self.transform_attack_prompt(attack_prompt)
@@ -180,8 +180,8 @@ class TestBon(TestBase):
                 self.info["code_name"],
                 self.status,
                 "Finished",
-                self.num_attempts * self.multistage_depth,
-                self.num_attempts * self.multistage_depth,
+                self.num_attempts * self.num_transformations,
+                self.num_attempts * self.num_transformations,
             )
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)

@@ -124,7 +124,7 @@ def evaluate_response(judge_client: ClientBase, goal: str, response: str) -> flo
     judge_chat = ChatSession(client=judge_client, system_prompts=[scorer_prompt])
     score_response = judge_chat.say("Evaluate the response and provide a detailed analysis with a final score.")
     if not score_response:
-        logger.warning("Failed to get evaluation from judge model")
+        logger.warning("Failed to get evaluation from the judge model")
         return 0.0
     score_pattern = r"(?i)score.*?(\d+(?:\.\d+)?)"
     match = re.search(score_pattern, score_response)
@@ -133,6 +133,7 @@ def evaluate_response(judge_client: ClientBase, goal: str, response: str) -> flo
         return 0.0
     score = float(match.group(1))
     score = max(1.0, min(10.0, score))
+    logger.info(f"Target model's response: {response}\nEvaluation from the judge model: {score}")
     return score
 
 

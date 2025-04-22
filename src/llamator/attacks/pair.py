@@ -142,9 +142,7 @@ class TestPAIR(TestBase):
                 dialog_session = MultiStageInteractionSession(
                     attacker_session=attack_chat,
                     tested_client_session=tested_client_chat,
-                    stop_criterion=lambda tested_client_history: self._stop_criterion(
-                        tested_client_history, goal
-                    ),
+                    stop_criterion=lambda tested_client_history: self._stop_criterion(tested_client_history, goal),
                     history_limit=self.multistage_depth,
                     tested_client_response_handler=self._refine_handler,
                     refine_kwargs={"goal": goal},
@@ -152,7 +150,7 @@ class TestPAIR(TestBase):
 
                 is_broken = dialog_session.start_conversation(start_prompt=attack_prompt)
                 if is_broken is None:
-                    logger.warning("Error while attacking target LLM (no response)")
+                    logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_prompt)
                     continue
 

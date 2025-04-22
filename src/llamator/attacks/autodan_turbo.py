@@ -433,7 +433,7 @@ class TestAutoDanTurbo(TestBase):
                 # Start conversation with the instruction for the attacker model
                 is_broken = dialog_session.start_conversation(start_prompt=attack_instruction)
                 if is_broken is None:
-                    logger.warning("Error while attacking target LLM (no response)")
+                    logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_instruction)
                     continue
 
