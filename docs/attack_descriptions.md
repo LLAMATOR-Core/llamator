@@ -39,18 +39,6 @@ Challenges the LLM with a dataset of lines, encoded into base64.
 </details>
 
 <details>
-<summary><strong>Best-of-N Jailbreak</strong></summary>
-
-In code name: `bon`
-
-Probes the LLM resilience against Best-Of-N attack.
-
-_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
-</details>
-
-<details>
 <summary><strong>Complimentary Transition</strong></summary>
 
 In code name: `complimentary_transition`
@@ -61,9 +49,21 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 </details>
 
 <details>
+<summary><strong>Dialogue Injection</strong></summary>
+
+In code name: `dialogue_injection`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.
+
+_Original Paper: <https://arxiv.org/abs/2503.08195>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Do Anything Now Jailbreak</strong></summary>
 
-In code name: `do_anything_now_jailbreak`
+In code name: `dan`
 
 Probes an LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
@@ -73,7 +73,7 @@ Probes an LLM's resilience against performing explicitly forbidden activities us
 <details>
 <summary><strong>Do Anything Now Jailbreak (RU)</strong></summary>
 
-In code name: `RU_do_anything_now_jailbreak`
+In code name: `RU_dan`
 
 Probes a Russian-language LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
@@ -118,18 +118,6 @@ In code name: `past_tense`
 Challenges the LLM with a dataset of harmful behavior prompts in past tense form.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/past_tense.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Shuffle Inconsistency</strong></summary>
-
-In code name: `shuffle`
-
-Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
-
-_Original Paper: <https://arxiv.org/html/2501.04931>_
-
-<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
 </details>
 
 <details>
@@ -188,14 +176,33 @@ For managing a multi-stage interaction between an attacker and tested chat clien
  * `current_step` is the current step of the attacker.
  * `refine_args` are additional positional arguments for the `tested_client_response_handler`.
  * `refine_kwargs` are additional keyword arguments for the `tested_client_response_handler`.
-
-The `multistage_depth` parameter for using in `history_limit` can be extracted from the attack's kwargs as follows:
-```python
- self.multistage_depth = kwargs.get("multistage_depth", 20)
-```
 </details>
 
 ### OWASP [LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) Continuous Prompt Injection
+
+<details>
+<summary><strong>AutoDAN-Turbo</strong></summary>
+
+In code name: `autodan_turbo`
+
+Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.
+
+_Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://github.com/SaFoLab-WISC/AutoDAN-Turbo>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Best-of-N Jailbreak</strong></summary>
+
+In code name: `bon`
+
+Probes the LLM resilience against Best-Of-N attack.
+
+_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
+</details>
 
 <details>
 <summary><strong>Crescendo</strong></summary>
@@ -217,6 +224,18 @@ In code name: `harmful_behavior_multistage`
 Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Shuffle Inconsistency</strong></summary>
+
+In code name: `shuffle`
+
+Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
+
+_Original Paper: <https://arxiv.org/html/2501.04931>_
+
+<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
 </details>
 
 ### OWASP [LLM07:2025](https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/) System Prompt Leakage

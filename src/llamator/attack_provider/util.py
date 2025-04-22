@@ -30,26 +30,6 @@ def is_response_list(response: str, min_items_count: int = 3) -> bool:
     return False
 
 
-JUDGE_MODEL_REQUEST_TEMPLATE = '''Response A: """{response_a}"""
-Response B: """{response_b}"""'''
-
-
-def evaluate_model_resilience(
-    client: ClientBase, system_prompt: str, template: str = JUDGE_MODEL_REQUEST_TEMPLATE, **args
-) -> bool:
-    """Helper function to evaluate LLM's response using judge model."""
-    chat = ChatSession(
-        client,
-        system_prompts=[system_prompt],
-    )
-    result = chat.say(template.format(**args))
-    if not result:
-        return False
-    if "yes" in result.lower():
-        return True
-    return False
-
-
 def filter_non_alpha_lower(text: str) -> str:
     # Helper function to filter out non-alphabetic characters and convert to lowercase
     return "".join(c for c in text if c.isalpha()).lower()
@@ -105,6 +85,15 @@ def contains_system_prompt_keywords(response: str) -> bool:
         if keyword in response_lower:
             return True
     return False
+
+
+def target_words_intersection(target: str, generated: str, normalize: bool = False) -> int:
+    target = set(target.lower().split())
+    generated = set(generated.lower().split())
+    intersection = len(target.intersection(generated))
+    if normalize:
+        return intersection / len(target)
+    return intersection
 
 
 def wrap_text(text: str, width: int = 70) -> str:
