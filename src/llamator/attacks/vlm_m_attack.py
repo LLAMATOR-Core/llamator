@@ -106,7 +106,7 @@ class TestVlmMAttack(TestBase):
         if missing:
             logger.warning(f"Missing variations found: {missing}")
             raise Exception(
-                "No data found, download manually with jupyter under llamator/attack_data/M-Attack-VLM destination."
+                "No data found."
             )
 
         # load targets
@@ -205,7 +205,7 @@ class TestVlmMAttack(TestBase):
 
             image_path = row["image_path"]
             image_base64 = row["image_encoded"]
-            caption = row["caption"][0]
+            caption = row["caption"][0] if isinstance(row["caption"], (list, str)) else ""
             attack_id = image_path
             if any([not isinstance(x, str) for x in [image_path, image_base64, caption]]):
                 logger.warning(f"Skipping attack for image {image_path} because of error in dataframe: {row}")
