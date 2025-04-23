@@ -20,25 +20,25 @@ bump2version>=1.0.1,<2.0.0
 
 # Project dependencies
 httpx==0.27.2
-openai==1.6.1
-langchain==0.2.16
-langchain-community==0.2.16
-langchain-core==0.2.38
+openai==1.68.2
+langchain==0.3.21
+langchain-community==0.3.20
+langchain-core==0.3.49
 tqdm==4.66.3
 colorama==0.4.6
 prettytable==3.10.0
 pandas==2.2.2
 inquirer==3.2.4
 prompt-toolkit==3.0.43
-fastparquet==2024.2.0
-yandexcloud==0.316.0
 openpyxl==3.1.5
 python-docx==1.1.2
 datetime==5.5
 jupyter==1.1.1
+pyarrow==19.0.1
 pymupdf==1.25.5
 
 # Publish package
 build==1.2.2
-twine==5.1.1
+twine==6.1.0
 furo==2024.8.6
+pkginfo==1.12.1.2
