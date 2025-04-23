@@ -102,10 +102,13 @@ def page2image(page: fitz.Page, rescale: float = 1.0, default_dpi: int = 72) -> 
     return img
 
 
-def pdf2images(path: Path, rescale: float = 1.0, idxs: Optional[List[int]] = None) -> List[Image.Image]:
+def pdf2images(
+    path: Path, is_long_flag: bool = False, rescale: float = 1.0, idxs: Optional[List[int]] = None
+) -> List[Image.Image]:
     doc = fitz.open(path)
     images = []
-    for idx in idxs or range(doc.page_count):
+    range_len = min(10, doc.page_count) if is_long_flag else doc.page_count
+    for idx in idxs or range(range_len):
         page = doc.load_page(idx)
         img = page2image(page, rescale=rescale)
         images.append(img)

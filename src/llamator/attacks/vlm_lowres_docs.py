@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 from pathlib import Path
 from typing import Generator, Optional
 
@@ -68,6 +69,9 @@ class TestVlmLowresPdf(TestBase):
         artifacts_path: Optional[str] = None,
         rescale: float = 0.25,
         num_attempts: int = 0,
+        is_long_pdf: bool = False,
+        custom_pdf_dir: Optional[Path] = None,
+        overwrite_existing_pdfs: bool = False,
         *args,
         **kwargs,
     ):
@@ -81,7 +85,14 @@ class TestVlmLowresPdf(TestBase):
             **kwargs,
         )
         self.rescale = rescale
+        self.is_long_pdf = is_long_pdf
+
+        self.custom_pdf_dir = Path(custom_pdf_dir) if custom_pdf_dir else None
+        self.overwrite_existing_pdfs = overwrite_existing_pdfs
+
         self.data_path = Path(__file__).parents[1] / "attack_data/lowres_pdf"
+        self.pdf_dir = self.data_path / "pdf"
+
         self.rescale_data_path = self.data_path / "images" / f"rescale__{self.rescale}".replace(".", "_")
 
     def _prepare_attack_artifacts(
@@ -110,7 +121,7 @@ class TestVlmLowresPdf(TestBase):
 
         out_dir.mkdir(parents=True, exist_ok=True)
         for path in pdf_dir.glob("*.pdf"):
-            images = pdf2images(path, rescale=self.rescale)
+            images = pdf2images(path, is_long_flag=self.is_long_pdf, rescale=self.rescale)
             for idx, img in enumerate(images):
                 fname = out_dir / f"{path.stem}__page_{idx+1}__rescale_{self.rescale}.png"
                 img.save(fname)
@@ -123,18 +134,43 @@ class TestVlmLowresPdf(TestBase):
                 repo_type="dataset",
                 local_dir=self.data_path,
                 local_dir_use_symlinks=False,
-                ignore_patterns=[".gitattributes"],
+                ignore_patterns=["*.png", ".gitattributes"],
             )
         except Exception as e:
             logger.error(f"Failed to download dataset from HuggingFace: {e}")
 
     def _load_attack_data(self) -> pd.DataFrame:
-        if not self.data_path.exists():
-            logger.warning(f"Data path {self.data_path} does not exist")
-            self._load_huggingface()
+        is_there_pdf = any(self.pdf_dir.glob("*.pdf"))
+        is_there_png = any(self.rescale_data_path.glob("*.png"))
 
-        if not self.rescale_data_path.exists():
+        if self.custom_pdf_dir:
+            self.pdf_dir.mkdir(parents=True, exist_ok=True)
+
+            if self.overwrite_existing_pdfs:
+                for f in self.pdf_dir.glob("*.pdf"):
+                    f.unlink()
+
+                for f in self.rescale_data_path.glob("*.png"):
+                    f.unlink()
+            copied = 0
+            for user_pdf in Path(self.custom_pdf_dir).glob("*.pdf"):
+                shutil.copy(user_pdf, self.pdf_dir / user_pdf.name)
+                copied += 1
+            logger.info(f"Copied {copied} custom PDFs to {self.pdf_dir}")
+
+            logger.info("Preparing images...")
             self._create_images()
+        else:
+            need_download_pdfs = (not is_there_pdf) and (not is_there_png)
+
+            if need_download_pdfs:
+                logger.warning(f"No data found in {self.pdf_dir}, downloading from HuggingFace...")
+                self._load_huggingface()
+                is_there_pdf = any(self.pdf_dir.glob("*.pdf"))  # re-check
+
+            if (not is_there_png) and is_there_pdf:
+                logger.info("No rescaled images found, generating them...")
+                self._create_images()
 
         data = []
         for file in self.rescale_data_path.glob("*.png"):
@@ -146,9 +182,7 @@ class TestVlmLowresPdf(TestBase):
                     image_encoded=image_encoded,
                 )
             )
-
-        df = pd.DataFrame(data)
-        return df
+        return pd.DataFrame(data)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         df_attack = self._load_attack_data().head(self.num_attempts)
