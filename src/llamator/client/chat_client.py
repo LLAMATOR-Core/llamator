@@ -256,18 +256,34 @@ class MultiStageInteractionSession:
         """
         Default stopping criterion that never stops the conversation.
 
+        How to use **kwargs
+        -------------------
+        ``kwargs`` is the *shared mutable dictionary* (`CALLBACK_KWARGS`) that
+        the main loop passes to **every** callback in a single turn.
+        Any function executed *before* this one may write control flags:
+
+        >>> kwargs["should_stop"] = True
+
+        A custom stop-criterion can then read the flag:
+
+        >>> if kwargs.get("should_stop", False):
+        ...     return True
+
+        You can also write to ``kwargs`` here; all later callbacks in the
+        same loop iteration will see the new values.
+
         Parameters
         ----------
         tested_client_history : List[Dict[str, str]]
             The history of the tested client.
-
         **kwargs
-            Additional keyword arguments.
+            Shared state between callbacks; key names and semantics are
+            user-defined.
 
         Returns
         -------
         bool
-            Always returns False.
+            Always returns False in the default implementation.
         """
         return False
 
@@ -276,21 +292,39 @@ class MultiStageInteractionSession:
         """
         Default tested_client_response_handler function that returns the response unchanged.
 
+        How to use **kwargs**
+        ---------------------
+        The same shared ``kwargs`` dictionary used by the stop-criterion is
+        passed in here.  Typical patterns:
+
+        * **Write a flag for the stop-criterion**
+
+          >>> if "fatal error" in tested_client_response.lower():
+          ...     kwargs["should_stop"] = True
+
+        * **Accumulate statistics**
+
+          >>> kwargs["reply_count"] = kwargs.get("reply_count", 0) + 1
+
+        * **Parameter-driven transformation**
+
+          >>> suffix = kwargs.get("suffix", "")
+          >>> return tested_client_response + suffix
+
+        Any updates to ``kwargs`` are visible to the rest of the callbacks in
+        the current loop cycle.
+
         Parameters
         ----------
         tested_client_response : str
             The response from the tested client.
         **kwargs : dict
-            Additional keyword arguments.
+            Shared state dictionary.
 
         Returns
         -------
         str
-            The original tested client's response.
-
-        # Usage Example:
-        # suffix = kwargs.get('suffix', '')
-        # return tested_client_response + suffix
+            The original tested client's response unless overridden.
         """
         return tested_client_response
 
@@ -370,6 +404,17 @@ class MultiStageInteractionSession:
         Returns
         -------
         List[Dict[str, str]]
-            The responses of the tested client's session.
+            The responses of the tested client.
         """
         return [message for message in self.tested_client_session.history if message["role"] == "assistant"]
+
+    def get_current_step(self) -> int:
+        """
+        Returns the current step of the attacker.
+
+        Returns
+        -------
+        int
+            The current step number of the attacker.
+        """
+        return self.current_step
