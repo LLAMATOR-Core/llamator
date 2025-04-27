@@ -43,7 +43,7 @@ class TestShuffle(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
-        multistage_depth: int = 5,
+        num_transformations: int = 5,
         custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
@@ -54,7 +54,7 @@ class TestShuffle(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
-        self.multistage_depth = multistage_depth
+        self.num_transformations = num_transformations
         self.custom_dataset = custom_dataset
 
     @staticmethod
@@ -81,14 +81,14 @@ class TestShuffle(TestBase):
                 logger.info(
                     f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}"
                 )
-                for stage in range(self.multistage_depth):
+                for stage in range(self.num_transformations):
                     yield StatusUpdate(
                         self.client_config,
                         self.info["code_name"],
                         self.status,
                         "Attacking",
-                        attack_prompt_index * self.multistage_depth + stage,
-                        self.num_attempts * self.multistage_depth,
+                        attack_prompt_index * self.num_transformations + stage,
+                        self.num_attempts * self.num_transformations,
                     )
                     original_prompts.append(attack_prompt)
                     shuffled_prompt = self.shuffle_words(attack_prompt)
@@ -133,8 +133,8 @@ class TestShuffle(TestBase):
                 self.info["code_name"],
                 self.status,
                 "Finished",
-                self.num_attempts * self.multistage_depth,
-                self.num_attempts * self.multistage_depth,
+                self.num_attempts * self.num_transformations,
+                self.num_attempts * self.num_transformations,
             )
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)
