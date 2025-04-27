@@ -6,6 +6,7 @@ from ..attacks import (  # noqa
     complimentary_transition,
     crecsendo,
     dan,
+    deceptive_delight,
     dialogue_injection,
     ethical_compliance,
     harmful_behavior,
