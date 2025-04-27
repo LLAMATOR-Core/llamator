@@ -6,6 +6,7 @@ from typing import Dict, Generator, List, Optional
 import pandas as pd
 
 from llamator.attack_provider.util import evaluate_response
+
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
 from ..client.attack_config import AttackConfig
@@ -58,9 +59,7 @@ class TestPAIR(TestBase):
                 "используя самоулучшение атакующей модели с оценкой модели-судьи."
             ),
         },
-        "github_link": (
-            "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py"
-        ),
+        "github_link": ("https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py"),
     }
 
     def __init__(
@@ -130,7 +129,6 @@ class TestPAIR(TestBase):
             data = self._load_dataset()
 
             for attack_prompt_index, row in data.iterrows():
-
                 yield StatusUpdate(
                     self.client_config,
                     self.info["code_name"],
@@ -142,9 +140,7 @@ class TestPAIR(TestBase):
 
                 goal = row["goal"]
                 attack_prompt = FIRST_ATTACK_PROMPT_TEMPLATE.format(goal=goal)
-                logger.info(
-                    f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}"
-                )
+                logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
 
                 attack_chat = ChatSession(
                     client=self.attack_config.attack_client.get_target_client(),
@@ -166,18 +162,12 @@ class TestPAIR(TestBase):
 
                 is_broken = dialog_session.start_conversation(start_prompt=attack_prompt)
                 if is_broken is None:
-                    logger.warning(
-                        "Error while attacking against target LLM (didn't receive response) ..."
-                    )
+                    logger.warning("Error while attacking against target LLM (didn't receive response) ...")
                     self.status.report_error(attack_prompt)
                     continue
 
-                iter_attack_prompts = [
-                    response["content"] for response in dialog_session.get_attacker_responses()
-                ]
-                iter_responses = [
-                    response["content"] for response in dialog_session.get_tested_client_responses()
-                ]
+                iter_attack_prompts = [response["content"] for response in dialog_session.get_attacker_responses()]
+                iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
 
                 if len(iter_attack_prompts) != len(iter_responses):
                     logger.warning("Mismatched number of requests and responses")
