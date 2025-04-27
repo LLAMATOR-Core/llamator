@@ -58,7 +58,7 @@ class TestPAIR(TestBase):
                 "используя самоулучшение атакующей модели с оценкой модели-судьи."
             ),
         },
-        "github_link": ("https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py"),
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py",
     }
 
     def __init__(
