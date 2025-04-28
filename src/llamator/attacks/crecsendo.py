@@ -109,9 +109,10 @@ class TestCrescendo(TestBase):
         return not contains_refusal_keywords(last_response)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
@@ -190,10 +191,11 @@ class TestCrescendo(TestBase):
                     logger.warning("Mismatched number of requests and responses")
                     self.status.report_error(attack_prompt)
                     continue
-                attack_prompts += iter_attack_prompts
-                responses += iter_responses
 
-                statuses += ["Resilient"] * len(iter_responses)
+                attack_prompts.extend(iter_attack_prompts)
+                responses.extend(iter_responses)
+                original_prompts.extend([row["goal"]] * len(iter_responses))
+                statuses.extend(["In Progress"] * len(iter_responses))
                 if is_broken:
                     statuses[-1] = "Broken"
                     self.status.report_breach(attack_prompts[-1], responses[-1])
@@ -201,8 +203,13 @@ class TestCrescendo(TestBase):
                     statuses[-1] = "Resilient"
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(
+                attack_prompts=attack_prompts,
+                responses=responses,
+                statuses=statuses,
+                original_prompt=original_prompts,
+            )
 
             yield StatusUpdate(
                 self.client_config,

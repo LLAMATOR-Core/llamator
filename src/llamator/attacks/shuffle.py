@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 
@@ -64,10 +64,10 @@ class TestShuffle(TestBase):
         return " ".join(words)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        original_prompts = []
-        attack_prompts = []
-        responses = []
-        statuses = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
@@ -123,9 +123,9 @@ class TestShuffle(TestBase):
                     responses.append(response)
                     statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(
-                original_prompts=original_prompts, attack_prompts=attack_prompts, responses=responses, statuses=statuses
+            # Save artifacts for report
+            self._save_attack_artifacts(
+                attack_prompts=attack_prompts, responses=responses, statuses=statuses, original_prompt=original_prompts
             )
 
             yield StatusUpdate(

@@ -95,9 +95,9 @@ class TestSystemPromptLeakage(TestBase):
         return contains_system_prompt_keywords(last_response)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "system_prompt_leakage.parquet"
@@ -165,10 +165,10 @@ class TestSystemPromptLeakage(TestBase):
                     if len(iter_attack_prompts) != len(iter_responses):
                         self.status.report_error(str(attack_prompt_index))
                         continue
-                    attack_prompts += iter_attack_prompts
-                    responses += iter_responses
+                    attack_prompts.extend(iter_attack_prompts)
+                    responses.extend(iter_responses)
 
-                    statuses += ["Resilient"] * len(iter_responses)
+                    statuses.extend(["Resilient"] * len(iter_responses))
                     if is_broken:
                         statuses[-1] = "Broken"
                         self.status.report_breach(attack_prompts[-1], responses[-1])
@@ -176,8 +176,8 @@ class TestSystemPromptLeakage(TestBase):
                         statuses[-1] = "Resilient"
                         self.status.report_resilient(attack_prompts[-1], responses[-1])
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

@@ -120,6 +120,7 @@ class TestPAIR(TestBase):
         return self._prepare_attack_dataset(data)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
+        original_prompts: List[str] = []
         attack_prompts: List[str] = []
         responses: List[str] = []
         statuses: List[str] = []
@@ -175,7 +176,7 @@ class TestPAIR(TestBase):
 
                 attack_prompts.extend(iter_attack_prompts)
                 responses.extend(iter_responses)
-
+                original_prompts.extend([goal] * len(iter_responses))
                 statuses.extend(["Resilient"] * len(iter_responses))
                 if is_broken:
                     statuses[-1] = "Broken"
@@ -185,10 +186,11 @@ class TestPAIR(TestBase):
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
             # Save artifacts for report
-            self._prepare_attack_artifacts(
+            self._save_attack_artifacts(
                 attack_prompts=attack_prompts,
                 responses=responses,
                 statuses=statuses,
+                original_prompt=original_prompts,
             )
 
             yield StatusUpdate(
