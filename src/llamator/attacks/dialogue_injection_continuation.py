@@ -17,7 +17,7 @@ from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
 
-from .dialogue_injection import build_emulation_prompt
+from .dialogue_injection_devmode import build_emulation_prompt
 
 
 logger = logging.getLogger(__name__)

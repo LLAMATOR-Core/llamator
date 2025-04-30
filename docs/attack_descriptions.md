@@ -61,15 +61,27 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 </details>
 
 <details>
-<summary><strong>Dialogue Injection</strong></summary>
+<summary><strong>Dialogue Injection: Continuation</strong></summary>
 
-In code name: `dialogue_injection`
+In code name: `dialogue_injection_continuation`
 
-Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique by using few-shot system prompting and unfinished assitant response at the end. Built according to the paper.
 
 _Original Paper: <https://arxiv.org/abs/2503.08195>_
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection_continuation.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Dialogue Injection: Developer mode</strong></summary>
+
+In code name: `dialogue_injection_devmode`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique to mislead the LLM with "Developer mode activation".
+
+_Original Paper: <https://arxiv.org/abs/2503.08195>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection_devmode.py">View code on GitHub</a>
 </details>
 
 <details>
