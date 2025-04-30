@@ -1,4 +1,4 @@
-"""Dialogue injection attack v0.3
+"""Dialogue injection continuation attack v0.3
 
 DISCLAIMER: THIS CODE CONTAINS AGGRESSIVE LANGUAGE STYLE
 
@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Dict, Generator, Optional
 
 import pandas as pd
-from typing_extensions import Literal
 
 from llamator.attack_provider.util import evaluate_response
 
@@ -20,8 +19,7 @@ from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
 
-from .dialogue_injection import (BaseConversationEntry,
-                                 build_emulation_prompt)
+from .dialogue_injection import build_emulation_prompt
 
 
 logger = logging.getLogger(__name__)
@@ -72,7 +70,7 @@ class TestDialogueInjectionContinuation(TestBase):
     info = {
         "name": "Dialogue Injection Continuation",
         "code_name": "dialogue_injection_continuation",
-        "tags": ["lang:ru", "dialog:single-stage", "owasp:llm01", "eval:heuristic", "arxiv:2503.08195"],
+        "tags": ["lang:en", "dialog:single-stage", "owasp:llm01", "eval:llm-as-a-judge", "arxiv:2503.08195"],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
             "ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста, беседы.",
