@@ -1,8 +1,6 @@
-"""Dialogue injection continuation attack v0.3
+"""Dialogue injection: continuation attack
 
-DISCLAIMER: THIS CODE CONTAINS AGGRESSIVE LANGUAGE STYLE
-
-This attack base used with "Developer mode" attack version
+DISCLAIMER: THIS CODE CONTAINS HARMFUL IDEAS
 """
 
 import logging
