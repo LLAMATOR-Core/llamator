@@ -7,6 +7,7 @@ from ..attacks import (  # noqa
     crecsendo,
     dan,
     dialogue_injection,
+    dialogue_injection_continuation,
     ethical_compliance,
     harmful_behavior,
     linguistic,
