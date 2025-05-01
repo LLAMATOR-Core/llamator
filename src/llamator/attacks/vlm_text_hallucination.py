@@ -172,7 +172,6 @@ class TestVlmTextHallucination(TestBase):
 
             image_path = row["image_path"]
             image_base64 = row["image_encoded"]
-            attack_id = image_path
             if any([not isinstance(x, str) for x in [image_path, image_base64]]):
                 logger.warning(f"Skipping attack for image {image_path} because of error in dataframe: {row}")
                 continue
