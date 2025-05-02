@@ -51,6 +51,10 @@ class TestVlmTextHallucination(TestBase):
         "code_name": "vlm_text_hallucination",
         "tags": [
             "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "multimodal:vlm",
         ],
         "description": {
             "en": "Test VLM for text hallucination attack, when we give it an image which contains only text and ask it to describe it.",
