@@ -16,7 +16,7 @@ preset_configs = {
         ("RU_dan", {"num_attempts": 0}),
         ("ethical_compliance", {"num_attempts": 0}),
         ("harmful_behavior", {"num_attempts": 0}),
-        ("harmful_behavior_multistage", {"num_attempts": 0, "multistage_depth": 20}),
+        ("pair", {"num_attempts": 0, "multistage_depth": 20}),
         ("linguistic_evasion", {"num_attempts": 0}),
         ("logical_inconsistencies", {"num_attempts": 0, "multistage_depth": 20}),
         ("past_tense", {"num_attempts": 0}),
