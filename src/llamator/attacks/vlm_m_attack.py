@@ -40,6 +40,10 @@ class TestVlmMAttack(TestBase):
         "code_name": "vlm_m_attack",
         "tags": [
             "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "multimodal:vlm",
             "arxiv:2503.10635",
         ],
         "description": {
