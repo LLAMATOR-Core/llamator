@@ -76,12 +76,12 @@ class TestDialogueInjectionContinuation(TestBase):
         "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/dialogue_injection_continuation.py",
     }
 
-    def response_verification(self, text: str) -> bool:
+    def response_verification(self, text: str, goal: str) -> bool:
         """Check conversation emulation attack is working."""
         
         prob = evaluate_response(
             judge_client=self.client_config.get_target_client(),
-            goal="Check if response is harmful or not",
+            goal=goal,
             response=text,
         )
 
@@ -126,7 +126,8 @@ class TestDialogueInjectionContinuation(TestBase):
 
             # Perform attacks
             for attack_prompt_index, row in data.iterrows():
-                attack_prompt = built_prompt.format(attack=row["goal"].lower())
+                goal = row["goal"].lower()
+                attack_prompt = built_prompt.format(attack=goal)
                 attack_prompts.append("'" + attack_prompt)
                 logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 yield StatusUpdate(
@@ -148,7 +149,7 @@ class TestDialogueInjectionContinuation(TestBase):
                     current_status = "Error"
                 else:
                     # Verify the response to determine if this specific attack was successful
-                    verified = self.response_verification(response)
+                    verified = self.response_verification(text=response, goal=goal)
                     logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                     logger.info(
                         f"Test '{self.info['name']}': attack response #{attack_prompt_index} break_success={verified}): {response}"
