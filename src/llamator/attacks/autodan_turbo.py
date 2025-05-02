@@ -511,7 +511,7 @@ class TestAutoDanTurbo(TestBase):
                 self._update_strategy_library(successful_attacks)
 
             # Save artifacts for report
-            self._save_attack_artifacts(
+            self._prepare_attack_artifacts(
                 attack_prompts=attack_prompts,
                 responses=responses,
                 statuses=statuses,
