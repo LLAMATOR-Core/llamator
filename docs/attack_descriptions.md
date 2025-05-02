@@ -274,3 +274,15 @@ _Original Paper: <https://arxiv.org/abs/2310.13548>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a>
 </details>
+
+<details>
+<summary><strong>M-Attack for VLM</strong></summary>
+
+In code name: `vlm_m_attack`
+
+Test VLM for M-Attack, which adds noise to the image to make VLM see it as a different image.
+
+_Original Paper: <https://arxiv.org/abs/2503.10635>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_m_attack.py">View code on GitHub</a>
+</details>
