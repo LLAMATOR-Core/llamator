@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from .langchain_integration import get_langchain_chat_models_info
 
@@ -33,7 +33,7 @@ class ClientBase(ABC):
     model_description: Optional[str] = None
 
     @abstractmethod
-    def interact(self, history: List[Dict[str, str]], messages: List[Dict[str, str]]) -> Dict[str, str]:
+    def interact(self, history: List[Dict[str, str]], messages: List[Dict[str, Any]]) -> Dict[str, str]:
         """
         Takes the conversation history and new messages, sends them to the LLM, and returns a new response.
 
