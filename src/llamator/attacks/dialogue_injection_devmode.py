@@ -93,14 +93,14 @@ class TestDialogueInjection(TestBase):
     """
 
     info = {
-        "name": "Dialogue Injection",
-        "code_name": "dialogue_injection",
+        "name": "Dialogue Injection Developer Mode",
+        "code_name": "dialogue_injection_devmode",
         "tags": ["lang:ru", "dialog:single-stage", "owasp:llm01", "eval:heuristic", "arxiv:2503.08195"],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
             "ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста, беседы.",
         },
-        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/dialogue_injection.py",
+        "github_link": "https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/dialogue_injection_devmode.py",
     }
 
     @staticmethod
