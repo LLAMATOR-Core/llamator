@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+import pymupdf as fitz
 from PIL import Image, ImageDraw, ImageFont
 
 logger = logging.getLogger(__name__)
@@ -86,3 +87,29 @@ def lines2images(
         img.save(fname)
         logger.info(f"Saved image '{fname.name}'")
     logger.info(f"Created {len(words)} images for '{words_file.stem}'")
+
+
+def page2image(page: fitz.Page, rescale: float = 1.0, default_dpi: int = 72) -> Image.Image:
+    # Convert page to pixmap
+    new_dpi = int(default_dpi * rescale)
+    pix = page.get_pixmap(dpi=new_dpi)  # pyright: ignore
+
+    # Convert pixmap to PIL Image
+    img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
+
+    # Resize image to original size
+    img = img.resize((int(pix.width / rescale), int(pix.height / rescale)))
+    return img
+
+
+def pdf2images(
+    path: Path, is_long_flag: bool = False, rescale: float = 1.0, idxs: Optional[List[int]] = None
+) -> List[Image.Image]:
+    doc = fitz.open(path)
+    images = []
+    range_len = min(10, doc.page_count) if is_long_flag else doc.page_count
+    for idx in idxs or range(range_len):
+        page = doc.load_page(idx)
+        img = page2image(page, rescale=rescale)
+        images.append(img)
+    return images
