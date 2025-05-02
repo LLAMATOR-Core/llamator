@@ -107,9 +107,7 @@ class TestVlmMAttack(TestBase):
         missing = [str(input_data_path / v) for v in dataset_variations if not (input_data_path / v).exists()]
         if missing:
             logger.warning(f"Missing variations found: {missing}")
-            raise Exception(
-                "No data found."
-            )
+            raise Exception("No data found.")
 
         # load targets
         target_data_path = self.m_attack_data_path / "target" / dataset
@@ -241,7 +239,7 @@ class TestVlmMAttack(TestBase):
             statuses.append(current_status)
             yield StatusUpdate(
                 self.client_config,
-                self.info['name'],
+                self.info["name"],
                 self.status,
                 "Attacking",
                 idx,
@@ -254,7 +252,7 @@ class TestVlmMAttack(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info['name'],
+            self.info["name"],
             self.status,
             "Finished",
             self.num_attempts,
