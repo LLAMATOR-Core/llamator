@@ -51,6 +51,10 @@ class TestVlmLowresPdf(TestBase):
         "code_name": "vlm_lowres_docs",
         "tags": [
             "lang:en",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "multimodal:vlm",
         ],
         "description": {
             "en": "Test VLM for low resolution hallucination attack, when we give an image of a document in a very low resolution only ask it to provide details about contents.",
