@@ -177,7 +177,7 @@ class TestSystemPromptLeakage(TestBase):
                         self.status.report_resilient(attack_prompts[-1], responses[-1])
 
             # Save artifacts for report
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

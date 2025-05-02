@@ -154,7 +154,7 @@ class TestBase(ABC):
             .reset_index(drop=True)
         )
 
-    def _prepare_attack_artifacts(
+    def _save_attack_artifacts(
         self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
     ) -> None:
         """
@@ -204,7 +204,7 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+        self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],

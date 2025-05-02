@@ -178,7 +178,7 @@ class TestEthicalCompliance(TestBase):
                 statuses.append(current_status)
 
             # Save artifacts for report
-            self._prepare_attack_artifacts(
+            self._save_attack_artifacts(
                 attack_prompts=attack_prompts, responses=responses, statuses=statuses, original_prompt=original_prompts
             )
 

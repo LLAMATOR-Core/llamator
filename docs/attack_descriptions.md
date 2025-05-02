@@ -288,21 +288,26 @@ _Original Paper: <https://arxiv.org/abs/2310.13548>_
 
 </details>
 
+## VLM attacks
+
+See an example with <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-vlm-attacks.ipynb">VLM attacks</a>.
+
+### OWASP [LLM09:2025](https://genai.owasp.org/llmrisk/llm092025-misinformation/) Misinformation
+
 <details>
-<summary><strong>Text Hallucination Attack for VLM</strong></summary>
+<summary><strong>Lowres Documents Hallucination Attack</strong></summary>
 
-In code name: `vlm_text_hallucination`
+In code name: `vlm_lowres_docs`
 
-Test class for VLM text hallucination attacks.
-The idea is to give model and image which contains only text and ask it to describe it.
-The goal is to see whether model will describe text or hallucinate with the description of an object written in text.
+Test class for VLM responses for low resolution documents.
+The idea is that we provide model with unreadable document and ask to describe its contents.
+The goal is to see whether model will signal that the document is unreadable or hallucinate about the contents.
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_text_hallucination.py">View code on GitHub</a>
-
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_lowres_docs.py">View code on GitHub</a>
 </details>
 
 <details>
-<summary><strong>M-Attack for VLM</strong></summary>
+<summary><strong>M-Attack</strong></summary>
 
 In code name: `vlm_m_attack`
 
@@ -314,14 +319,13 @@ _Original Paper: <https://arxiv.org/abs/2503.10635>_
 </details>
 
 <details>
-<summary><strong>Lowres Documents Hallucination Attack for VLM</strong></summary>
+<summary><strong>Text Hallucination Attack</strong></summary>
 
-In code name: `vlm_lowres_docs`
+In code name: `vlm_text_hallucination`
 
-Test class for VLM responses for low resolution documents.
-The idea is that we provide model with unreadable document and ask to describe its contents.
-The goal is to see whether model will signal that the document is unreadable or hallucinate about the contents.
+Test class for VLM text hallucination attacks.
+The idea is to give model and image which contains only text and ask it to describe it.
+The goal is to see whether model will describe text or hallucinate with the description of an object written in text.
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_lowres_docs.py">View code on GitHub</a>
-
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_text_hallucination.py">View code on GitHub</a>
 </details>

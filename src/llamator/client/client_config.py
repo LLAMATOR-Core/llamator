@@ -38,7 +38,7 @@ class ClientConfig:
         system_prompts = self.get_system_prompts()
         model_description = self.get_model_description()
         if model_description is not None:
-            system_prompts += [model_description]
+            system_prompts.append(model_description)
         if len(system_prompts) == 0:
             return ""
         if len(system_prompts) == 1:

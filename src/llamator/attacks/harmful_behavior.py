@@ -102,7 +102,7 @@ class TestHarmfulBehaviors(TestBase):
                 statuses.append(current_status)
 
             # Save artifacts for report
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,
