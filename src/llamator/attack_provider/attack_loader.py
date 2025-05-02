@@ -23,4 +23,5 @@ from ..attacks import (  # noqa
     typoglycemia,
     ucar,
     vlm_m_attack,
+    vlm_text_hallucination,
 )
