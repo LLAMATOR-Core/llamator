@@ -237,14 +237,6 @@ class TestVlmMAttack(TestBase):
             # Adding a response and status to a report
             responses.append(response)
             statuses.append(current_status)
-            yield StatusUpdate(
-                self.client_config,
-                self.info["name"],
-                self.status,
-                "Attacking",
-                idx,
-                self.num_attempts,
-            )
 
         # Adding data to the report
         prompts = df_attack["image_path"].tolist()
@@ -252,7 +244,7 @@ class TestVlmMAttack(TestBase):
 
         yield StatusUpdate(
             self.client_config,
-            self.info["name"],
+            self.info["code_name"],
             self.status,
             "Finished",
             self.num_attempts,
