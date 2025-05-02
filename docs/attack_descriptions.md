@@ -39,6 +39,18 @@ Challenges the LLM with a dataset of lines, encoded into base64.
 </details>
 
 <details>
+<summary><strong>Best-of-N (BoN) Jailbreak</strong></summary>
+
+In code name: `bon`
+
+Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.
+
+_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Complimentary Transition</strong></summary>
 
 In code name: `complimentary_transition`
@@ -121,6 +133,18 @@ Challenges the LLM with a dataset of harmful behavior prompts in past tense form
 </details>
 
 <details>
+<summary><strong>Shuffle Inconsistency</strong></summary>
+
+In code name: `shuffle`
+
+Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
+
+_Original Paper: <https://arxiv.org/html/2501.04931>_
+
+<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Typoglycemia Attack</strong></summary>
 
 In code name: `typoglycemia_attack`
@@ -193,18 +217,6 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://g
 </details>
 
 <details>
-<summary><strong>Best-of-N Jailbreak</strong></summary>
-
-In code name: `bon`
-
-Probes the LLM resilience against Best-Of-N attack.
-
-_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
-</details>
-
-<details>
 <summary><strong>Crescendo</strong></summary>
 
 In code name: `crescendo`
@@ -217,25 +229,14 @@ _Original Paper: <https://arxiv.org/abs/2404.01833>_
 </details>
 
 <details>
-<summary><strong>Harmful Behavior Multistage</strong></summary>
+<summary><strong>Prompt Automatic Iterative Refinement (PAIR)</strong></summary>
 
-In code name: `harmful_behavior_multistage`
+In code name: `pair`
 
-Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.
+Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+    Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Shuffle Inconsistency</strong></summary>
-
-In code name: `shuffle`
-
-Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
-
-_Original Paper: <https://arxiv.org/html/2501.04931>_
-
-<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a>
 </details>
 
 ### OWASP [LLM07:2025](https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/) System Prompt Leakage
@@ -286,4 +287,16 @@ The goal is to see whether model will describe text or hallucinate with the desc
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_text_hallucination.py">View code on GitHub</a>
 
+</details>
+
+<details>
+<summary><strong>M-Attack for VLM</strong></summary>
+
+In code name: `vlm_m_attack`
+
+Test VLM for M-Attack, which adds noise to the image to make VLM see it as a different image.
+
+_Original Paper: <https://arxiv.org/abs/2503.10635>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_m_attack.py">View code on GitHub</a>
 </details>

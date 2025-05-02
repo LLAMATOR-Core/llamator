@@ -9,9 +9,9 @@ from ..attacks import (  # noqa
     dialogue_injection,
     ethical_compliance,
     harmful_behavior,
-    harmful_behavior_multistage,
     linguistic,
     logical_inconsistencies,
+    pair,
     past_tense,
     ru_dan,
     ru_typoglycemia,
@@ -22,5 +22,6 @@ from ..attacks import (  # noqa
     system_prompt_leakage,
     typoglycemia,
     ucar,
+    vlm_m_attack,
     vlm_text_hallucination,
 )

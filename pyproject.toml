@@ -42,6 +42,8 @@ known_third_party = [ # Most popular libraries. Extend if necessary.
     'torchvision',
     'tqdm',
     'typer',
+    'huggingface_hub',
+    'datasets',
 ]
 skip_gitignore = true
 

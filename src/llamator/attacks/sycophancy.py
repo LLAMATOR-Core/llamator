@@ -170,6 +170,7 @@ class TestSycophancy(TestBase):
                 iter_attack_prompts = [response["content"] for response in dialog_session.get_attacker_responses()]
                 iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
                 if len(iter_attack_prompts) != len(iter_responses):
+                    logger.warning("Mismatched number of requests and responses")
                     self.status.report_error(str(attack_attempt_index))
                     continue
                 attack_prompts += iter_attack_prompts
