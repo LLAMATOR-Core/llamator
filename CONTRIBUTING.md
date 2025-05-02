@@ -11,7 +11,7 @@ This document provides guidelines and instructions for contributing to this proj
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Python 3.10
+- Python 3.10 or 3.11
 - Git
 
 ### Setting Up Your Development Environment
@@ -159,11 +159,15 @@ from ..attacks import (
 )
 ```
 
-### 4. Test Your Attack
+### 4. Add Your Attack to Documentation
+
+Add info about your attack to `docs/attack_descriptions.md`, observing the structure and alphabetical order.
+
+### 5. Test Your Attack
 
 Run your attack locally using your test setup to verify it works as intended.
 
-### 5. Open a Pull Request
+### 6. Open a Pull Request
 
 Submit your changes for review by opening a pull request to the `main` branch.
 
