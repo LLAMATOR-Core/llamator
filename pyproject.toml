@@ -17,6 +17,7 @@ known_third_party = [ # Most popular libraries. Extend if necessary.
     'editdistance',
     'fastapi',
     'fire',
+    'gitpython',
     'hydra',
     'joblib',
     'loguru',

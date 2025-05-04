@@ -162,7 +162,7 @@ class TestDeceptiveDelight(TestBase):
                     self.status.report_resilient(third_turn, response)
 
             # Save artifacts for report
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

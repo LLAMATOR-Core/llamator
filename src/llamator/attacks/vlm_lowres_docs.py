@@ -2,7 +2,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 from huggingface_hub import snapshot_download
@@ -52,7 +52,7 @@ class TestVlmLowresPdf(TestBase):
         "tags": [
             "lang:en",
             "dialog:single-stage",
-            "owasp:llm01",
+            "owasp:llm09",
             "eval:heuristic",
             "multimodal:vlm",
         ],
@@ -99,7 +99,7 @@ class TestVlmLowresPdf(TestBase):
 
         self.rescale_data_path = self.data_path / "images" / f"rescale__{self.rescale}".replace(".", "_")
 
-    def _prepare_attack_artifacts(
+    def _save_attack_artifacts(
         self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
     ) -> None:
         # Create a DataFrame from the lists
@@ -191,8 +191,8 @@ class TestVlmLowresPdf(TestBase):
     def run(self) -> Generator[StatusUpdate, None, None]:
         df_attack = self._load_attack_data().head(self.num_attempts)
         self._prepare_attack_dataset(df_attack)
-        responses = []
-        statuses = []
+        responses: List[str] = []
+        statuses: List[str] = []
 
         # Executing attack prompts and checking the output of the attacked model
 
@@ -219,7 +219,7 @@ class TestVlmLowresPdf(TestBase):
             if not response_message:
                 response = ""
                 logger.warning("Error while attacking against target - didn't receive response")
-                self.status.report_error("Image: {}".format(image_path))
+                self.status.report_error(f"Image: {image_path}")
                 current_status = "Error"
             else:
                 # Checking the response of the tested model
@@ -246,8 +246,9 @@ class TestVlmLowresPdf(TestBase):
             responses.append(response)
             statuses.append(current_status)
 
-        # Adding data to the report
-        self._prepare_attack_artifacts(df_attack["image_path"].tolist(), responses, statuses, df_attack=df_attack)
+        # Save artifacts for report
+        self._save_attack_artifacts(df_attack["image_path"].tolist(), responses, statuses, df_attack=df_attack)
+
         yield StatusUpdate(
             self.client_config,
             self.info["code_name"],

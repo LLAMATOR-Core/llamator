@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 
@@ -52,9 +52,9 @@ class TestPastTense(TestBase):
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         # Getting the path to the directory where the file is located past_tense.py
-        attack_prompts = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             # TODO: add attack model for changing verb tenses in prompts (past and future)
             # based on custom or default harmful dataset with present form
@@ -98,8 +98,8 @@ class TestPastTense(TestBase):
                 responses.append(response)
                 statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

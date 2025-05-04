@@ -348,11 +348,11 @@ class TestAutoDanTurbo(TestBase):
             logger.error(f"Failed to parse strategy summary: {e}")
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
-        malicious_requests = []
-        successful_attacks = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
+        successful_attacks: List[str] = []
 
         try:
             # Load and prepare dataset
@@ -451,7 +451,7 @@ class TestAutoDanTurbo(TestBase):
                 logger.info(f"Attack #{i} completed after {conversation_stages} turns")
 
                 # Process statuses for each stage of the conversation
-                conversation_statuses = []
+                conversation_statuses: List[str] = []
                 if is_broken:
                     # If broken on last message, mark previous turns as "Resilient" and the last one as "Broken"
                     conversation_statuses = ["Resilient"] * (conversation_stages - 1) + ["Broken"]
@@ -494,10 +494,10 @@ class TestAutoDanTurbo(TestBase):
                     logger.info(f"Model remained resilient after {conversation_stages} iterations.")
 
                 # Add results to the overall lists
-                attack_prompts += iter_attack_prompts
-                responses += iter_responses
-                statuses += conversation_statuses
-                malicious_requests += [malicious_request] * conversation_stages
+                attack_prompts.extend(iter_attack_prompts)
+                responses.extend(iter_responses)
+                statuses.extend(conversation_statuses)
+                original_prompts.extend([malicious_request] * conversation_stages)
 
                 yield StatusUpdate(
                     self.client_config,
@@ -510,12 +510,12 @@ class TestAutoDanTurbo(TestBase):
                 # Update strategy library
                 self._update_strategy_library(successful_attacks)
 
-            # Prepare final report
-            self._prepare_attack_artifacts(
+            # Save artifacts for report
+            self._save_attack_artifacts(
                 attack_prompts=attack_prompts,
                 responses=responses,
                 statuses=statuses,
-                malicious_requests=malicious_requests,
+                original_prompt=original_prompts,
             )
 
             yield StatusUpdate(

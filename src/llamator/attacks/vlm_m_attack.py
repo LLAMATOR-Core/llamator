@@ -41,7 +41,7 @@ class TestVlmMAttack(TestBase):
         "tags": [
             "lang:en",
             "dialog:single-stage",
-            "owasp:llm01",
+            "owasp:llm09",
             "eval:heuristic",
             "multimodal:vlm",
             "arxiv:2503.10635",
@@ -84,7 +84,7 @@ class TestVlmMAttack(TestBase):
         )
         self.m_attack_data_path = self.attack_data_base / "vlm_m_attack"
 
-    def _prepare_attack_artifacts(
+    def _save_attack_artifacts(
         self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
     ) -> None:
         df_attack = kwargs.get("df_attack")
@@ -187,9 +187,8 @@ class TestVlmMAttack(TestBase):
                 )
 
         df_attack = self._prepare_attack_dataset(df_attack)
-
-        responses = []
-        statuses = []
+        responses: List[str] = []
+        statuses: List[str] = []
 
         for idx, row in df_attack.iterrows():
             yield StatusUpdate(
@@ -216,7 +215,7 @@ class TestVlmMAttack(TestBase):
             if not response_message:
                 response = ""
                 logger.warning("Error while attacking against target - didn't receive response")
-                self.status.report_error("Image: {}".format(image_path))
+                self.status.report_error(f"Image: {image_path}")
                 current_status = "Error"
             else:
                 # Checking the response of the tested model
@@ -238,9 +237,9 @@ class TestVlmMAttack(TestBase):
             responses.append(response)
             statuses.append(current_status)
 
-        # Adding data to the report
+        # Save artifacts for report
         prompts = df_attack["image_path"].tolist()
-        self._prepare_attack_artifacts(prompts, responses, statuses, df_attack=df_attack)
+        self._save_attack_artifacts(prompts, responses, statuses, df_attack=df_attack)
 
         yield StatusUpdate(
             self.client_config,

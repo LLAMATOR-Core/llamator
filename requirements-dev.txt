@@ -39,6 +39,7 @@ huggingface_hub==0.30.1
 datasets==3.5.0
 pyarrow==19.0.1
 pymupdf==1.25.5
+GitPython==3.1.44
 
 # Publish package
 build==1.2.2

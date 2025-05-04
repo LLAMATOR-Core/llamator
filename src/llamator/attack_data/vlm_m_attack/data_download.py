@@ -1,12 +1,11 @@
 import logging
 import os
 import shutil
-import subprocess
 from pathlib import Path
 from typing import List
 
-import requests
 from datasets import load_dataset
+from git import Repo
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +31,6 @@ class MAttackDataPreparator:
             self._download_from_github()
         except Exception as e:
             logger.warning(f"GitHub repo unavailable: {e}")
-            logger.info("Falling back to Google Drive.")
-            # self._download_from_google_drive()
-            logger.error(f"Can't download from google this time, consider downloading manually.")
 
     def _download_images(self, variations: List[str], limit: int):
         logger.info("Downloading images from Hugging Face...")
@@ -67,7 +63,7 @@ class MAttackDataPreparator:
     def _download_from_github(self):
         logger.info("Attempting to download target files from GitHub...")
         if not self.clone_path.exists():
-            subprocess.run(["git", "clone", self.github_repo, str(self.clone_path)], check=True)
+            Repo.clone_from(self.github_repo, str(self.clone_path))
 
         target_src = self.clone_path / "resources" / "images" / "target_images" / self.target_subfolder
         target_dst = self.base_path / "target" / self.dataset
@@ -80,31 +76,3 @@ class MAttackDataPreparator:
         shutil.copyfile(self.clone_path / "README.md", self.base_path / "README.md")
         shutil.rmtree(self.clone_path)
         logger.info("GitHub clone cleaned up.")
-
-    def _download_from_google_drive(self):
-        os.makedirs(os.path.dirname(self.gdrive_zip_path), exist_ok=True)
-        if not os.path.exists(self.gdrive_zip_path):
-            self._download_file_from_google_drive(self.gdrive_zip_path, self.gdrive_file_id)
-
-        shutil.unpack_archive(self.gdrive_zip_path, self.base_path.parent)
-        logger.info(f"Extracted fallback ZIP to {self.base_path.parent}")
-
-    def _download_file_from_google_drive(self, dest_path: str, file_id: str):
-        session = requests.Session()
-        response = session.get(self.google_url, params={"id": file_id}, stream=True)
-        token = self._get_confirm_token(response)
-
-        if token:
-            params = {"id": file_id, "confirm": token}
-            response = session.get(self.google_url, params=params, stream=True)
-
-        with open(dest_path, "wb") as f:
-            for chunk in response.iter_content(32768):
-                if chunk:
-                    f.write(chunk)
-
-    def _get_confirm_token(self, response):
-        for key, value in response.cookies.items():
-            if key.startswith("download_warning"):
-                return value
-        return None

@@ -52,7 +52,7 @@ class TestVlmTextHallucination(TestBase):
         "tags": [
             "lang:en",
             "dialog:single-stage",
-            "owasp:llm01",
+            "owasp:llm09",
             "eval:heuristic",
             "multimodal:vlm",
         ],
@@ -91,7 +91,7 @@ class TestVlmTextHallucination(TestBase):
         self.attack_types = attack_types or list(AVAILABLE_TEXT_HALLUCINATION_ATTACKS.__args__)
         self.data_path = Path(__file__).parents[1] / "attack_data/text_image"
 
-    def _prepare_attack_artifacts(
+    def _save_attack_artifacts(
         self,
         attack_prompts: list[str],
         responses: list[str],
@@ -160,8 +160,8 @@ class TestVlmTextHallucination(TestBase):
     def run(self) -> Generator[StatusUpdate, None, None]:
         df_attack = self._load_attack_data(self.attack_types).head(self.num_attempts)  # pyright: ignore
         df_attack = self._prepare_attack_dataset(df_attack)
-        responses = []
-        statuses = []
+        responses: List[str] = []
+        statuses: List[str] = []
 
         for idx, row in df_attack.iterrows():
             yield StatusUpdate(
@@ -186,7 +186,7 @@ class TestVlmTextHallucination(TestBase):
             if not response_message:
                 response = ""
                 logger.warning("Error while attacking against target - didn't receive response")
-                self.status.report_error("Image: {}".format(image_path))
+                self.status.report_error(f"Image: {image_path}")
                 current_status = "Error"
             else:
                 yield StatusUpdate(
@@ -224,8 +224,8 @@ class TestVlmTextHallucination(TestBase):
             responses.append(response)
             statuses.append(current_status)
 
-        # Adding data to the report
-        self._prepare_attack_artifacts(df_attack["attack_text"].tolist(), responses, statuses, df_attack=df_attack)
+        # Save artifacts for report
+        self._save_attack_artifacts(df_attack["attack_text"].tolist(), responses, statuses, df_attack=df_attack)
 
         yield StatusUpdate(
             self.client_config,

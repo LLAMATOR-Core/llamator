@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 
@@ -53,9 +53,9 @@ class TestHarmfulBehaviors(TestBase):
         self.custom_dataset = custom_dataset
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
@@ -101,8 +101,8 @@ class TestHarmfulBehaviors(TestBase):
                 responses.append(response)
                 statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,
