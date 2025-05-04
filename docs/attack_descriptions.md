@@ -61,6 +61,16 @@ Evaluates the LLM's ability to maintain content moderation standards when transi
 </details>
 
 <details>
+<summary><strong>Deceptive Delight</strong></summary>
+
+In code name: `deceptive_delight`
+
+Tests LLM's vulnerability to distraction and context manipulation by embedding unsafe content alongside benign topics in three messages.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/deceptive_delight.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Dialogue Injection: Continuation</strong></summary>
 
 In code name: `dialogue_injection_continuation`
