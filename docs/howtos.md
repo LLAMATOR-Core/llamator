@@ -7,6 +7,7 @@
 * 💬 [Telegram bot testing via Telethon](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb)
 * 📱 [WhatsApp bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb)
 * 🔗 [LangChain client testing with custom attack](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
+* 📷 [Vision Model testing via LangChain](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-vlm-attacks.ipynb)
 * 🐋 [Running LLAMATOR in Docker](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 
 ## Installation Guide
