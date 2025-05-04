@@ -1,6 +1,6 @@
 # ![LLAMATOR](assets/LLAMATOR.svg)
 
-Red Teaming python-framework for testing chatbots and LLM systems
+Red Teaming python-framework for testing chatbots and GenAI systems
 
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC_BY--NC--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/llamator)](https://pypi.org/project/llamator)
@@ -33,6 +33,7 @@ Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-
 * 💬 [Telegram bot testing via Telethon](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb)
 * 📱 [WhatsApp bot testing via Selenium](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb)
 * 🔗 [LangChain client testing with custom attack](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb)
+* 📷 [Vision Model testing via LangChain](https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-vlm-attacks.ipynb)
 * 🐋 [Running LLAMATOR in Docker](https://github.com/LLAMATOR-Core/llamator/blob/release/docker)
 
 
@@ -44,8 +45,8 @@ Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-
 
 ## Unique Features 🌟
 
-* ️🗡 Support for custom attacks from the user
-* 👜 Large selection of attacks on RAG / Agent / Prompt in English and Russian
+* ️🗡 Support for custom attacks and datasets from the user
+* 👜 Large selection of attacks on LLMs, RAGs, Agents, VLMs in English and Russian
 * 🛡 Custom configuration of chat clients
 * 📊 History of attack requests and responses in Excel and CSV format
 * 📄 Test report document in DOCX format
