@@ -11,7 +11,7 @@ This document provides guidelines and instructions for contributing to this proj
 ### Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Python 3.10 or 3.11
+- Python 3.9, 3.10, or 3.11
 - Git
 
 ### Setting Up Your Development Environment
