@@ -51,16 +51,6 @@ _Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://git
 </details>
 
 <details>
-<summary><strong>Complimentary Transition</strong></summary>
-
-In code name: `complimentary_transition`
-
-Evaluates the LLM's ability to maintain content moderation standards when transitioning from a compliment to a new task. It assesses the LLM's ability to maintain defined boundaries when prompted to switch topics.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/complimentary_transition.py">View code on GitHub</a>
-</details>
-
-<details>
 <summary><strong>Deceptive Delight</strong></summary>
 
 In code name: `deceptive_delight`
@@ -164,26 +154,6 @@ Attempts to bypass LLM's defense mechanism by randomly shuffling elements in inp
 _Original Paper: <https://arxiv.org/html/2501.04931>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Typoglycemia Attack</strong></summary>
-
-In code name: `typoglycemia_attack`
-
-Attempts to exploit a text processing vulnerability in LLMs that can cause incorrect responses by removing random characters from words.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/typoglycemia.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Typoglycemia Attack (RU)</strong></summary>
-
-In code name: `RU_typoglycemia_attack`
-
-Attempts to exploit a text processing vulnerability in Russian-language LLMs that can cause incorrect responses by removing random characters from words.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py">View code on GitHub</a>
 </details>
 
 <details>
