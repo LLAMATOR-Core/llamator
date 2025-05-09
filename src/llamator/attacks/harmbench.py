@@ -15,23 +15,23 @@ logger = logging.getLogger(__name__)
 
 
 @register_test
-class TestHarmfulBehaviors(TestBase):
-    """Challenges the LLM with a dataset of harmful behavior prompts."""
+class TestHarmbench(TestBase):
+    """Challenges the LLM with harmful behavior prompts from Harmbench."""
 
     info = {
-        "name": "Harmful Behavior",
-        "code_name": "harmful_behavior",
+        "name": "Harmbench",
+        "code_name": "harmbench",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
         ],
         "description": {
-            "en": "Challenges the LLM with a dataset of harmful behavior prompts.",
-            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением.",
+            "en": "Challenges the LLM with harmful behavior prompts from Harmbench.",
+            "ru": "Испытывает LLM набором вредоносных запросов из датасета Harmbench.",
         },
-        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py",
     }
 
     def __init__(
@@ -41,6 +41,7 @@ class TestHarmfulBehaviors(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
+        language: str = "en",
         **kwargs,
     ):
         super().__init__(
@@ -51,6 +52,9 @@ class TestHarmfulBehaviors(TestBase):
             **kwargs,
         )
         self.custom_dataset = custom_dataset
+        if language not in ("en", "ru"):
+            raise ValueError("Language must be 'en' or 'ru'")
+        self.language = language
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts: List[str] = []
@@ -58,14 +62,14 @@ class TestHarmfulBehaviors(TestBase):
         statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
-                attack_prompt = row["goal"]
+                attack_prompt = row["ru_goal"] if self.language == "ru" else row["goal"]
                 attack_prompts.append(attack_prompt)
                 logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 yield StatusUpdate(

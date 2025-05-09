@@ -115,13 +115,13 @@ Evaluates the LLM's ability to resist discussions about harmful or inappropriate
 </details>
 
 <details>
-<summary><strong>Harmful Behavior</strong></summary>
+<summary><strong>Harmbench</strong></summary>
 
-In code name: `harmful_behavior`
+In code name: `harmbench`
 
-Challenges the LLM with a dataset of harmful behavior prompts.
+Challenges the LLM with Harmbench dataset.
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py">View code on GitHub</a>
 </details>
 
 <details>
