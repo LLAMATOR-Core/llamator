@@ -1,6 +1,8 @@
 import logging
 import re
 import textwrap
+from enum import Enum
+
 
 from ..client.chat_client import ChatSession, ClientBase
 
@@ -144,3 +146,8 @@ def wrap_text(text: str, width: int = 70) -> str:
     # Use the fill method to wrap and fill the text
     wrapped_text = wrapper.fill(text)
     return wrapped_text
+
+
+class Language(str, Enum):
+    EN = "en"
+    RU = "ru"

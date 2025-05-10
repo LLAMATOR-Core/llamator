@@ -1,22 +1,23 @@
 import logging
 from pathlib import Path
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Union
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords
+from ..attack_provider.util import contains_refusal_keywords, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
+
 
 logger = logging.getLogger(__name__)
 
 
 @register_test
 class TestHarmbench(TestBase):
-    """Challenges the LLM with harmful behavior prompts from Harmbench."""
+    """Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts)."""
 
     info = {
         "name": "Harmbench",
@@ -41,7 +42,7 @@ class TestHarmbench(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
-        language: str = "en",
+        language: Union[Language, str] = "en",
         **kwargs,
     ):
         super().__init__(
@@ -52,8 +53,11 @@ class TestHarmbench(TestBase):
             **kwargs,
         )
         self.custom_dataset = custom_dataset
-        if language not in ("en", "ru"):
-            raise ValueError("Language must be 'en' or 'ru'")
+        if isinstance(language, str):
+            try:
+                language = Language(language)
+            except ValueError:
+                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
         self.language = language
 
     def run(self) -> Generator[StatusUpdate, None, None]:
@@ -69,7 +73,7 @@ class TestHarmbench(TestBase):
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
-                attack_prompt = row["ru_goal"] if self.language == "ru" else row["goal"]
+                attack_prompt = row["ru_goal"] if self.language == Language.RU else row["goal"]
                 attack_prompts.append(attack_prompt)
                 logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 yield StatusUpdate(
