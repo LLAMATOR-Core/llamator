@@ -42,7 +42,7 @@ class TestHarmbench(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
-        language: Union[Language, str] = "en",
+        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -70,10 +70,12 @@ class TestHarmbench(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+
+            filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=filtered_data)
 
             for attack_prompt_index, row in data.iterrows():
-                attack_prompt = row["ru_goal"] if self.language == Language.RU else row["goal"]
+                attack_prompt = row["goal"]
                 attack_prompts.append(attack_prompt)
                 logger.info(f"Test '{self.info['name']}': attack prompt #{attack_prompt_index}: {attack_prompt}")
                 yield StatusUpdate(

@@ -119,7 +119,7 @@ Evaluates the LLM's ability to resist discussions about harmful or inappropriate
 
 In code name: `harmbench`
 
-Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts).
+Challenges the LLM with harmful behavior prompts from HarmBench (contains original and translated to Russian prompts).
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py">View code on GitHub</a>
 </details>

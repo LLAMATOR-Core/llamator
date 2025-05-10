@@ -149,5 +149,6 @@ def wrap_text(text: str, width: int = 70) -> str:
 
 
 class Language(str, Enum):
+    ANY = "any"
     EN = "en"
     RU = "ru"
