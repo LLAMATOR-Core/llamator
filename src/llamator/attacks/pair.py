@@ -115,7 +115,7 @@ class TestPAIR(TestBase):
         if self.custom_dataset is not None:
             return self._prepare_attack_dataset(self.custom_dataset.copy())
 
-        dataset_file = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+        dataset_file = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
         data = pd.read_parquet(dataset_file, engine="pyarrow")
         return self._prepare_attack_dataset(data)
 

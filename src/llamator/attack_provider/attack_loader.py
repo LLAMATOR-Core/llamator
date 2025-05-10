@@ -9,7 +9,7 @@ from ..attacks import (  # noqa
     dialogue_injection_continuation,
     dialogue_injection_devmode,
     ethical_compliance,
-    harmful_behavior,
+    harmbench,
     linguistic,
     logical_inconsistencies,
     pair,

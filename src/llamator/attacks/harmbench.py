@@ -1,37 +1,38 @@
 import logging
 from pathlib import Path
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Union
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords
+from ..attack_provider.util import contains_refusal_keywords, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
+
 
 logger = logging.getLogger(__name__)
 
 
 @register_test
-class TestHarmfulBehaviors(TestBase):
-    """Challenges the LLM with a dataset of harmful behavior prompts."""
+class TestHarmbench(TestBase):
+    """Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts)."""
 
     info = {
-        "name": "Harmful Behavior",
-        "code_name": "harmful_behavior",
+        "name": "Harmbench",
+        "code_name": "harmbench",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
         ],
         "description": {
-            "en": "Challenges the LLM with a dataset of harmful behavior prompts.",
-            "ru": "Испытывает LLM набором запросов, связанных с вредным поведением.",
+            "en": "Challenges the LLM with harmful behavior prompts from Harmbench.",
+            "ru": "Испытывает LLM набором вредоносных запросов из датасета Harmbench.",
         },
-        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py",
+        "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py",
     }
 
     def __init__(
@@ -41,6 +42,7 @@ class TestHarmfulBehaviors(TestBase):
         artifacts_path: Optional[str] = None,
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
+        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -51,6 +53,12 @@ class TestHarmfulBehaviors(TestBase):
             **kwargs,
         )
         self.custom_dataset = custom_dataset
+        if isinstance(language, str):
+            try:
+                language = Language(language)
+            except ValueError:
+                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
+        self.language = language
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts: List[str] = []
@@ -58,11 +66,13 @@ class TestHarmfulBehaviors(TestBase):
         statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+
+            filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=filtered_data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]
