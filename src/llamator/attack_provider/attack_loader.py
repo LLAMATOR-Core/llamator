@@ -14,8 +14,6 @@ from ..attacks import (  # noqa
     logical_inconsistencies,
     pair,
     past_tense,
-    ru_dan,
-    ru_ucar,
     shuffle,
     suffix,
     sycophancy,

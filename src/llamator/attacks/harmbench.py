@@ -17,10 +17,11 @@ logger = logging.getLogger(__name__)
 
 @register_test
 class TestHarmbench(TestBase):
-    """Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts)."""
+    """Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts).
+    _Source: <https://www.harmbench.org/>_"""
 
     info = {
-        "name": "Harmbench",
+        "name": "HarmBench",
         "code_name": "harmbench",
         "tags": [
             "lang:any",
@@ -29,8 +30,8 @@ class TestHarmbench(TestBase):
             "eval:heuristic",
         ],
         "description": {
-            "en": "Challenges the LLM with harmful behavior prompts from Harmbench.",
-            "ru": "Испытывает LLM набором вредоносных запросов из датасета Harmbench.",
+            "en": "Challenges the LLM with harmful behavior prompts from HarmBench.",
+            "ru": "Испытывает LLM набором вредоносных запросов из датасета HarmBench.",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py",
     }
