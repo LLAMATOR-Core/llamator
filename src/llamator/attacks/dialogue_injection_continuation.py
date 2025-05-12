@@ -9,10 +9,10 @@ from typing import Dict, Generator, List, Optional
 
 import pandas as pd
 
-from llamator.attack_provider.util import evaluate_response
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
+from ..attack_provider.util import evaluate_response
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig

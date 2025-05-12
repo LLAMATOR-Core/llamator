@@ -4,10 +4,9 @@ from typing import Any, Dict, Generator, List, Optional
 
 import pandas as pd
 
-from llamator.attack_provider.util import evaluate_response
-
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
+from ..attack_provider.util import evaluate_response, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -361,7 +360,7 @@ class TestAutoDanTurbo(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+            data = self._prepare_attack_dataset(dataset=data[data["language"] == Language.EN])
 
             # Process each malicious request
             for i, malicious_request in enumerate(data["goal"]):

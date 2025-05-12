@@ -6,7 +6,7 @@ import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords
+from ..attack_provider.util import contains_refusal_keywords, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -119,7 +119,7 @@ class TestCrescendo(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+            data = self._prepare_attack_dataset(dataset=data[data["language"] == Language.EN])
 
             yield StatusUpdate(
                 self.client_config, self.info["code_name"], self.status, "Generating", 0, self.num_attempts
