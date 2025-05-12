@@ -111,7 +111,7 @@ In code name: `harmbench`
 
 Challenges the LLM with harmful behavior prompts from HarmBench (contains original and translated to Russian prompts).
 
-_Source: <https://www.harmbench.org/>_
+_Original Paper: <https://arxiv.org/abs/2402.04249>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py">View code on GitHub</a>
 </details>

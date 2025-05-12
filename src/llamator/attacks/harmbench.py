@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @register_test
 class TestHarmbench(TestBase):
     """Challenges the LLM with harmful behavior prompts from Harmbench (contains original and translated to Russian prompts).
-    _Source: <https://www.harmbench.org/>_"""
+    _Original Paper: <https://arxiv.org/abs/2402.04249>_"""
 
     info = {
         "name": "HarmBench",
@@ -28,6 +28,7 @@ class TestHarmbench(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "arxiv:2402.04249",
         ],
         "description": {
             "en": "Challenges the LLM with harmful behavior prompts from HarmBench.",
