@@ -85,23 +85,13 @@ _Original Paper: <https://arxiv.org/abs/2503.08195>_
 </details>
 
 <details>
-<summary><strong>Do Anything Now Jailbreak</strong></summary>
+<summary><strong>Do Anything Now (DAN) Jailbreak</strong></summary>
 
 In code name: `dan`
 
 Probes an LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dan.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Do Anything Now Jailbreak (RU)</strong></summary>
-
-In code name: `RU_dan`
-
-Probes a Russian-language LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_dan.py">View code on GitHub</a>
 </details>
 
 <details>
@@ -115,13 +105,15 @@ Evaluates the LLM's ability to resist discussions about harmful or inappropriate
 </details>
 
 <details>
-<summary><strong>Harmful Behavior</strong></summary>
+<summary><strong>HarmBench</strong></summary>
 
-In code name: `harmful_behavior`
+In code name: `harmbench`
 
-Challenges the LLM with a dataset of harmful behavior prompts.
+Challenges the LLM with harmful behavior prompts from HarmBench (contains original and translated to Russian prompts).
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py">View code on GitHub</a>
+_Original Paper: <https://arxiv.org/abs/2402.04249>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py">View code on GitHub</a>
 </details>
 
 <details>
@@ -157,23 +149,13 @@ _Original Paper: <https://arxiv.org/html/2501.04931>_
 </details>
 
 <details>
-<summary><strong>UCAR</strong></summary>
+<summary><strong>UCAR Jailbreak</strong></summary>
 
 In code name: `ucar`
 
 Probes an LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>UCAR (RU)</strong></summary>
-
-In code name: `RU_ucar`
-
-Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_ucar.py">View code on GitHub</a>
 </details>
 
 ## Multi-stage attacks

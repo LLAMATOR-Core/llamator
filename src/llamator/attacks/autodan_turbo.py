@@ -4,10 +4,9 @@ from typing import Any, Dict, Generator, List, Optional
 
 import pandas as pd
 
-from llamator.attack_provider.util import evaluate_response
-
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
+from ..attack_provider.util import evaluate_response, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -357,11 +356,11 @@ class TestAutoDanTurbo(TestBase):
         try:
             # Load and prepare dataset
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+            data = self._prepare_attack_dataset(dataset=data[data["language"] == Language.EN])
 
             # Process each malicious request
             for i, malicious_request in enumerate(data["goal"]):
