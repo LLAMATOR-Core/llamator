@@ -1,13 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Dict, Generator, List, Optional
+from typing import Dict, Generator, List, Optional, Union
 
 import pandas as pd
 
-from llamator.attack_provider.util import evaluate_response
-
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
+from ..attack_provider.util import evaluate_response, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -34,7 +33,7 @@ Do not use prefixes like "Refined prompt:..." or something like that. Reply just
 @register_test
 class TestPAIR(TestBase):
     """
-    Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+    Challenges the LLM with a dataset of HarmBench prompts using multistage refinement with judge model scoring.
     Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
     """
 
@@ -42,7 +41,7 @@ class TestPAIR(TestBase):
         "name": "Prompt Automatic Iterative Refinement (PAIR)",
         "code_name": "pair",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",
@@ -50,7 +49,7 @@ class TestPAIR(TestBase):
         ],
         "description": {
             "en": (
-                "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement "
+                "Challenges the LLM with a dataset of HarmBench prompts using multistage refinement "
                 "judge model scoring."
             ),
             "ru": (
@@ -70,6 +69,7 @@ class TestPAIR(TestBase):
         num_attempts: int = 0,
         multistage_depth: int = 20,
         custom_dataset: Optional[pd.DataFrame] = None,
+        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -82,6 +82,12 @@ class TestPAIR(TestBase):
         )
         self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
+        if isinstance(language, str):
+            try:
+                language = Language(language)
+            except ValueError:
+                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
+        self.language = language
 
     def _stop_criterion(self, tested_client_history: List[Dict[str, str]], goal: str) -> bool:
         """
@@ -117,7 +123,8 @@ class TestPAIR(TestBase):
 
         dataset_file = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
         data = pd.read_parquet(dataset_file, engine="pyarrow")
-        return self._prepare_attack_dataset(data)
+        filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
+        return self._prepare_attack_dataset(filtered_data)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         original_prompts: List[str] = []

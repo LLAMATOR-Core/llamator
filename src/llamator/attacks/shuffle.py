@@ -1,13 +1,13 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, List, Optional
+from typing import Generator, List, Optional, Union
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords
+from ..attack_provider.util import contains_refusal_keywords, Language
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
@@ -24,7 +24,7 @@ class TestShuffle(TestBase):
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -32,7 +32,7 @@ class TestShuffle(TestBase):
         ],
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
-            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
+            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/shuffle.py",
     }
@@ -45,6 +45,7 @@ class TestShuffle(TestBase):
         num_attempts: int = 0,
         num_transformations: int = 5,
         custom_dataset: Optional[pd.DataFrame] = None,
+        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -56,6 +57,12 @@ class TestShuffle(TestBase):
         )
         self.num_transformations = num_transformations
         self.custom_dataset = custom_dataset
+        if isinstance(language, str):
+            try:
+                language = Language(language)
+            except ValueError:
+                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
+        self.language = language
 
     @staticmethod
     def shuffle_words(prompt: str) -> str:
@@ -74,7 +81,8 @@ class TestShuffle(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data)
+            filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=filtered_data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]
