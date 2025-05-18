@@ -1,16 +1,15 @@
 import logging
 from pathlib import Path
-from typing import Generator, List, Optional, Union
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords, Language
+from ..attack_provider.util import contains_refusal_keywords
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -42,9 +41,9 @@ class TestHarmbench(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
-        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -54,13 +53,8 @@ class TestHarmbench(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
-        self.custom_dataset = custom_dataset
-        if isinstance(language, str):
-            try:
-                language = Language(language)
-            except ValueError:
-                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
         self.language = language
+        self.custom_dataset = custom_dataset
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         attack_prompts: List[str] = []
@@ -72,9 +66,9 @@ class TestHarmbench(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-
-            filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
-            data = self._prepare_attack_dataset(dataset=filtered_data)
+            if self.language != "any":
+                data = data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["goal"]

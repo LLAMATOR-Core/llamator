@@ -146,13 +146,15 @@ class TestBase(ABC):
         Returns:
             pd.DataFrame: A DataFrame prepared for the attack.
         """
-        if self.num_attempts <= dataset.shape[0]:
-            return dataset.head(n=self.num_attempts).reset_index()
-        return (
-            pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
-            .sort_index()
-            .reset_index(drop=True)
-        )
+        if dataset.shape[0] == 0:
+            return dataset
+        if self.num_attempts > dataset.shape[0]:
+            return (
+                pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
+                .sort_index()
+                .reset_index(drop=True)
+            )
+        return dataset.head(n=self.num_attempts).reset_index(drop=True)
 
     def _save_attack_artifacts(
         self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs

@@ -1,12 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Generator, List, Optional, Union
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import contains_refusal_keywords, filter_non_alpha_lower, Language
+from ..attack_provider.util import contains_refusal_keywords, filter_non_alpha_lower
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession
 from ..client.client_config import ClientConfig
@@ -40,8 +40,8 @@ class TestUCAR(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
-        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -51,11 +51,6 @@ class TestUCAR(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
-        if isinstance(language, str):
-            try:
-                language = Language(language)
-            except ValueError:
-                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
         self.language = language
 
     @staticmethod
@@ -75,8 +70,9 @@ class TestUCAR(TestBase):
         try:
             dataset_filename = Path(__file__).parent.parent / "attack_data" / "ucar-dan_prompts.parquet"
             data = pd.read_parquet(dataset_filename, engine="pyarrow")
-            filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
-            data = self._prepare_attack_dataset(dataset=filtered_data)
+            if self.language != "any":
+                data = data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
                 attack_prompt = row["ucar"]  # attack is the with static input

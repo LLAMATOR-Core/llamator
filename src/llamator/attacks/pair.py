@@ -1,12 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Dict, Generator, List, Optional, Union
+from typing import Dict, Generator, List, Literal, Optional
 
 import pandas as pd
 
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
-from ..attack_provider.util import evaluate_response, Language
+from ..attack_provider.util import evaluate_response
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -66,10 +66,10 @@ class TestPAIR(TestBase):
         attack_config: AttackConfig,
         judge_config: JudgeConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         multistage_depth: int = 20,
         custom_dataset: Optional[pd.DataFrame] = None,
-        language: Union[Language, str] = "any",
         **kwargs,
     ):
         super().__init__(
@@ -80,14 +80,9 @@ class TestPAIR(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.language = language
         self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
-        if isinstance(language, str):
-            try:
-                language = Language(language)
-            except ValueError:
-                raise ValueError(f"Invalid language '{language}'. Must be one of: {[l.value for l in Language]}")
-        self.language = language
 
     def _stop_criterion(self, tested_client_history: List[Dict[str, str]], goal: str) -> bool:
         """
@@ -116,16 +111,6 @@ class TestPAIR(TestBase):
             score=self.last_score,
         )
 
-    def _load_dataset(self) -> pd.DataFrame:
-        """Loads and pre-processes the dataset used for attacks."""
-        if self.custom_dataset is not None:
-            return self._prepare_attack_dataset(self.custom_dataset.copy())
-
-        dataset_file = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
-        data = pd.read_parquet(dataset_file, engine="pyarrow")
-        filtered_data = data if self.language == Language.ANY else data[data["language"] == self.language]
-        return self._prepare_attack_dataset(filtered_data)
-
     def run(self) -> Generator[StatusUpdate, None, None]:
         original_prompts: List[str] = []
         attack_prompts: List[str] = []
@@ -133,7 +118,15 @@ class TestPAIR(TestBase):
         statuses: List[str] = []
 
         try:
-            data = self._load_dataset()
+            # Load and prepare dataset
+            if self.custom_dataset is None:
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
+                data = pd.read_parquet(dataset_filename, engine="pyarrow")
+            else:
+                data = self.custom_dataset.copy()
+            if self.language != "any":
+                data = data[data["language"] == self.language]
+            data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
                 yield StatusUpdate(
