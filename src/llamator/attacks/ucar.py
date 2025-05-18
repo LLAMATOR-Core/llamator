@@ -23,7 +23,8 @@ class TestUCAR(TestBase):
         "name": "UCAR Jailbreak",
         "code_name": "ucar",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",

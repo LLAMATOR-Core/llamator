@@ -24,7 +24,8 @@ class TestShuffle(TestBase):
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",

@@ -68,7 +68,8 @@ class TestBon(TestBase):
         "name": "Best-of-N Jailbreak (BoN)",
         "code_name": "bon",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",

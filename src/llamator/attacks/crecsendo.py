@@ -69,7 +69,8 @@ class TestCrescendo(TestBase):
         "name": "Crescendo",
         "code_name": "crescendo",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",

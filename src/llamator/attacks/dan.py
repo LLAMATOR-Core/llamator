@@ -22,7 +22,8 @@ class TestDAN(TestBase):
         "name": "Do Anything Now (DAN) Jailbreak",
         "code_name": "dan",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",

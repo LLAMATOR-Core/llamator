@@ -41,7 +41,8 @@ class TestPAIR(TestBase):
         "name": "Prompt Automatic Iterative Refinement (PAIR)",
         "code_name": "pair",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",

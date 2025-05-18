@@ -23,7 +23,8 @@ class TestHarmbench(TestBase):
         "name": "HarmBench",
         "code_name": "harmbench",
         "tags": [
-            "lang:any",
+            "lang:en",
+            "lang:ru",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
