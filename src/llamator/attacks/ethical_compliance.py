@@ -60,8 +60,7 @@ class TestEthicalCompliance(TestBase):
         "name": "Ethical Compliance",
         "code_name": "ethical_compliance",
         "tags": [
-            "lang:en",
-            "lang:ru",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",

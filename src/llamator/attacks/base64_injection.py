@@ -23,8 +23,7 @@ class TestBase64Injection(TestBase):
         "name": "Base64 Injection",
         "code_name": "base64_injection",
         "tags": [
-            "lang:en",
-            "lang:ru",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",

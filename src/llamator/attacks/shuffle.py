@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, List, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -24,7 +24,7 @@ class TestShuffle(TestBase):
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -32,7 +32,7 @@ class TestShuffle(TestBase):
         ],
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
-            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
+            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/shuffle.py",
     }
@@ -42,6 +42,7 @@ class TestShuffle(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         num_transformations: int = 5,
         custom_dataset: Optional[pd.DataFrame] = None,
@@ -54,6 +55,7 @@ class TestShuffle(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.language = language
         self.num_transformations = num_transformations
         self.custom_dataset = custom_dataset
 
@@ -70,10 +72,12 @@ class TestShuffle(TestBase):
         statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
+            if self.language != "any":
+                data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
