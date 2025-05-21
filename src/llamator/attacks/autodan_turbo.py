@@ -95,8 +95,7 @@ class TestAutoDanTurbo(TestBase):
         "name": "AutoDAN-Turbo",
         "code_name": "autodan_turbo",
         "tags": [
-            "lang:en",
-            "lang:ru",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",
