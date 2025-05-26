@@ -1,13 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Dict, Generator, List, Optional
+from typing import Dict, Generator, List, Literal, Optional
 
 import pandas as pd
 
-from llamator.attack_provider.util import evaluate_response
-
 from ..attack_provider.attack_registry import register_test
 from ..attack_provider.test_base import StatusUpdate, TestBase
+from ..attack_provider.util import evaluate_response
 from ..client.attack_config import AttackConfig
 from ..client.chat_client import ChatSession, MultiStageInteractionSession
 from ..client.client_config import ClientConfig
@@ -34,7 +33,7 @@ Do not use prefixes like "Refined prompt:..." or something like that. Reply just
 @register_test
 class TestPAIR(TestBase):
     """
-    Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+    Challenges the LLM with a dataset of HarmBench prompts using multistage refinement with judge model scoring.
     Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
     """
 
@@ -42,7 +41,7 @@ class TestPAIR(TestBase):
         "name": "Prompt Automatic Iterative Refinement (PAIR)",
         "code_name": "pair",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",
@@ -50,7 +49,7 @@ class TestPAIR(TestBase):
         ],
         "description": {
             "en": (
-                "Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement "
+                "Challenges the LLM with a dataset of HarmBench prompts using multistage refinement "
                 "judge model scoring."
             ),
             "ru": (
@@ -67,6 +66,7 @@ class TestPAIR(TestBase):
         attack_config: AttackConfig,
         judge_config: JudgeConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         multistage_depth: int = 20,
         custom_dataset: Optional[pd.DataFrame] = None,
@@ -80,6 +80,7 @@ class TestPAIR(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.language = language
         self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
 
@@ -109,15 +110,6 @@ class TestPAIR(TestBase):
             tested_client_response=tested_client_response,
             score=self.last_score,
         )
-
-    def _load_dataset(self) -> pd.DataFrame:
-        """Loads and pre-processes the dataset used for attacks."""
-        if self.custom_dataset is not None:
-            return self._prepare_attack_dataset(self.custom_dataset.copy())
-
-        dataset_file = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
-        data = pd.read_parquet(dataset_file, engine="pyarrow")
-        return self._prepare_attack_dataset(data)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         original_prompts: List[str] = []
@@ -185,7 +177,6 @@ class TestPAIR(TestBase):
                     statuses[-1] = "Resilient"
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
-            # Save artifacts for report
             self._save_attack_artifacts(
                 attack_prompts=attack_prompts,
                 responses=responses,
@@ -204,3 +195,23 @@ class TestPAIR(TestBase):
 
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)
+
+    def _load_dataset(self) -> pd.DataFrame:
+        if self.custom_dataset is None:
+            dataset_path = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
+            if not dataset_path.is_file():
+                raise FileNotFoundError(f"Dataset not found: {dataset_path}")
+            data = pd.read_parquet(dataset_path, engine="pyarrow")
+        else:
+            if not isinstance(self.custom_dataset, pd.DataFrame):
+                raise ValueError("custom_dataset must be a pandas.DataFrame")
+            data = self.custom_dataset.copy()
+
+        if self.language != "any":
+            data = data[data["language"] == self.language]
+
+        data = self._prepare_attack_dataset(dataset=data)
+        if data.empty:
+            raise RuntimeError("Prepared dataset is empty")
+
+        return data

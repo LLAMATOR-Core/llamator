@@ -50,7 +50,7 @@ class TestSystemPromptLeakage(TestBase):
         "name": "System Prompt Leakage",
         "code_name": "system_prompt_leakage",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm07",
             "eval:heuristic",

@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, List, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -68,7 +68,7 @@ class TestBon(TestBase):
         "name": "Best-of-N Jailbreak (BoN)",
         "code_name": "bon",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -86,6 +86,7 @@ class TestBon(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         num_transformations: int = 5,
         sigma: float = 0.4,
@@ -99,8 +100,9 @@ class TestBon(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
-        self.sigma = sigma  # proportion of characters to augment
+        self.language = language
         self.num_transformations = num_transformations
+        self.sigma = sigma  # proportion of characters to augment
         self.custom_dataset = custom_dataset
 
     def transform_attack_prompt(self, prompt: str) -> str:
@@ -117,10 +119,12 @@ class TestBon(TestBase):
         statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
+            if self.language != "any":
+                data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
