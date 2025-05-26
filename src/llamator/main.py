@@ -178,7 +178,7 @@ def start_testing(
     num_threads: Optional[int] = 1,
     basic_tests: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
-):
+) -> Dict[str, Dict[str, int]] | None:
     """
     The main entry point for launching tests.
 
@@ -191,15 +191,15 @@ def start_testing(
     config : dict
         Configuration dictionary with keys:
 
-        - 'enable_logging' : bool
+        - 'enable_logging': bool
             Whether to enable logging.
-        - 'enable_reports' : bool
+        - 'enable_reports': bool
             Whether to generate Excel/Word reports.
-        - 'artifacts_path' : Optional[str]
+        - 'artifacts_path': Optional[str]
             Path to the folder for saving artifacts (logs, CSV, etc.).
-        - 'debug_level' : int
+        - 'debug_level': int
             Logging level (0=WARNING, 1=INFO, 2=DEBUG).
-        - 'report_language' : str
+        - 'report_language': str
             Language code for the final report ('en' or 'ru').
     judge_model : Optional[ClientBase]
         The model that judges the responses (optional).
@@ -212,7 +212,8 @@ def start_testing(
 
     Returns
     -------
-    None
+    Dict[str, Dict[str, int]]
+        Aggregated results per attack. Empty dict if testing was not executed.
     """
     enable_logging = config.get("enable_logging", True)
     enable_reports = config.get("enable_reports", False)
@@ -230,12 +231,12 @@ def start_testing(
     else:
         if not validate_artifacts_path(artifacts_path):
             print(f"{BRIGHT_RED}✘{RESET} Invalid artifacts path.")
-            return
+            return {}
         elif enable_reports or enable_logging:
             run_folder_name = f"LLAMATOR_run_{start_timestamp}"
             run_folder_path = os.path.join(artifacts_path, run_folder_name)
             os.makedirs(run_folder_path, exist_ok=True)
-            artifacts_run_path = run_folder_path
+            artifacts_run_path = str(run_folder_path)
             print(f"{BRIGHT_CYAN}ℹ{RESET} Artifacts will be saved to: {artifacts_run_path}")
         else:
             artifacts_run_path = None
@@ -252,10 +253,10 @@ def start_testing(
 
     # Validate models, test codes, and parameters
     if not validate_models_and_tests(attack_model, judge_model, tested_model, basic_tests, custom_tests):
-        return
+        return {}
 
     # Run tests
-    setup_models_and_tests(
+    results_dict = setup_models_and_tests(
         attack_model=attack_model,
         judge_model=judge_model,
         tested_model=tested_model,
@@ -307,3 +308,5 @@ def start_testing(
     print(format_centered_line(thank_you_text, box_width))
     print(get_bottom_border(box_width))
     logging.shutdown()
+
+    return results_dict
