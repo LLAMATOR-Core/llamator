@@ -118,15 +118,7 @@ class TestPAIR(TestBase):
         statuses: List[str] = []
 
         try:
-            # Load and prepare dataset
-            if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
-                data = pd.read_parquet(dataset_filename, engine="pyarrow")
-            else:
-                data = self.custom_dataset.copy()
-            if self.language != "any":
-                data = data[data["language"] == self.language]
-            data = self._prepare_attack_dataset(dataset=data)
+            data = self._load_dataset()
 
             for attack_prompt_index, row in data.iterrows():
                 yield StatusUpdate(
@@ -185,7 +177,6 @@ class TestPAIR(TestBase):
                     statuses[-1] = "Resilient"
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
-            # Save artifacts for report
             self._save_attack_artifacts(
                 attack_prompts=attack_prompts,
                 responses=responses,
@@ -204,3 +195,23 @@ class TestPAIR(TestBase):
 
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)
+
+    def _load_dataset(self) -> pd.DataFrame:
+        if self.custom_dataset is None:
+            dataset_path = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
+            if not dataset_path.is_file():
+                raise FileNotFoundError(f"Dataset not found: {dataset_path}")
+            data = pd.read_parquet(dataset_path, engine="pyarrow")
+        else:
+            if not isinstance(self.custom_dataset, pd.DataFrame):
+                raise ValueError("custom_dataset must be a pandas.DataFrame")
+            data = self.custom_dataset.copy()
+
+        if self.language != "any":
+            data = data[data["language"] == self.language]
+
+        data = self._prepare_attack_dataset(dataset=data)
+        if data.empty:
+            raise RuntimeError("Prepared dataset is empty")
+
+        return data
