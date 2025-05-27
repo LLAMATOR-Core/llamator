@@ -1,5 +1,3 @@
-# llamator/src/llamator/initial_validation.py
-
 import logging
 import os
 from typing import Dict, List, Tuple, Type
@@ -123,27 +121,27 @@ def validate_artifacts_path(artifacts_path: str) -> bool:
 
 def validate_language(language: str) -> str:
     """
-    Validates the requested report language. Defaults to 'en' if an unsupported code is provided.
+    Validates the requested report language. Defaults to 'any' if an unsupported code is provided.
 
     Parameters
     ----------
     language : str
-        The language code to validate (e.g. 'en' or 'ru').
+        The language code to validate.
 
     Returns
     -------
     str
-        The validated language code. If the provided language is not supported, 'en' is returned.
+        The validated language code. If the provided language is not supported, 'any' is returned.
     """
     try:
-        supported_languages = {"en", "ru"}
+        supported_languages = {"en", "ru", "any"}
         if language not in supported_languages:
-            logging.warning(f"Unsupported language '{language}'. Defaulting to 'en'.")
-            return "en"
+            logging.warning(f"Unsupported language '{language}'. Defaulting to 'any'.")
+            return "any"
         return language
     except Exception as e:
-        logging.error(f"Failed to validate language: {e}. Defaulting to 'en'.")
-        return "en"
+        logging.error(f"Failed to validate language: {e}. Defaulting to 'any'.")
+        return "any"
 
 
 def validate_basic_tests_params(basic_tests_params: List[Tuple[str, Dict]]) -> bool:
