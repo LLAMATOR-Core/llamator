@@ -36,14 +36,14 @@ def _render_py_literal(value: Any) -> str:
     return repr(value)
 
 
-def _format_param_block(param_dict: Dict[str, Any], max_line: int = 80, indent: int = 8) -> str:
+def _format_param_block(param_dict: dict[str, Any], max_line: int = 80, indent: int = 8) -> str:
     """
     Format *param_dict* as a compact or multi-line Python dict literal.
     """
     if not param_dict:
         return "{}"
 
-    items = [f'{_render_py_literal(k)}: {_render_py_literal(param_dict[k])}' for k in sorted(param_dict)]
+    items = [f"{_render_py_literal(k)}: {_render_py_literal(param_dict[k])}" for k in sorted(param_dict)]
     one_liner = "{ " + ", ".join(items) + " }"
     if len(one_liner) <= max_line - indent:
         return one_liner
@@ -55,7 +55,7 @@ def _format_param_block(param_dict: Dict[str, Any], max_line: int = 80, indent: 
 # --------------------------------------------------------------------------- #
 # ------------------------  INTROSPECTION HELPERS --------------------------- #
 # --------------------------------------------------------------------------- #
-def _get_class_init_params(cls) -> Dict[str, str]:
+def _get_class_init_params(cls) -> dict[str, str]:
     """
     Extracts all initialization parameters from a class's __init__ method,
     excluding 'self', 'args' and 'kwargs'.
@@ -73,7 +73,7 @@ def _get_class_init_params(cls) -> Dict[str, str]:
     """
     try:
         sig = inspect.signature(cls.__init__)
-        params_dict: Dict[str, Any] = {}
+        params_dict: dict[str, Any] = {}
         for param_name, param_obj in sig.parameters.items():
             if param_name in ("self", "args", "kwargs"):
                 continue
@@ -86,7 +86,7 @@ def _get_class_init_params(cls) -> Dict[str, str]:
         return {}
 
 
-def _get_attack_params(cls) -> Dict[str, str]:
+def _get_attack_params(cls) -> dict[str, str]:
     """
     Extracts initialization parameters from a class's __init__ method
     but excludes the parameters commonly used for configuration in TestBase:
@@ -116,7 +116,7 @@ def _get_attack_params(cls) -> Dict[str, str]:
             "artifacts_path",
         }
         sig = inspect.signature(cls.__init__)
-        params_dict: Dict[str, Any] = {}
+        params_dict: dict[str, Any] = {}
         for param_name, param_obj in sig.parameters.items():
             if param_name in excluded_params:
                 continue
