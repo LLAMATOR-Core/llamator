@@ -74,7 +74,7 @@ config = {
 }
 
 # Start testing
-llamator.start_testing(
+test_result_dict = llamator.start_testing(
     attack_model=attack_model, # LLM model for generating attack text
     tested_model=tested_model, # LLM system under test
     judge_model=judge_model, # LLM model for evaluating responses
@@ -83,6 +83,21 @@ llamator.start_testing(
     custom_tests=None, # New user attacks
     num_threads=1
 )
+
+# Dictionary output with test results, for example:
+# {
+#     'aim_jailbreak': {
+#         'broken': 1,
+#         'resilient': 0,
+#         'errors': 0
+#     },
+#     'suffix': {
+#         'broken': 0,
+#         'resilient': 1,
+#         'errors': 0
+#     }
+# }
+print(test_result_dict)
 ```
 
 ---
@@ -124,4 +139,3 @@ print_chat_models_info(detailed=True)
 ```
 
 This information helps you quickly identify available chat models and their configurable parameters.
-

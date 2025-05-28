@@ -18,6 +18,7 @@ AVAILABLE_DATASET_VARIATIONS = Literal["4", "8", "16"]
 
 M_ATTACK_VISION_PROMPT = "What is in the image?"
 
+
 @register_test
 class TestVlmMAttack(TestBase):
     """
