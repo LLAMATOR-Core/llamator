@@ -1,6 +1,5 @@
 import logging
 import os
-from enum import Enum
 from pathlib import Path
 from typing import Generator, List, Literal, Optional
 
@@ -18,13 +17,6 @@ logger = logging.getLogger(__name__)
 AVAILABLE_DATASET_VARIATIONS = Literal["4", "8", "16"]
 
 M_ATTACK_VISION_PROMPT = "What is in the image?"
-
-
-class VlmAttackSource(Enum):
-    PARQUET = "parquet"  # subset from the main dataset
-    LOCAL = "local"  # use downloaded data
-    HUGGINGFACE = "huggingface"  # Download from huggingface
-
 
 @register_test
 class TestVlmMAttack(TestBase):
@@ -62,7 +54,7 @@ class TestVlmMAttack(TestBase):
         num_attempts: int = 0,
         dataset: str = "bigscale_100",
         dataset_variations: Optional[List[AVAILABLE_DATASET_VARIATIONS]] = None,  # loads all when none
-        attack_source: VlmAttackSource = VlmAttackSource.PARQUET,
+        attack_source: Literal["parquet", "local", "huggingface"] = "parquet",
         *args,
         **kwargs,
     ):
@@ -174,17 +166,16 @@ class TestVlmMAttack(TestBase):
             raise e
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        match self.attack_source:
-            case VlmAttackSource.HUGGINGFACE.value:
-                df_attack = self._load_huggingface()
-            case VlmAttackSource.LOCAL.value:
-                df_attack = self._load_attack_data(self.dataset, self.dataset_variations)
-            case VlmAttackSource.PARQUET.value:
-                df_attack = self._load_parquet()
-            case _:
-                raise ValueError(
-                    f"Unknown attack source: {self.attack_source}, choose one of {VlmAttackSource.__members__}"
-                )
+        if self.attack_source == "huggingface":
+            df_attack = self._load_huggingface()
+        elif self.attack_source == "local":
+            df_attack = self._load_attack_data(self.dataset, self.dataset_variations)
+        elif self.attack_source == "parquet":
+            df_attack = self._load_parquet()
+        else:
+            raise ValueError(
+                f"Unknown attack source: {self.attack_source}, choose one of ['parquet', 'local', 'huggingface']"
+            )
 
         df_attack = self._prepare_attack_dataset(df_attack)
         responses: List[str] = []
