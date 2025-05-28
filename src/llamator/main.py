@@ -178,7 +178,7 @@ def start_testing(
     num_threads: Optional[int] = 1,
     basic_tests: Optional[List[Tuple[str, Dict]]] = None,
     custom_tests: Optional[List[Tuple[Type[TestBase], Dict]]] = None,
-) -> Dict[str, Dict[str, int]] | None:
+) -> Dict[str, Dict[str, int]]:
     """
     The main entry point for launching tests.
 
