@@ -350,7 +350,7 @@ def setup_models_and_tests(
     basic_tests_params: Optional[List[Tuple[str, dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], dict]]] = None,
     artifacts_path: Optional[str] = None,
-) -> Dict[str, Dict[str, int]] | None:
+) -> Dict[str, Dict[str, int]]:
     """
     Set up and validate the models, then run the tests.
 
@@ -375,7 +375,8 @@ def setup_models_and_tests(
 
     Returns
     -------
-    None
+    Dict[str, Dict[str, int]]
+        Aggregated results per attack. Empty dict if testing was not executed.
     """
     try:
         client_config = ClientConfig(tested_model)
