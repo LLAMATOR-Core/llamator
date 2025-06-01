@@ -7,7 +7,7 @@
 Run from project root directory:
 
 ```bash
-. ./setup_dev_env.s
+. ./setup_dev_env.sh
 ```
 ```bash
 source venv/bin/activate
