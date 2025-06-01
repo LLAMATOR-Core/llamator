@@ -319,12 +319,13 @@
 <li><p>💬 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-telegram.ipynb">Telegram bot testing via Telethon</a></p></li>
 <li><p>📱 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-whatsapp.ipynb">WhatsApp bot testing via Selenium</a></p></li>
 <li><p>🔗 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-langchain-custom-attack.ipynb">LangChain client testing with custom attack</a></p></li>
+<li><p>📷 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-vlm-attacks.ipynb">Vision Model testing via LangChain</a></p></li>
 <li><p>🐋 <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/docker">Running LLAMATOR in Docker</a></p></li>
 </ul>
 </section>
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">3</span>.1.0
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">3</span>.2.0
 </pre></div>
 </div>
 </section>
@@ -385,7 +386,7 @@
 <span class="p">}</span>
 
 <span class="c1"># Start testing</span>
-<span class="n">llamator</span><span class="o">.</span><span class="n">start_testing</span><span class="p">(</span>
+<span class="n">test_result_dict</span> <span class="o">=</span> <span class="n">llamator</span><span class="o">.</span><span class="n">start_testing</span><span class="p">(</span>
     <span class="n">attack_model</span><span class="o">=</span><span class="n">attack_model</span><span class="p">,</span> <span class="c1"># LLM model for generating attack text</span>
     <span class="n">tested_model</span><span class="o">=</span><span class="n">tested_model</span><span class="p">,</span> <span class="c1"># LLM system under test</span>
     <span class="n">judge_model</span><span class="o">=</span><span class="n">judge_model</span><span class="p">,</span> <span class="c1"># LLM model for evaluating responses</span>
@@ -394,6 +395,21 @@
     <span class="n">custom_tests</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># New user attacks</span>
     <span class="n">num_threads</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span>
+
+<span class="c1"># Dictionary output with test results, for example:</span>
+<span class="c1"># {</span>
+<span class="c1">#     &#39;aim_jailbreak&#39;: {</span>
+<span class="c1">#         &#39;broken&#39;: 1,</span>
+<span class="c1">#         &#39;resilient&#39;: 0,</span>
+<span class="c1">#         &#39;errors&#39;: 0</span>
+<span class="c1">#     },</span>
+<span class="c1">#     &#39;suffix&#39;: {</span>
+<span class="c1">#         &#39;broken&#39;: 0,</span>
+<span class="c1">#         &#39;resilient&#39;: 1,</span>
+<span class="c1">#         &#39;errors&#39;: 0</span>
+<span class="c1">#     }</span>
+<span class="c1"># }</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">test_result_dict</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

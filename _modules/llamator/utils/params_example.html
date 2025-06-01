@@ -299,15 +299,64 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for llamator.utils.params_example</h1><div class="highlight"><pre>
-<span></span><span class="c1"># File: llamator/src/llamator/utils/params_example.py</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Literal</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..attack_provider.attack_registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">test_classes</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.test_presets</span><span class="w"> </span><span class="kn">import</span> <span class="n">preset_configs</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_class_init_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># ---------------------------  LOW-LEVEL RENDERERS -------------------------- #</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_render_py_literal</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert *value* into a valid Python literal string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Leave literals/sentinels intact (already quoted or &lt;no default&gt;).</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">))</span> <span class="ow">or</span> <span class="n">value</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="s2"> </span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2"> </span><span class="se">}}</span><span class="s2">&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">,)&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_format_param_block</span><span class="p">(</span><span class="n">param_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">max_line</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Format *param_dict* as a compact or multi-line Python dict literal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">param_dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">_render_py_literal</span><span class="p">(</span><span class="n">param_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)]</span>
+    <span class="n">one_liner</span> <span class="o">=</span> <span class="s2">&quot;{ &quot;</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; }&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">one_liner</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_line</span> <span class="o">-</span> <span class="n">indent</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">one_liner</span>
+
+    <span class="n">inner</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span> <span class="o">+</span> <span class="n">item</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;{</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">inner</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">indent</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+
+
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># ------------------------  INTROSPECTION HELPERS --------------------------- #</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_class_init_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts all initialization parameters from a class&#39;s __init__ method,</span>
 <span class="sd">    excluding &#39;self&#39;, &#39;args&#39; and &#39;kwargs&#39;.</span>
@@ -325,20 +374,20 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
-        <span class="n">params_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">params_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_obj</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;self&quot;</span><span class="p">,</span> <span class="s2">&quot;args&quot;</span><span class="p">,</span> <span class="s2">&quot;kwargs&quot;</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">param_obj</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
                 <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;no default&gt;&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">param_obj</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+                <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_obj</span><span class="o">.</span><span class="n">default</span>
         <span class="k">return</span> <span class="n">params_dict</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_get_attack_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_attack_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extracts initialization parameters from a class&#39;s __init__ method</span>
 <span class="sd">    but excludes the parameters commonly used for configuration in TestBase:</span>
@@ -368,77 +417,55 @@
             <span class="s2">&quot;artifacts_path&quot;</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span>
-        <span class="n">params_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">params_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_obj</span> <span class="ow">in</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">param_name</span> <span class="ow">in</span> <span class="n">excluded_params</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">param_obj</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
                 <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;no default&gt;&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">param_obj</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+                <span class="n">params_dict</span><span class="p">[</span><span class="n">param_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">param_obj</span><span class="o">.</span><span class="n">default</span>
         <span class="k">return</span> <span class="n">params_dict</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{}</span>
 
 
+<span class="c1"># --------------------------------------------------------------------------- #</span>
+<span class="c1"># ------------------------  PUBLIC API – GENERATORS ------------------------- #</span>
+<span class="c1"># --------------------------------------------------------------------------- #</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_basic_tests_params_example</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate example code for configuring basic_tests_params with all available tests</span>
-<span class="sd">    and their configurable parameters.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        A code snippet showing how to configure basic_tests_params.</span>
+<span class="sd">    Build example code block with all registered tests.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">test_configs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">sorted_test_classes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-        <span class="n">test_classes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">cls</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
-    <span class="p">)</span>
-    <span class="k">for</span> <span class="n">test_cls</span> <span class="ow">in</span> <span class="n">sorted_test_classes</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">test_cls</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;code_name&quot;</span> <span class="ow">in</span> <span class="n">test_cls</span><span class="o">.</span><span class="n">info</span><span class="p">:</span>
-            <span class="n">code_name</span> <span class="o">=</span> <span class="n">test_cls</span><span class="o">.</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;code_name&quot;</span><span class="p">]</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="n">_get_attack_params</span><span class="p">(</span><span class="n">test_cls</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
-                <span class="n">param_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-                <span class="n">test_configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="se">{{</span><span class="si">{</span><span class="n">param_str</span><span class="si">}</span><span class="se">}}</span><span class="s1">),&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">test_configs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="se">{{}}</span><span class="s1">),&#39;</span><span class="p">)</span>
-    <span class="n">example</span> <span class="o">=</span> <span class="s2">&quot;basic_tests_params = [</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">test_configs</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">]&quot;</span>
-    <span class="k">return</span> <span class="n">example</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;basic_tests_params = [&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="bp">cls</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">test_classes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)):</span>
+        <span class="n">code_name</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;code_name&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">_get_attack_params</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">_format_param_block</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="si">{</span><span class="n">block</span><span class="si">}</span><span class="s1">),&#39;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_preset_tests_params_example">
 <a class="viewcode-back" href="../../../code_documentation.html#llamator.utils.params_example.get_preset_tests_params_example">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_preset_tests_params_example</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate example code for configuring basic_tests_params based on a preset configuration.</span>
-<span class="sd">    If preset_name is &quot;all&quot;, returns configuration for all tests (as in get_basic_tests_params_example).</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    preset_name : Literal[&quot;all&quot;, &quot;standard&quot;]</span>
-<span class="sd">        The name of the preset configuration to use.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    str</span>
-<span class="sd">        A code snippet showing the configuration for the given preset.</span>
+<span class="sd">    Build example for a named preset or all tests if ``preset_name == &quot;all&quot;``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">preset_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">get_basic_tests_params_example</span><span class="p">()</span>
+
     <span class="n">preset</span> <span class="o">=</span> <span class="n">preset_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">preset_name</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;# Preset &#39;</span><span class="si">{</span><span class="n">preset_name</span><span class="si">}</span><span class="s2">&#39; not found. Allowed presets: &#39;all&#39;, &#39;standard&#39;.&quot;</span>
-    <span class="n">preset_lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">code_name</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">preset</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
-            <span class="n">params_items</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">&quot;: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
-            <span class="n">preset_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="se">{{</span><span class="si">{</span><span class="n">params_items</span><span class="si">}</span><span class="se">}}</span><span class="s1">),&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">preset_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="se">{{}}</span><span class="s1">),&#39;</span><span class="p">)</span>
-    <span class="n">example</span> <span class="o">=</span> <span class="s2">&quot;basic_tests_params = [</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preset_lines</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">]&quot;</span>
-    <span class="k">return</span> <span class="n">example</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;# Preset &#39;</span><span class="si">{</span><span class="n">preset_name</span><span class="si">}</span><span class="s2">&#39; not found. Allowed presets: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">preset_configs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;basic_tests_params = [&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">code_name</span><span class="p">,</span> <span class="n">param_dict</span> <span class="ow">in</span> <span class="n">preset</span><span class="p">:</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">_format_param_block</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="si">{</span><span class="n">block</span><span class="si">}</span><span class="s1">),&#39;</span><span class="p">)</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
 
 
 
@@ -446,17 +473,11 @@
 <a class="viewcode-back" href="../../../code_documentation.html#llamator.utils.params_example.print_preset_tests_params_example">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">print_preset_tests_params_example</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Print an example configuration for basic_tests_params based on a preset to the console.</span>
-<span class="sd">    If preset_name is &quot;all&quot;, prints configuration for all tests.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    preset_name : Literal[&quot;all&quot;, &quot;standard&quot;]</span>
-<span class="sd">        The name of the preset configuration to print.</span>
+<span class="sd">    Print example code to stdout.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">example</span> <span class="o">=</span> <span class="n">get_preset_tests_params_example</span><span class="p">(</span><span class="n">preset_name</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Example configuration for preset &#39;</span><span class="si">{</span><span class="n">preset_name</span><span class="si">}</span><span class="s2">&#39;:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">example</span><span class="p">)</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">example</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_l</span><span class="p">:</span> <span class="kc">True</span><span class="p">))</span></div>
 
 </pre></div>
         </article>

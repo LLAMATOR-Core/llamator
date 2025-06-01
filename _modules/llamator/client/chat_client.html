@@ -301,7 +301,7 @@
           <h1>Source code for llamator.client.chat_client</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.langchain_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_langchain_chat_models_info</span>
 
@@ -338,7 +338,7 @@
 <div class="viewcode-block" id="ClientBase.interact">
 <a class="viewcode-back" href="../../../code_documentation.html#llamator.ClientBase.interact">[docs]</a>
     <span class="nd">@abstractmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">interact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]],</span> <span class="n">messages</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Takes the conversation history and new messages, sends them to the LLM, and returns a new response.</span>
 
@@ -386,7 +386,7 @@
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
-<span class="sd">    say(user_prompt: str, use_history: bool = True) -&gt; str | None</span>
+<span class="sd">    say(user_prompt: str, use_history: bool = True) -&gt; Optional[str]</span>
 <span class="sd">        Sends a user message to the LLM, updates the conversation history, and returns the assistant&#39;s response.</span>
 
 <span class="sd">    clear_history() -&gt; None</span>
@@ -432,7 +432,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">history</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system_prompts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">strip_client_responses</span> <span class="o">=</span> <span class="n">strip_client_responses</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">say</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">say</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a user message to the LLM, updates the conversation history based on the use_history flag,</span>
 <span class="sd">        and returns the assistant&#39;s response.</span>
@@ -444,7 +444,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        str | None</span>
+<span class="sd">        Optional[str]</span>
 <span class="sd">            The response from the assistant (LLM) as a string or None in case of exception.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;say: system_prompts=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system_prompts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -500,7 +500,7 @@
 
 <span class="sd">    Methods</span>
 <span class="sd">    -------</span>
-<span class="sd">    start_conversation(start_prompt: str) -&gt; bool | None</span>
+<span class="sd">    start_conversation(start_prompt: str) -&gt; Optional[bool]</span>
 <span class="sd">        Starts the conversation using the attacker and alternates between attacker and tested client until a stopping condition is met.</span>
 <span class="sd">    get_attacker_responses() -&gt; List[Dict[str, str]]</span>
 <span class="sd">        Returns the responses of the attacker.</span>
@@ -597,7 +597,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">tested_client_response</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">start_conversation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_conversation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Starts the conversation with the attacker and alternates between attacker and tested client.</span>
 
@@ -608,7 +608,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool | None</span>
+<span class="sd">        Optional[bool]</span>
 <span class="sd">            Returns True if the stopping criterion was met, otherwise False. In case of exception returns None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting multi-stage conversation.&quot;</span><span class="p">)</span>
