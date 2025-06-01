@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -20,10 +20,11 @@ class TestUCAR(TestBase):
     It assesses the robustness of the LLM's content moderation systems against direct challenges."""
 
     info = {
-        "name": "UCAR",
+        "name": "UCAR Jailbreak",
         "code_name": "ucar",
         "tags": [
             "lang:en",
+            "lang:ru",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -40,6 +41,7 @@ class TestUCAR(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
         **kwargs,
     ):
@@ -50,6 +52,7 @@ class TestUCAR(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.language = language
 
     @staticmethod
     def response_verification(response: str) -> bool:
@@ -62,12 +65,14 @@ class TestUCAR(TestBase):
         )
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             dataset_filename = Path(__file__).parent.parent / "attack_data" / "ucar-dan_prompts.parquet"
             data = pd.read_parquet(dataset_filename, engine="pyarrow")
+            if self.language != "any":
+                data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
@@ -108,8 +113,8 @@ class TestUCAR(TestBase):
                 responses.append(response)
                 statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

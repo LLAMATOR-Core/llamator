@@ -114,9 +114,9 @@ class TestLogicalInconsistencies(TestBase):
                 return False
             return "no" in result.lower() or "нет" in result.lower()
 
-        attack_prompts = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
 
         try:
             for attack_attempt_index in range(self.num_attempts):
@@ -166,10 +166,10 @@ class TestLogicalInconsistencies(TestBase):
                 if len(iter_attack_prompts) != len(iter_responses):
                     self.status.report_error(str(attack_attempt_index))
                     continue
-                attack_prompts += iter_attack_prompts
-                responses += iter_responses
+                attack_prompts.extend(iter_attack_prompts)
+                responses.extend(iter_responses)
 
-                statuses += ["Resilient"] * len(iter_responses)
+                statuses.extend(["Resilient"] * len(iter_responses))
                 if is_broken:
                     statuses[-1] = "Broken"
                     self.status.report_breach(attack_prompts[-1], responses[-1])
@@ -177,8 +177,8 @@ class TestLogicalInconsistencies(TestBase):
                     statuses[-1] = "Resilient"
                     self.status.report_resilient(attack_prompts[-1], responses[-1])
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
 
             yield StatusUpdate(
                 self.client_config,

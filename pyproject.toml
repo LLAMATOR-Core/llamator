@@ -10,11 +10,14 @@ known_first_party = ['llamator']
 known_third_party = [ # Most popular libraries. Extend if necessary.
     'IPython',
     'PIL',
+    'pillow',
+    'pymupdf',
     'cv2',
     'dotenv',
     'editdistance',
     'fastapi',
     'fire',
+    'gitpython',
     'hydra',
     'joblib',
     'loguru',
@@ -41,6 +44,8 @@ known_third_party = [ # Most popular libraries. Extend if necessary.
     'torchvision',
     'tqdm',
     'typer',
+    'huggingface_hub',
+    'datasets',
 ]
 skip_gitignore = true
 

@@ -1,5 +1,5 @@
 import textwrap
-from typing import List, Tuple, Type
+from typing import Dict, List, Tuple, Type
 
 import colorama
 from pydantic import ValidationError
@@ -20,6 +20,33 @@ logger = logging.getLogger(__name__)
 # Define desired column widths for Attack Type and Strength
 ATTACK_TYPE_WIDTH = 25
 STRENGTH_WIDTH = 20
+
+
+def _aggregate_results(tests: List[TestBase]) -> Dict[str, Dict[str, int]]:
+    """
+    Build a compact dictionary with counters for every executed attack.
+
+    Parameters
+    ----------
+    tests : List[TestBase]
+        Executed test instances.
+
+    Returns
+    -------
+    Dict[str, Dict[str, int]]
+        {
+            "aim_jailbreak": {"broken": 3, "resilient": 7, "errors": 0},
+            ...
+        }
+    """
+    result: Dict[str, Dict[str, int]] = {}
+    for test in tests:
+        result[test.info["code_name"]] = {
+            "broken": test.status.breach_count,
+            "resilient": test.status.resilient_count,
+            "errors": test.status.error_count,
+        }
+    return result
 
 
 class TestTask:
@@ -107,7 +134,7 @@ def run_tests(
     basic_tests_params: Optional[List[Tuple[str, dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], dict]]] = None,
     artifacts_path: Optional[str] = None,
-):
+) -> Dict[str, Dict[str, int]]:
     """
     Run the tests on the given client and attack configurations.
 
@@ -165,6 +192,9 @@ def run_tests(
 
     # Report test results
     report_results(tests)
+
+    # Return aggregated statistics
+    return _aggregate_results(tests)
 
 
 def run_tests_in_parallel(tests: List[TestBase], threads_count: int = 1):
@@ -320,7 +350,7 @@ def setup_models_and_tests(
     basic_tests_params: Optional[List[Tuple[str, dict]]] = None,
     custom_tests_params: Optional[List[Tuple[Type[TestBase], dict]]] = None,
     artifacts_path: Optional[str] = None,
-):
+) -> Dict[str, Dict[str, int]]:
     """
     Set up and validate the models, then run the tests.
 
@@ -345,30 +375,31 @@ def setup_models_and_tests(
 
     Returns
     -------
-    None
+    Dict[str, Dict[str, int]]
+        Aggregated results per attack. Empty dict if testing was not executed.
     """
     try:
         client_config = ClientConfig(tested_model)
     except (ModuleNotFoundError, ValidationError) as e:
         logger.warning(f"Error accessing the Tested Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
-        return
+        return {}
 
     try:
         attack_config = AttackConfig(attack_client=ClientConfig(attack_model))
     except (ModuleNotFoundError, ValidationError) as e:
         logger.warning(f"Error accessing the Attack Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
-        return
+        return {}
 
     if judge_model is not None:
         try:
             judge_config = JudgeConfig(judge_client=ClientConfig(judge_model))
         except (ModuleNotFoundError, ValidationError) as e:
             logger.warning(f"Error accessing the Judge Model: {colorama.Fore.RED}{e}{colorama.Style.RESET_ALL}")
-            return
+            return {}
     else:
         judge_config = None
 
-    run_tests(
+    result_dict = run_tests(
         client_config=client_config,
         attack_config=attack_config,
         judge_config=judge_config,
@@ -377,3 +408,5 @@ def setup_models_and_tests(
         custom_tests_params=custom_tests_params,
         artifacts_path=artifacts_path,
     )
+
+    return result_dict
