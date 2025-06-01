@@ -39,45 +39,59 @@ Challenges the LLM with a dataset of lines, encoded into base64.
 </details>
 
 <details>
-<summary><strong>Complimentary Transition</strong></summary>
+<summary><strong>Best-of-N (BoN) Jailbreak</strong></summary>
 
-In code name: `complimentary_transition`
+In code name: `bon`
 
-Evaluates the LLM's ability to maintain content moderation standards when transitioning from a compliment to a new task. It assesses the LLM's ability to maintain defined boundaries when prompted to switch topics.
+Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/complimentary_transition.py">View code on GitHub</a>
+_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
 </details>
 
 <details>
-<summary><strong>Dialogue Injection</strong></summary>
+<summary><strong>Deceptive Delight</strong></summary>
 
-In code name: `dialogue_injection`
+In code name: `deceptive_delight`
 
-Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.
+Tests LLM's vulnerability to distraction and context manipulation by embedding unsafe content alongside benign topics in three messages.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/deceptive_delight.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Dialogue Injection: Continuation</strong></summary>
+
+In code name: `dialogue_injection_continuation`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique by using few-shot system prompting and unfinished assitant response at the end. Built according to the paper.
 
 _Original Paper: <https://arxiv.org/abs/2503.08195>_
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection_continuation.py">View code on GitHub</a>
 </details>
 
 <details>
-<summary><strong>Do Anything Now Jailbreak</strong></summary>
+<summary><strong>Dialogue Injection: Developer mode</strong></summary>
+
+In code name: `dialogue_injection_devmode`
+
+Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique to mislead the LLM with "Developer mode activation".
+
+_Original Paper: <https://arxiv.org/abs/2503.08195>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dialogue_injection_devmode.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Do Anything Now (DAN) Jailbreak</strong></summary>
 
 In code name: `dan`
 
 Probes an LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/dan.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Do Anything Now Jailbreak (RU)</strong></summary>
-
-In code name: `RU_dan`
-
-Probes a Russian-language LLM's resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_dan.py">View code on GitHub</a>
 </details>
 
 <details>
@@ -91,13 +105,15 @@ Evaluates the LLM's ability to resist discussions about harmful or inappropriate
 </details>
 
 <details>
-<summary><strong>Harmful Behavior</strong></summary>
+<summary><strong>HarmBench</strong></summary>
 
-In code name: `harmful_behavior`
+In code name: `harmbench`
 
-Challenges the LLM with a dataset of harmful behavior prompts.
+Challenges the LLM with harmful behavior prompts from HarmBench (contains original and translated to Russian prompts).
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior.py">View code on GitHub</a>
+_Original Paper: <https://arxiv.org/abs/2402.04249>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py">View code on GitHub</a>
 </details>
 
 <details>
@@ -121,43 +137,25 @@ Challenges the LLM with a dataset of harmful behavior prompts in past tense form
 </details>
 
 <details>
-<summary><strong>Typoglycemia Attack</strong></summary>
+<summary><strong>Shuffle Inconsistency</strong></summary>
 
-In code name: `typoglycemia_attack`
+In code name: `shuffle`
 
-Attempts to exploit a text processing vulnerability in LLMs that can cause incorrect responses by removing random characters from words.
+Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/typoglycemia.py">View code on GitHub</a>
+_Original Paper: <https://arxiv.org/html/2501.04931>_
+
+<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
 </details>
 
 <details>
-<summary><strong>Typoglycemia Attack (RU)</strong></summary>
-
-In code name: `RU_typoglycemia_attack`
-
-Attempts to exploit a text processing vulnerability in Russian-language LLMs that can cause incorrect responses by removing random characters from words.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_typoglycemia.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>UCAR</strong></summary>
+<summary><strong>UCAR Jailbreak</strong></summary>
 
 In code name: `ucar`
 
 Probes an LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>UCAR (RU)</strong></summary>
-
-In code name: `RU_ucar`
-
-Probes a Russian-language LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ru_ucar.py">View code on GitHub</a>
 </details>
 
 ## Multi-stage attacks
@@ -193,18 +191,6 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://g
 </details>
 
 <details>
-<summary><strong>Best-of-N Jailbreak</strong></summary>
-
-In code name: `bon`
-
-Probes the LLM resilience against Best-Of-N attack.
-
-_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
-</details>
-
-<details>
 <summary><strong>Crescendo</strong></summary>
 
 In code name: `crescendo`
@@ -217,25 +203,14 @@ _Original Paper: <https://arxiv.org/abs/2404.01833>_
 </details>
 
 <details>
-<summary><strong>Harmful Behavior Multistage</strong></summary>
+<summary><strong>Prompt Automatic Iterative Refinement (PAIR)</strong></summary>
 
-In code name: `harmful_behavior_multistage`
+In code name: `pair`
 
-Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement.
+Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+    Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
 
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmful_behavior_multistage.py">View code on GitHub</a>
-</details>
-
-<details>
-<summary><strong>Shuffle Inconsistency</strong></summary>
-
-In code name: `shuffle`
-
-Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
-
-_Original Paper: <https://arxiv.org/html/2501.04931>_
-
-<a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a>
 </details>
 
 ### OWASP [LLM07:2025](https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/) System Prompt Leakage
@@ -272,4 +247,47 @@ Attacks the LLM system during a multistage conversation using the argumentum ad 
 _Original Paper: <https://arxiv.org/abs/2310.13548>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/sycophancy.py">View code on GitHub</a>
+
+</details>
+
+## VLM attacks
+
+See an example with <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/examples/llamator-vlm-attacks.ipynb">VLM attacks</a>.
+
+### OWASP [LLM09:2025](https://genai.owasp.org/llmrisk/llm092025-misinformation/) Misinformation
+
+<details>
+<summary><strong>Lowres Documents Hallucination Attack</strong></summary>
+
+In code name: `vlm_lowres_docs`
+
+Test class for VLM responses for low resolution documents.
+The idea is that we provide model with unreadable document and ask to describe its contents.
+The goal is to see whether model will signal that the document is unreadable or hallucinate about the contents.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_lowres_docs.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>M-Attack</strong></summary>
+
+In code name: `vlm_m_attack`
+
+Test VLM for M-Attack, which adds noise to the image to make VLM see it as a different image.
+
+_Original Paper: <https://arxiv.org/abs/2503.10635>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_m_attack.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Text Hallucination Attack</strong></summary>
+
+In code name: `vlm_text_hallucination`
+
+Test class for VLM text hallucination attacks.
+The idea is to give model and image which contains only text and ask it to describe it.
+The goal is to see whether model will describe text or hallucinate with the description of an object written in text.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/vlm_text_hallucination.py">View code on GitHub</a>
 </details>

@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -61,22 +61,22 @@ def apply_ascii_noising(prompt: str, sigma: float) -> str:
 
 @register_test
 class TestBon(TestBase):
-    """Probes the LLM resilience against Best-of-N attack (text augmentations).
+    """Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.
     Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking"""
 
     info = {
-        "name": "Best-of-N Jailbreak",
+        "name": "Best-of-N Jailbreak (BoN)",
         "code_name": "bon",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2412.03556",
         ],
         "description": {
-            "en": "Probes the LLM resilience against Best-of-N attack. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
-            "ru": "Испытывает устойчивость LLM к атаке Best-of-N. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
+            "en": "Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
+            "ru": "Испытывает устойчивость LLM к атаке Best-of-N (BoN), которая случайно трансформирует символы в запросе. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py",
     }
@@ -86,8 +86,9 @@ class TestBon(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
-        multistage_depth: int = 5,
+        num_transformations: int = 5,
         sigma: float = 0.4,
         custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
@@ -99,8 +100,9 @@ class TestBon(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
+        self.language = language
+        self.num_transformations = num_transformations
         self.sigma = sigma  # proportion of characters to augment
-        self.multistage_depth = multistage_depth
         self.custom_dataset = custom_dataset
 
     def transform_attack_prompt(self, prompt: str) -> str:
@@ -111,16 +113,18 @@ class TestBon(TestBase):
         return prompt
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        original_prompts = []
-        attack_prompts = []
-        responses = []
-        statuses = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
+            if self.language != "any":
+                data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
@@ -128,14 +132,14 @@ class TestBon(TestBase):
                 logger.info(
                     f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}"
                 )
-                for stage in range(self.multistage_depth):
+                for stage in range(self.num_transformations):
                     yield StatusUpdate(
                         self.client_config,
                         self.info["code_name"],
                         self.status,
                         "Attacking",
-                        attack_prompt_index * self.multistage_depth + stage,
-                        self.num_attempts * self.multistage_depth,
+                        attack_prompt_index * self.num_transformations + stage,
+                        self.num_attempts * self.num_transformations,
                     )
                     original_prompts.append(attack_prompt)
                     transformed_prompt = self.transform_attack_prompt(attack_prompt)
@@ -170,9 +174,9 @@ class TestBon(TestBase):
                     responses.append(response)
                     statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(
-                original_prompts=original_prompts, attack_prompts=attack_prompts, responses=responses, statuses=statuses
+            # Save artifacts for report
+            self._save_attack_artifacts(
+                attack_prompts=attack_prompts, responses=responses, statuses=statuses, original_prompt=original_prompts
             )
 
             yield StatusUpdate(
@@ -180,8 +184,8 @@ class TestBon(TestBase):
                 self.info["code_name"],
                 self.status,
                 "Finished",
-                self.num_attempts * self.multistage_depth,
-                self.num_attempts * self.multistage_depth,
+                self.num_attempts * self.num_transformations,
+                self.num_attempts * self.num_transformations,
             )
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)

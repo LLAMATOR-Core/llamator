@@ -146,15 +146,17 @@ class TestBase(ABC):
         Returns:
             pd.DataFrame: A DataFrame prepared for the attack.
         """
-        if self.num_attempts <= dataset.shape[0]:
-            return dataset.head(n=self.num_attempts).reset_index()
-        return (
-            pd.concat([dataset] * (self.num_attempts // len(dataset) + 1))[: self.num_attempts]
-            .sort_index()
-            .reset_index(drop=True)
-        )
+        rows = dataset.shape[0]
 
-    def _prepare_attack_artifacts(
+        if rows == 0:
+            return dataset
+        elif self.num_attempts > rows:
+            repeats = -(-self.num_attempts // rows)
+            return pd.concat([dataset] * repeats).head(self.num_attempts).sort_index().reset_index(drop=True)
+        else:
+            return dataset.head(self.num_attempts).reset_index(drop=True)
+
+    def _save_attack_artifacts(
         self, attack_prompts: list[str], responses: list[str], statuses: list[str], **kwargs
     ) -> None:
         """
@@ -204,7 +206,7 @@ class TestBase(ABC):
         """
         logging.exception(f"Exception occurred during test {self.info['name']} execution")
         self.status.report_error(str(e), additional_info=f"Exception during test {self.info['name']} execution")
-        self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+        self._save_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
         return StatusUpdate(
             self.client_config,
             self.info["code_name"],

@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Optional
 
 from .chat_client import ChatSession, ClientBase
 
 
-def summarize_system_prompts(client: ClientBase, system_prompts: List[str]) -> str | None:
+def summarize_system_prompts(client: ClientBase, system_prompts: List[str]) -> Optional[bool]:
     "Given list of system prompts, summarize them and return a short (up to 5 words) representation of the idea behind them"
     chat = ChatSession(client)
     separator = "----------------------------------"
@@ -34,11 +34,11 @@ class ClientConfig:
     def get_model_description(self):
         return self.target_client.model_description
 
-    def get_system_prompts_summary(self, client: ClientBase) -> str | None:
+    def get_system_prompts_summary(self, client: ClientBase) -> Optional[bool]:
         system_prompts = self.get_system_prompts()
         model_description = self.get_model_description()
         if model_description is not None:
-            system_prompts += [model_description]
+            system_prompts.append(model_description)
         if len(system_prompts) == 0:
             return ""
         if len(system_prompts) == 1:

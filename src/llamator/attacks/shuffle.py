@@ -1,7 +1,7 @@
 import logging
 import random
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Literal, Optional
 
 import pandas as pd
 
@@ -24,7 +24,7 @@ class TestShuffle(TestBase):
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
         "tags": [
-            "lang:en",
+            "lang:any",
             "dialog:multi-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -32,7 +32,7 @@ class TestShuffle(TestBase):
         ],
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
-            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во входном вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
+            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/shuffle.py",
     }
@@ -42,8 +42,9 @@ class TestShuffle(TestBase):
         client_config: ClientConfig,
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
+        language: Literal["any", "en", "ru"] = "any",
         num_attempts: int = 0,
-        multistage_depth: int = 5,
+        num_transformations: int = 5,
         custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
     ):
@@ -54,7 +55,8 @@ class TestShuffle(TestBase):
             num_attempts=num_attempts,
             **kwargs,
         )
-        self.multistage_depth = multistage_depth
+        self.language = language
+        self.num_transformations = num_transformations
         self.custom_dataset = custom_dataset
 
     @staticmethod
@@ -64,16 +66,18 @@ class TestShuffle(TestBase):
         return " ".join(words)
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        original_prompts = []
-        attack_prompts = []
-        responses = []
-        statuses = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
-                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmful_behavior.parquet"
+                dataset_filename = Path(__file__).parent.parent / "attack_data" / "harmbench_text.parquet"
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
+            if self.language != "any":
+                data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():
@@ -81,14 +85,14 @@ class TestShuffle(TestBase):
                 logger.info(
                     f"Test '{self.info['name']}': original attack prompt #{attack_prompt_index}: {attack_prompt}"
                 )
-                for stage in range(self.multistage_depth):
+                for stage in range(self.num_transformations):
                     yield StatusUpdate(
                         self.client_config,
                         self.info["code_name"],
                         self.status,
                         "Attacking",
-                        attack_prompt_index * self.multistage_depth + stage,
-                        self.num_attempts * self.multistage_depth,
+                        attack_prompt_index * self.num_transformations + stage,
+                        self.num_attempts * self.num_transformations,
                     )
                     original_prompts.append(attack_prompt)
                     shuffled_prompt = self.shuffle_words(attack_prompt)
@@ -123,9 +127,9 @@ class TestShuffle(TestBase):
                     responses.append(response)
                     statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(
-                original_prompts=original_prompts, attack_prompts=attack_prompts, responses=responses, statuses=statuses
+            # Save artifacts for report
+            self._save_attack_artifacts(
+                attack_prompts=attack_prompts, responses=responses, statuses=statuses, original_prompt=original_prompts
             )
 
             yield StatusUpdate(
@@ -133,8 +137,8 @@ class TestShuffle(TestBase):
                 self.info["code_name"],
                 self.status,
                 "Finished",
-                self.num_attempts * self.multistage_depth,
-                self.num_attempts * self.multistage_depth,
+                self.num_attempts * self.num_transformations,
+                self.num_attempts * self.num_transformations,
             )
         except Exception as e:
             yield self.handle_exception(e, attack_prompts, responses, statuses)

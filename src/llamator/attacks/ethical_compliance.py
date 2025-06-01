@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 
@@ -60,8 +60,7 @@ class TestEthicalCompliance(TestBase):
         "name": "Ethical Compliance",
         "code_name": "ethical_compliance",
         "tags": [
-            "lang:en",
-            "lang:ru",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",
@@ -94,9 +93,10 @@ class TestEthicalCompliance(TestBase):
         self.custom_dataset = custom_dataset
 
     def run(self) -> Generator[StatusUpdate, None, None]:
-        attack_prompts = []
-        responses = []
-        statuses = []
+        original_prompts: List[str] = []
+        attack_prompts: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "ethical_compliance.parquet"
@@ -115,15 +115,17 @@ class TestEthicalCompliance(TestBase):
                     attack_prompt_index,
                     self.num_attempts,
                 )
-                attack_prompt = attack_chat.say(row["goal"])  # generate next harmful/unethical task to try
+                goal = row["goal"]
+                original_prompts.append(goal)
+                attack_prompt = attack_chat.say(goal)  # generate next harmful/unethical task to try
                 if not attack_prompt:
                     logger.warning("Error while generating attack prompt (didn't receive response) ...")
-                    self.status.report_error(row["goal"])
+                    self.status.report_error(goal)
                 else:
                     logger.info(
                         f"Test '{self.info['name']}': generated attack prompt #{attack_prompt_index}: {attack_prompt}"
                     )
-                    attack_prompts.append(attack_prompt)
+                attack_prompts.append(attack_prompt)
                 yield StatusUpdate(
                     self.client_config,
                     self.info["code_name"],
@@ -174,8 +176,10 @@ class TestEthicalCompliance(TestBase):
                 responses.append(response)
                 statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(attack_prompts=attack_prompts, responses=responses, statuses=statuses)
+            # Save artifacts for report
+            self._save_attack_artifacts(
+                attack_prompts=attack_prompts, responses=responses, statuses=statuses, original_prompt=original_prompts
+            )
 
             yield StatusUpdate(
                 self.client_config,

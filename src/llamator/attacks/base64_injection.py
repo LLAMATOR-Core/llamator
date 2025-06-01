@@ -1,7 +1,7 @@
 import base64
 import logging
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, List, Optional
 
 import pandas as pd
 
@@ -23,8 +23,7 @@ class TestBase64Injection(TestBase):
         "name": "Base64 Injection",
         "code_name": "base64_injection",
         "tags": [
-            "lang:en",
-            "lang:ru",
+            "lang:any",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
@@ -56,10 +55,10 @@ class TestBase64Injection(TestBase):
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         # Lists to store prompts, responses, and statuses for report generation
-        attack_prompts = []
-        decoded_strings = []
-        responses = []
-        statuses = []
+        attack_prompts: List[str] = []
+        decoded_strings: List[str] = []
+        responses: List[str] = []
+        statuses: List[str] = []
         try:
             if self.custom_dataset is None:
                 dataset_filename = Path(__file__).parent.parent / "attack_data" / "base64_prompts.parquet"
@@ -112,8 +111,8 @@ class TestBase64Injection(TestBase):
                 responses.append(response)
                 statuses.append(current_status)
 
-            # Prepare data for report generation
-            self._prepare_attack_artifacts(
+            # Save artifacts for report
+            self._save_attack_artifacts(
                 attack_prompts=attack_prompts, decoded_strings=decoded_strings, responses=responses, statuses=statuses
             )
 

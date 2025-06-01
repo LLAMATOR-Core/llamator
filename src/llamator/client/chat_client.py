@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from .langchain_integration import get_langchain_chat_models_info
 
@@ -33,7 +33,7 @@ class ClientBase(ABC):
     model_description: Optional[str] = None
 
     @abstractmethod
-    def interact(self, history: List[Dict[str, str]], messages: List[Dict[str, str]]) -> Dict[str, str]:
+    def interact(self, history: List[Dict[str, str]], messages: List[Dict[str, Any]]) -> Dict[str, str]:
         """
         Takes the conversation history and new messages, sends them to the LLM, and returns a new response.
 
@@ -79,7 +79,7 @@ class ChatSession:
 
     Methods
     -------
-    say(user_prompt: str, use_history: bool = True) -> str | None
+    say(user_prompt: str, use_history: bool = True) -> Optional[str]
         Sends a user message to the LLM, updates the conversation history, and returns the assistant's response.
 
     clear_history() -> None
@@ -125,7 +125,7 @@ class ChatSession:
         self.history = list(self.system_prompts)
         self.strip_client_responses = strip_client_responses
 
-    def say(self, user_prompt: str) -> str | None:
+    def say(self, user_prompt: str) -> Optional[str]:
         """
         Sends a user message to the LLM, updates the conversation history based on the use_history flag,
         and returns the assistant's response.
@@ -137,7 +137,7 @@ class ChatSession:
 
         Returns
         -------
-        str | None
+        Optional[str]
             The response from the assistant (LLM) as a string or None in case of exception.
         """
         logger.debug(f"say: system_prompts={self.system_prompts}")
@@ -193,7 +193,7 @@ class MultiStageInteractionSession:
 
     Methods
     -------
-    start_conversation(start_prompt: str) -> bool | None
+    start_conversation(start_prompt: str) -> Optional[bool]
         Starts the conversation using the attacker and alternates between attacker and tested client until a stopping condition is met.
     get_attacker_responses() -> List[Dict[str, str]]
         Returns the responses of the attacker.
@@ -290,7 +290,7 @@ class MultiStageInteractionSession:
         """
         return tested_client_response
 
-    def start_conversation(self, start_prompt: str) -> bool | None:
+    def start_conversation(self, start_prompt: str) -> Optional[bool]:
         """
         Starts the conversation with the attacker and alternates between attacker and tested client.
 
@@ -301,7 +301,7 @@ class MultiStageInteractionSession:
 
         Returns
         -------
-        bool | None
+        Optional[bool]
             Returns True if the stopping criterion was met, otherwise False. In case of exception returns None.
         """
         logger.debug("Starting multi-stage conversation.")
