@@ -308,7 +308,7 @@ class MultiStageInteractionSession:
 
         # Attacker initiates the conversation
         attacker_response = self.attacker_session.say(start_prompt)
-        if not attacker_response:
+        if attacker_response is None:
             return None
         logger.debug(f"Step {self.current_step}: Attacker response: {attacker_response}")
 
@@ -316,7 +316,7 @@ class MultiStageInteractionSession:
             # Send attacker's response to the tested client and receive tested client's response
             tested_client_response = self.tested_client_session.say(attacker_response)
             logger.debug(f"Step {self.current_step}: Tested client response: {tested_client_response}")
-            if not tested_client_response:
+            if tested_client_response is None:
                 return None
 
             # Check stopping criterion by history
@@ -339,7 +339,7 @@ class MultiStageInteractionSession:
             # Send the handled tested client's response to the attacker for refinement and sending next iteration
             attacker_response = self.attacker_session.say(attacker_prompt)
             logger.debug(f"Step {self.current_step}: Attacker response: {attacker_response}")
-            if not attacker_response:
+            if attacker_response is None:
                 return None
 
             # Increment step
