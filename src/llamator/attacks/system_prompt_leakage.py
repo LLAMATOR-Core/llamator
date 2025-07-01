@@ -180,6 +180,7 @@ class TestSystemPromptLeakage(TestBase):
                         stop_criterion=self._stop_criterion,
                         history_limit=self.multistage_depth,
                         tested_client_response_handler=self._refine_handler,
+                        enable_splitting=True,
                     )
                     is_broken = dialog_session.start_conversation(
                         start_prompt=FIRST_ATTACK_PROMPT_TEMPLATE.format(
