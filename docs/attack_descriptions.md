@@ -127,16 +127,6 @@ Leverages the use of a non-Russian language to circumvent the restrictions or fo
 </details>
 
 <details>
-<summary><strong>Past Tense Attack</strong></summary>
-
-In code name: `past_tense`
-
-Challenges the LLM with a dataset of harmful behavior prompts in past tense form.
-
-<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/past_tense.py">View code on GitHub</a>
-</details>
-
-<details>
 <summary><strong>Shuffle Inconsistency</strong></summary>
 
 In code name: `shuffle`
@@ -146,6 +136,16 @@ Attempts to bypass LLM's defense mechanism by randomly shuffling elements in inp
 _Original Paper: <https://arxiv.org/html/2501.04931>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
+</details>
+
+<details>
+<summary><strong>Time Machine Attack</strong></summary>
+
+In code name: `time_machine`
+
+Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py">View code on GitHub</a>
 </details>
 
 <details>
