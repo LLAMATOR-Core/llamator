@@ -146,7 +146,7 @@ def get_basic_tests_params_example() -> str:
     return "\n".join(lines)
 
 
-def get_preset_tests_params_example(preset_name: Literal["all", "standard"] = "all") -> str:
+def get_preset_tests_params_example(preset_name: Literal["all", "standard", "vlm"] = "all") -> str:
     """
     Build example for a named preset or all tests if ``preset_name == "all"``.
     """
@@ -165,7 +165,7 @@ def get_preset_tests_params_example(preset_name: Literal["all", "standard"] = "a
     return "\n".join(lines)
 
 
-def print_preset_tests_params_example(preset_name: Literal["all", "standard"]) -> None:
+def print_preset_tests_params_example(preset_name: Literal["all", "standard", "vlm"] = "all") -> None:
     """
     Print example code to stdout.
     """
