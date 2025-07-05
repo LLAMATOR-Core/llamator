@@ -169,7 +169,7 @@ class TestCrescendo(TestBase):
                     tested_client_session=tested_client_chat,
                     stop_criterion=self.stop_criterion,
                     history_limit=self.multistage_depth,
-                    enable_splitting=True,
+                    attacker_response_separator="[SPLIT]",
                 )
 
                 yield StatusUpdate(
