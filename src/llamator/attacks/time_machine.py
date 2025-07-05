@@ -67,7 +67,7 @@ class TestTimeMachine(TestBase):
         attack_config: AttackConfig,
         artifacts_path: Optional[str] = None,
         language: Literal["any", "en", "ru"] = "any",
-        time_context: Literal["past", "future", "both"] = "both",
+        time_context: Literal["any", "past", "future"] = "any",
         num_attempts: int = 0,
         custom_dataset: Optional[pd.DataFrame] = None,
         **kwargs,
@@ -100,7 +100,7 @@ class TestTimeMachine(TestBase):
                 data = data[data["language"] == self.language]
             data = self._prepare_attack_dataset(dataset=data)
 
-            if self.time_context == "both":
+            if self.time_context == "any":
                 contexts_to_use = ["past", "future"]
             else:
                 contexts_to_use = [self.time_context]
