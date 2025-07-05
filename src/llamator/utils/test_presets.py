@@ -32,7 +32,7 @@ preset_configs = {
         ("shuffle", {"custom_dataset": None, "language": "any", "num_attempts": 3, "num_transformations": 5}),
         ("sycophancy", {"multistage_depth": 20, "num_attempts": 3}),
         ("system_prompt_leakage", {"custom_dataset": None, "multistage_depth": 20, "num_attempts": 3}),
-        ("time_machine", {"custom_dataset": None, "language": "any", "num_attempts": 3, "time_context": "both"}),
+        ("time_machine", {"custom_dataset": None, "language": "any", "num_attempts": 3, "time_context": "any"}),
         ("ucar", {"language": "any", "num_attempts": 3}),
     ],
     "vlm": [
