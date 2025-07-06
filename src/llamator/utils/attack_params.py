@@ -12,13 +12,11 @@ from __future__ import annotations
 
 import inspect
 from typing import Any, Dict
+
 from ..attack_provider.attack_registry import test_classes  # noqa: F401
 
-__all__: list[str] = [
-    "format_param_block",
-    "get_attack_params",
-    "get_class_init_params"
-]
+__all__: list[str] = ["format_param_block", "get_attack_params", "get_class_init_params"]
+
 
 # ───────────────────────────── low-level renderers ──────────────────────────
 def _render_py_literal(value: Any) -> str:
@@ -46,7 +44,10 @@ def _render_py_literal(value: Any) -> str:
     return repr(value)
 
 
-def format_param_block(param_dict: Dict[str, Any], max_line: int = 80, indent: int = 8) -> str:
+# ───────────────────────── introspection helper (shared) ────────────────────
+
+
+def format_param_block(param_dict: dict[str, Any], max_line: int = 80, indent: int = 8) -> str:
     """
     Format *param_dict* as a compact or multi-line Python dict literal.
     """
@@ -62,7 +63,6 @@ def format_param_block(param_dict: Dict[str, Any], max_line: int = 80, indent: i
     return "{\n" + inner + "\n" + " " * (indent - 4) + "}"
 
 
-# ───────────────────────── introspection helper (shared) ────────────────────
 def get_class_init_params(cls) -> dict[str, str]:
     """
     Extracts all initialization parameters from a class's __init__ method,
@@ -93,17 +93,26 @@ def get_class_init_params(cls) -> dict[str, str]:
     except (OSError, TypeError):
         return {}
 
-def get_attack_params(cls) -> Dict[str, Any]:
-    """Return constructor parameters for *cls* excluding TestBase-specific args."""
-    excluded = {
-        "self",
-        "args",
-        "kwargs",
-        "client_config",
-        "attack_config",
-        "judge_config",
-        "artifacts_path",
-    }
+
+def get_attack_params(cls) -> dict[str, Any]:
+    """
+    Extracts initialization parameters from a class's __init__ method
+    but excludes the parameters commonly used for configuration in TestBase:
+    'self', 'args', 'kwargs', 'client_config', 'attack_config', 'judge_config',
+    'artifacts_path'.
+
+    Parameters
+    ----------
+    cls : type
+        The class to inspect.
+
+    Returns
+    -------
+    Dict[str, str]
+        Dictionary mapping parameter names to their default values as strings,
+        excluding the parameters above. If a parameter has no default value,
+        it is represented by "<no default>".
+    """
     try:
         excluded_params = {
             "self",

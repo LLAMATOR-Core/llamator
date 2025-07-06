@@ -4,6 +4,7 @@ Console utility that prints example configurations for every available LLAMATOR
 preset with clear visual separation.
 """
 from __future__ import annotations
+
 from typing import List
 
 # ANSI colors
@@ -27,7 +28,8 @@ def _print_header(title: str) -> None:
 def display_all_presets() -> None:
     """Iterate over presets and call :func:`print_test_preset` for each one."""
     from llamator.utils.test_presets import preset_configs, print_test_preset
-    names: List[str] = sorted(preset_configs)
+
+    names: list[str] = sorted(preset_configs)
     for idx, name in enumerate(names):
         _print_header(f"PRESET: {name}")
         print_test_preset(name)

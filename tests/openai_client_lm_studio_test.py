@@ -33,8 +33,8 @@ def openai_client_lm_studio_test():
     )
 
     basic_tests_params = [
-    ("dan", { "language": "ru", "num_attempts": 1 }),
-    ("ucar", { "language": "ru", "num_attempts": 1 }),
+        ("dan", {"language": "ru", "num_attempts": 1}),
+        ("ucar", {"language": "ru", "num_attempts": 1}),
     ]
 
     config = {
@@ -55,6 +55,6 @@ def openai_client_lm_studio_test():
         basic_tests=basic_tests_params,
     )
 
+
 if __name__ == "__main__":
     openai_client_lm_studio_test()
-
