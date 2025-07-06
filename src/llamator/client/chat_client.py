@@ -184,6 +184,9 @@ class MultiStageInteractionSession:
         The maximum allowed history length for the attacker.
     tested_client_response_handler : Callable[..., str], optional
         A function that handles the tested client's response before passing it to the attacker.
+    attacker_response_separator : str, optional
+        Separator for splitting the attacker's request into a reasoning part and a direct request.
+        Only the direct request is sent to the tested client.
     current_step : int
         The current step of the attacker.
     refine_args : tuple
@@ -210,6 +213,7 @@ class MultiStageInteractionSession:
         stop_criterion: Optional[Callable[[List[Dict[str, str]]], bool]] = None,
         history_limit: Optional[int] = 20,
         tested_client_response_handler: Optional[Callable[..., str]] = None,
+        attacker_response_separator: Optional[str] = None,
         refine_args: Optional[tuple] = None,
         refine_kwargs: Optional[dict] = None,
     ):
@@ -230,6 +234,9 @@ class MultiStageInteractionSession:
         tested_client_response_handler : Callable[..., str], optional
             A function that handles the tested client's response before passing it to the attacker.
             If None, a default function that returns the response unchanged is used. (default is None)
+        attacker_response_separator : str, optional
+            Separator for splitting the attacker's request into a reasoning part and a direct request.
+            Only the direct request is sent to the tested client.
         refine_args : tuple, optional
             Additional positional arguments for tested_client_response_handler. (default is None)
         refine_kwargs : dict, optional
@@ -244,6 +251,7 @@ class MultiStageInteractionSession:
             if tested_client_response_handler is not None
             else self.default_tested_client_response_handler
         )
+        self.attacker_response_separator = attacker_response_separator
         self.current_step = 1
         self.refine_args = refine_args if refine_args is not None else ()
         self.refine_kwargs = refine_kwargs if refine_kwargs is not None else {}
@@ -314,7 +322,9 @@ class MultiStageInteractionSession:
 
         while True:
             # Send attacker's response to the tested client and receive tested client's response
-            tested_client_response = self.tested_client_session.say(attacker_response)
+            if self.attacker_response_separator:
+                attacker_response = attacker_response.split(self.attacker_response_separator)[-1]
+            tested_client_response = self.tested_client_session.say(attacker_response.strip())
             logger.debug(f"Step {self.current_step}: Tested client response: {tested_client_response}")
             if tested_client_response is None:
                 return None
