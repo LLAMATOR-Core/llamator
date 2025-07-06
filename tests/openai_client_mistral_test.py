@@ -1,7 +1,5 @@
 import os
-
 from dotenv import load_dotenv
-
 
 def openai_client_mistral_test():
     """
@@ -60,5 +58,5 @@ def openai_client_mistral_test():
         basic_tests=basic_tests_params,
     )
 
-
-openai_client_mistral_test()
+if __name__ == "__main__":
+    openai_client_mistral_test()

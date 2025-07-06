@@ -29,6 +29,7 @@ class TestHarmbench(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2402.04249",
+            "model:llm",
         ],
         "description": {
             "en": "Challenges the LLM with harmful behavior prompts from HarmBench.",

@@ -48,6 +48,7 @@ class TestPAIR(TestBase):
             "owasp:llm01",
             "eval:llm-as-a-judge",
             "arxiv:2310.08419v4",
+            "model:llm",
         ],
         "description": {
             "en": (

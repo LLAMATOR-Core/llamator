@@ -29,6 +29,7 @@ class TestSuffix(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2307.15043",
+            "model:llm",
         ],
         "description": {
             "en": "Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation. Original Paper: https://arxiv.org/abs/2307.15043, Original Code: https://github.com/llm-attacks/llm-attacks",

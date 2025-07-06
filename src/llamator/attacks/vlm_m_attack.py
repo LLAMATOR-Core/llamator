@@ -36,7 +36,7 @@ class TestVlmMAttack(TestBase):
             "dialog:single-stage",
             "owasp:llm09",
             "eval:heuristic",
-            "multimodal:vlm",
+            "model:vlm",
             "arxiv:2503.10635",
         ],
         "description": {

@@ -95,7 +95,14 @@ class TestDialogueInjection(TestBase):
     info = {
         "name": "Dialogue Injection Developer Mode",
         "code_name": "dialogue_injection_devmode",
-        "tags": ["lang:ru", "dialog:single-stage", "owasp:llm01", "eval:heuristic", "arxiv:2503.08195"],
+        "tags": [
+            "lang:ru",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:heuristic",
+            "arxiv:2503.08195",
+            "model:llm",
+        ],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique.",
             "ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста, беседы.",

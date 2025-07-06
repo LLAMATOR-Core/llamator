@@ -45,6 +45,7 @@ class TestAIM(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the Nicolo Machiavelli character roleplay.",

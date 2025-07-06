@@ -70,6 +70,7 @@ class TestSystemPromptLeakage(TestBase):
             "dialog:multi-stage",
             "owasp:llm07",
             "eval:llm-as-a-judge",
+            "model:llm",
         ],
         "description": {
             "en": "Challenges the LLM with datasets of malicious prompts to extract system instructions using multistage refinement.",
