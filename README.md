@@ -62,6 +62,14 @@ Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-
 * 💬 Telegram Chat — [LLAMATOR | AI Red Team Community](https://t.me/llamator)
 * 🖤 Supported by [AI Talent Hub and ITMO University](https://ai.itmo.ru)
 
+## Contacts 📬
+
+✉️ **Email**: [team@llamator.org](mailto:team@llamator.org)
+
+## Enterprise Version 🏢
+
+⚡️<span style="color:#FFC107;"><em>Coming Soon</em></span>⚡️
+
 ## License 📜
 
 © Roman Neronov, Timur Nizamov, Nikita Ivanov
