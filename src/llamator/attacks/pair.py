@@ -35,7 +35,7 @@ Use original language of the goal."""
 @register_test
 class TestPAIR(TestBase):
     """
-    Challenges the LLM with a dataset of HarmBench prompts using multistage refinement with judge model scoring.
+    Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring.
     Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
     """
 
@@ -50,14 +50,8 @@ class TestPAIR(TestBase):
             "arxiv:2310.08419v4",
         ],
         "description": {
-            "en": (
-                "Challenges the LLM with a dataset of HarmBench prompts using multistage refinement "
-                "judge model scoring."
-            ),
-            "ru": (
-                "Испытывает LLM набором запросов, связанных с вредоносным поведением, "
-                "используя самоулучшение атакующей модели с оценкой модели-судьи."
-            ),
+            "en": "Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring. Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs",
+            "ru": "Проверяет LLM набором вредоносных запросов в несколько запросов, используя самоулучшение атакующей модели на основании оценки модели-судьи. Статья: https://arxiv.org/abs/2310.08419v4, репозиторий: https://github.com/patrickrchao/JailbreakingLLMs",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py",
     }

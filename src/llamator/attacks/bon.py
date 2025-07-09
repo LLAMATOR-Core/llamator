@@ -69,14 +69,14 @@ class TestBon(TestBase):
         "code_name": "bon",
         "tags": [
             "lang:any",
-            "dialog:multi-stage",
+            "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2412.03556",
         ],
         "description": {
-            "en": "Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt. Original Paper: https://arxiv.org/abs/2412.03556, Original Code: https://github.com/jplhughes/bon-jailbreaking",
-            "ru": "Испытывает устойчивость LLM к атаке Best-of-N (BoN), которая случайно трансформирует символы в запросе. Статья: https://arxiv.org/abs/2412.03556, оригинальный код: https://github.com/jplhughes/bon-jailbreaking",
+            "en": "Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt. Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking",
+            "ru": "Испытывает устойчивость LLM к атаке Best-of-N (BoN), которая случайно трансформирует символы в запросе. Статья: https://arxiv.org/abs/2412.03556, репозиторий: https://github.com/jplhughes/bon-jailbreaking",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py",
     }

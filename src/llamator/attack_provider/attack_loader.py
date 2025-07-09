@@ -11,6 +11,7 @@ from ..attacks import (  # noqa
     ethical_compliance,
     harmbench,
     linguistic,
+    linguistic_sandwich,
     logical_inconsistencies,
     pair,
     shuffle,
