@@ -70,6 +70,7 @@ class TestLinguisticSandwich(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2404.07242v1",
+            "model:llm",
         ],
         "description": {
             "en": "Exploits attention blink by hiding adversarial questions between innocent questions in low-resource languages. Original Paper: https://arxiv.org/abs/2404.07242v1",
