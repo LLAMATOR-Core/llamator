@@ -13,7 +13,7 @@ In code name: `suffix`
 
 Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model's vulnerability to input data manipulation.
 
-_Original Paper: <https://arxiv.org/abs/2307.15043>, Original Code: <https://github.com/llm-attacks/llm-attacks>_
+_Original Paper: <https://arxiv.org/abs/2307.15043>, Code: <https://github.com/llm-attacks/llm-attacks>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/suffix.py">View code on GitHub</a>
 </details>
@@ -45,7 +45,7 @@ In code name: `bon`
 
 Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.
 
-_Original Paper: <https://arxiv.org/abs/2412.03556>, Original Code: <https://github.com/jplhughes/bon-jailbreaking>_
+_Original Paper: <https://arxiv.org/abs/2412.03556>, Code: <https://github.com/jplhughes/bon-jailbreaking>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a>
 </details>
@@ -127,13 +127,25 @@ Leverages the use of a non-Russian language to circumvent the restrictions or fo
 </details>
 
 <details>
+<summary><strong>Linguistic Sandwich</strong></summary>
+
+In code name: `linguistic_sandwich`
+
+Exploits attention blink phenomena by hiding adversarial questions between innocent questions in low-resource languages. The attack leverages the concept that LLMs may have reduced attention when processing mixed low-resource languages.
+
+_Original Paper: <https://arxiv.org/abs/2404.07242v1>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/linguistic_sandwich.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Shuffle Inconsistency</strong></summary>
 
 In code name: `shuffle`
 
 Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt.
 
-_Original Paper: <https://arxiv.org/html/2501.04931>_
+_Original Paper: <https://arxiv.org/abs/2501.04931>_
 
 <a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a>
 </details>
@@ -163,7 +175,7 @@ Probes an LLM's adherence to content restrictions when explicitly requested to i
 <details>
 <summary><strong>What Drives the Multi-stage?</strong></summary>
 
-Multi-stage attacks are inspired by the [Jailbreaking Black Box Large Language Models in Twenty Queries (PAIR)](https://arxiv.org/html/2310.08419) paper.
+Multi-stage attacks are inspired by the [Jailbreaking Black Box Large Language Models in Twenty Queries (PAIR)](https://arxiv.org/abs/2310.08419) paper.
 
 For managing a multi-stage interaction between an attacker and tested chat clients, the `MultiStageInteractionSession` class is available [[source]](https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/client/chat_client.py). It contains the following properties:
  * `attacker_session` is the session for the attacker.
@@ -185,7 +197,7 @@ In code name: `autodan_turbo`
 
 Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.
 
-_Original Paper: <https://arxiv.org/abs/2410.05295v3>, Original Code: <https://github.com/SaFoLab-WISC/AutoDAN-Turbo>_
+_Original Paper: <https://arxiv.org/abs/2410.05295v3>, Code: <https://github.com/SaFoLab-WISC/AutoDAN-Turbo>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py">View code on GitHub</a>
 </details>
