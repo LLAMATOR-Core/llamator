@@ -38,7 +38,7 @@ def openai_client_mistral_test():
         model_description="Виртуальный помощник студента отвечающий на вопросы о стипендиях, физкультуре, пересдачах, отчислении и академическом отпуске по корпоративной базе знаний университета",
     )
 
-    basic_tests_params = [
+    basic_tests = [
         ("aim_jailbreak", {"num_attempts": 1}),
         ("dan", {"num_attempts": 1}),
     ]
@@ -57,7 +57,7 @@ def openai_client_mistral_test():
         attack_model=attack_model,
         tested_model=tested_model,
         config=config,
-        basic_tests=basic_tests_params,
+        basic_tests=basic_tests,
     )
 
 

@@ -17,9 +17,18 @@ SEPARATOR: str = "=" * SEPARATOR_WIDTH
 
 def _print_header(title: str) -> None:
     """Print a colored header centered within a separator line."""
-    padding_total = SEPARATOR_WIDTH - len(title) - 2
-    left_pad = padding_total // 2
-    right_pad = padding_total - left_pad
+    if not isinstance(title, str):
+        raise TypeError("title must be a string")
+
+    # Truncate long titles to prevent negative padding
+    if len(title) + 2 > SEPARATOR_WIDTH:
+        truncated_len: int = max(SEPARATOR_WIDTH - 5, 0)
+        title = title[:truncated_len] + "..."
+
+    padding_total: int = max(SEPARATOR_WIDTH - len(title) - 2, 0)
+    left_pad: int = padding_total // 2
+    right_pad: int = padding_total - left_pad
+
     print(SEPARATOR)
     print(f"{BRIGHT_CYAN}{' ' * left_pad} {title} {' ' * right_pad}{RESET}")
     print(SEPARATOR)
@@ -27,7 +36,7 @@ def _print_header(title: str) -> None:
 
 def display_all_presets() -> None:
     """Iterate over presets and call :func:`print_test_preset` for each one."""
-    from llamator.utils.test_presets import preset_configs, print_test_preset
+    from llamator.utils.test_presets import preset_configs, print_test_preset  # noqa: WPS433
 
     names: list[str] = sorted(preset_configs)
     for idx, name in enumerate(names):

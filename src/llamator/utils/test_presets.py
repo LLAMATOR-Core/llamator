@@ -1,5 +1,5 @@
 """
-Dynamic preset generator for ``basic_tests_params`` and user-facing helpers.
+Dynamic preset generator for ``basic_tests`` and user-facing helpers.
 
 Preset mapping
 --------------
@@ -101,14 +101,14 @@ PresetName = Literal[Tuple[Literal[tuple(preset_configs.keys())]]]  # type: igno
 
 def get_test_preset(preset_name: PresetName = "all") -> str:  # type: ignore[valid-type]
     """
-    Build an example ``basic_tests_params`` code block for *preset_name*.
+    Build an example ``basic_tests`` code block for *preset_name*.
     """
     preset = preset_configs.get(preset_name)
     if preset is None:
         available = ", ".join(sorted(preset_configs))
         return f"# Preset '{preset_name}' not found. Available presets: {available}."
 
-    lines: list[str] = ["basic_tests_params = ["]
+    lines: list[str] = ["basic_tests = ["]
     for code_name, param_dict in preset:
         lines.append(f'    ("{code_name}", {format_param_block(param_dict)}),')
     lines.append("]")
