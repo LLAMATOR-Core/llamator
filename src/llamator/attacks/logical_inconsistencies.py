@@ -67,6 +67,7 @@ class TestLogicalInconsistencies(TestBase):
             "dialog:multi-stage",
             "owasp:llm09",
             "eval:llm-as-a-judge",
+            "model:llm",
         ],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation to generate logical inconsistencies in answers using antonyms, negations, and paraphrases based on the system's domain.",

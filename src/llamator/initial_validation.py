@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Type
 from .attack_provider.attack_registry import test_classes
 from .attack_provider.test_base import TestBase
 from .client.chat_client import ClientBase
-from .utils.params_example import _get_class_init_params
+from .utils.attack_params import get_class_init_params
 
 
 def get_registered_test_code_names() -> List[str]:
@@ -173,7 +173,7 @@ def validate_basic_tests_params(basic_tests_params: List[Tuple[str, Dict]]) -> b
             return False
 
         cls = code_name_to_class[test_code_name]
-        init_params = _get_class_init_params(cls)
+        init_params = get_class_init_params(cls)
         recognized_param_names = set(init_params.keys())
 
         for param_key in param_dict.keys():
@@ -219,13 +219,13 @@ def check_judge_config_usage(
     for code_name, _ in basic_tests_params:
         cls = code_name_to_class.get(code_name)
         if cls:
-            init_params = _get_class_init_params(cls)
+            init_params = get_class_init_params(cls)
             if "judge_config" in init_params and judge_model is None:
                 logging.error(f"Test '{code_name}' requires 'judge_config', but no judge model was provided.")
                 return False
 
     for custom_test_cls, _ in custom_tests_params:
-        init_params = _get_class_init_params(custom_test_cls)
+        init_params = get_class_init_params(custom_test_cls)
         if "judge_config" in init_params and judge_model is None:
             logging.error(
                 f"Custom test '{custom_test_cls.__name__}' requires 'judge_config', " "but no judge model was provided."

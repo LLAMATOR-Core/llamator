@@ -53,6 +53,7 @@ class TestTimeMachine(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": "Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.",

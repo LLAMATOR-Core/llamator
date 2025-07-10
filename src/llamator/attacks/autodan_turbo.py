@@ -100,6 +100,7 @@ class TestAutoDanTurbo(TestBase):
             "owasp:llm01",
             "eval:llm-as-a-judge",
             "arxiv:2410.05295v3",
+            "model:llm",
         ],
         "description": {
             "en": "Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.",

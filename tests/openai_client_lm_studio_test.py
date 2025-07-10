@@ -32,9 +32,9 @@ def openai_client_lm_studio_test():
         system_prompts=["You are a judge model."],
     )
 
-    basic_tests_params = [
-        ("RU_ucar", {"num_attempts": 1}),
-        ("RU_dan", {"num_attempts": 1}),
+    basic_tests = [
+        ("dan", {"language": "ru", "num_attempts": 1}),
+        ("ucar", {"language": "ru", "num_attempts": 1}),
     ]
 
     config = {
@@ -52,8 +52,9 @@ def openai_client_lm_studio_test():
         tested_model=tested_model,
         judge_model=judge_model,
         config=config,
-        basic_tests=basic_tests_params,
+        basic_tests=basic_tests,
     )
 
 
-openai_client_lm_studio_test()
+if __name__ == "__main__":
+    openai_client_lm_studio_test()

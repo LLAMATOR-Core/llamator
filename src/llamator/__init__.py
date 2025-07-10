@@ -4,7 +4,7 @@ from .client.chat_client import ClientBase
 from .client.langchain_integration import print_chat_models_info
 from .client.specific_chat_clients import ClientLangChain, ClientOpenAI
 from .main import start_testing
-from .utils.params_example import get_preset_tests_params_example, print_preset_tests_params_example
+from .utils.test_presets import get_test_preset, print_test_preset
 
 __all__ = [
     "__version__",
@@ -13,7 +13,7 @@ __all__ = [
     "TestBase",
     "ClientLangChain",
     "ClientOpenAI",
-    "print_preset_tests_params_example",
-    "get_preset_tests_params_example",
+    "print_test_preset",
+    "get_test_preset",
     "print_chat_models_info",
 ]

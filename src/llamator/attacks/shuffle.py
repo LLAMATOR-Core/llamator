@@ -29,6 +29,7 @@ class TestShuffle(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2501.04931",
+            "model:llm",
         ],
         "description": {
             "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
