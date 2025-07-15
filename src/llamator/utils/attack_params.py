@@ -17,8 +17,15 @@ from ..attack_provider.attack_registry import test_classes  # noqa: F401
 
 __all__: list[str] = ["format_param_block", "get_attack_params", "get_class_init_params"]
 
+# --------------------------------------------------------------------------- #
+# Module-level constants
+# --------------------------------------------------------------------------- #
+_DEFAULT_NUM_ATTEMPTS: int = 3  # Fallback value for ``num_attempts``.
 
-# ───────────────────────────── low-level renderers ──────────────────────────
+
+# --------------------------------------------------------------------------- #
+# Low-level renderers
+# --------------------------------------------------------------------------- #
 def _render_py_literal(value: Any) -> str:
     """
     Convert *value* into a valid Python literal string.
@@ -39,14 +46,35 @@ def _render_py_literal(value: Any) -> str:
 
     if isinstance(value, tuple):
         items = ", ".join(_render_py_literal(v) for v in value)
+        # Correct rendering for single-element tuples.
         return f"({items},)" if len(value) == 1 else f"({items})"
 
     return repr(value)
 
 
-# ───────────────────────── introspection helper (shared) ────────────────────
+# --------------------------------------------------------------------------- #
+# Internal helpers
+# --------------------------------------------------------------------------- #
+def _patch_num_attempts(params: dict[str, Any]) -> None:
+    """
+    Ensure that the ``num_attempts`` parameter has a safe default.
+
+    The function mutates *params* in-place:
+
+    * If ``"num_attempts"`` exists and its value is ``0`` or ``"<no default>"``,
+      it is replaced with ``_DEFAULT_NUM_ATTEMPTS``.
+    """
+    if "num_attempts" not in params:
+        return
+
+    value = params["num_attempts"]
+    if value in (0, "<no default>"):
+        params["num_attempts"] = _DEFAULT_NUM_ATTEMPTS
 
 
+# --------------------------------------------------------------------------- #
+# Shared introspection helper
+# --------------------------------------------------------------------------- #
 def format_param_block(param_dict: dict[str, Any], max_line: int = 80, indent: int = 8) -> str:
     """
     Format *param_dict* as a compact or multi-line Python dict literal.
@@ -63,7 +91,7 @@ def format_param_block(param_dict: dict[str, Any], max_line: int = 80, indent: i
     return "{\n" + inner + "\n" + " " * (indent - 4) + "}"
 
 
-def get_class_init_params(cls) -> dict[str, str]:
+def get_class_init_params(cls) -> dict[str, Any]:
     """
     Extracts all initialization parameters from a class's __init__ method,
     excluding 'self', 'args' and 'kwargs'.
@@ -85,10 +113,14 @@ def get_class_init_params(cls) -> dict[str, str]:
         for param_name, param_obj in sig.parameters.items():
             if param_name in ("self", "args", "kwargs"):
                 continue
+
             if param_obj.default is inspect.Parameter.empty:
                 params_dict[param_name] = "<no default>"
             else:
                 params_dict[param_name] = param_obj.default
+
+        # Set a safe default for ``num_attempts`` without touching other keys.
+        _patch_num_attempts(params_dict)
         return params_dict
     except (OSError, TypeError):
         return {}
@@ -128,10 +160,14 @@ def get_attack_params(cls) -> dict[str, Any]:
         for param_name, param_obj in sig.parameters.items():
             if param_name in excluded_params:
                 continue
+
             if param_obj.default is inspect.Parameter.empty:
                 params_dict[param_name] = "<no default>"
             else:
                 params_dict[param_name] = param_obj.default
+
+        # Set a safe default for ``num_attempts`` without touching other keys.
+        _patch_num_attempts(params_dict)
         return params_dict
     except (OSError, TypeError):
         return {}
