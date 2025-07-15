@@ -40,6 +40,7 @@ class TestDeceptiveDelight(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": "Tests LLM's vulnerability to distraction and context manipulation by embedding unsafe content alongside benign topics in three messages.",
