@@ -64,6 +64,7 @@ class TestEthicalCompliance(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:llm-as-a-judge",
+            "model:llm",
         ],
         "description": {
             "en": "Evaluates the LLM's ability to resist discussions about harmful or inappropriate misconceptions on sensitive topics. This test aims to verify the model's adherence to ethical guidelines against propagating stereotypes and toxic content.",

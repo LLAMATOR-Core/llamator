@@ -104,26 +104,29 @@ print(test_result_dict)
 
 ## Helper Functions
 
-### `print_preset_tests_params_example`
+### `print_test_preset`
 Prints example configuration for presets to the console.
 
+Available presets: `all`, `eng`, `llm`, `owasp:llm01`, `owasp:llm07`, `owasp:llm09`, `rus`, `vlm`
+
 **Usage:**
+
 ```python
-from llamator import print_preset_tests_params_example
+from llamator import print_test_preset
 
 # Print configuration for all available tests
-print_preset_tests_params_example("all")
+print_test_preset("all")
 ```
 
-### `get_preset_tests_params_example`
+### `get_test_preset`
 Returns a string containing example configurations for presets.
 
 **Usage:**
 ```python
-from llamator import get_preset_tests_params_example
+from llamator import get_test_preset
 
 # Get example for all available tests
-all_tests_preset = get_preset_tests_params_example("all")
+all_tests_preset = get_test_preset("all")
 print(all_tests_preset)
 ```
 

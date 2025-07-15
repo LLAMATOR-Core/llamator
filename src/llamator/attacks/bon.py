@@ -73,6 +73,7 @@ class TestBon(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2412.03556",
+            "model:llm",
         ],
         "description": {
             "en": "Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt. Original Paper: https://arxiv.org/abs/2412.03556, Code: https://github.com/jplhughes/bon-jailbreaking",

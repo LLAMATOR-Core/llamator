@@ -48,6 +48,7 @@ class TestPAIR(TestBase):
             "owasp:llm01",
             "eval:llm-as-a-judge",
             "arxiv:2310.08419v4",
+            "model:llm",
         ],
         "description": {
             "en": "Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring. Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs",

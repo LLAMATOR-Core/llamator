@@ -66,7 +66,14 @@ class TestDialogueInjectionContinuation(TestBase):
     info = {
         "name": "Dialogue Injection Continuation",
         "code_name": "dialogue_injection_continuation",
-        "tags": ["lang:any", "dialog:single-stage", "owasp:llm01", "eval:llm-as-a-judge", "arxiv:2503.08195"],
+        "tags": [
+            "lang:any",
+            "dialog:single-stage",
+            "owasp:llm01",
+            "eval:llm-as-a-judge",
+            "arxiv:2503.08195",
+            "model:llm",
+        ],
         "description": {
             "en": "Probes an LLM's ethical compliance by eliciting detailed instructions on illegal activities, using the conversation simulation technique. Original Paper: https://arxiv.org/abs/2503.08195",
             "ru": "Проверяет этическое соответствие LLM, вызывая детальные инструкции по незаконной деятельности, используя технику имитации контекста. Статья: https://arxiv.org/abs/2503.08195",
