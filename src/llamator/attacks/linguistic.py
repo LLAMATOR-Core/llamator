@@ -28,6 +28,7 @@ class TestLinguisticEvasion(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": "Leverages the use of a non-Russian language to circumvent the restrictions or focus set by the system prompt.",

@@ -14,7 +14,7 @@ Red Teaming python-framework for testing chatbots and GenAI systems
 ## Install 🚀
 
 ```bash
-pip install llamator==3.2.0
+pip install llamator==3.3.0
 ```
 
 ## Documentation 📚
@@ -59,15 +59,16 @@ Documentation Link: [https://LLAMATOR-Core.github.io/llamator](https://LLAMATOR-
 
 ## Community 🌍
 
-* 💬 [Telegram Chat — LLAMATOR | AI Red Team Community](https://t.me/llamator)
-* 📣 [Telegram Channel — AI Security Lab](https://t.me/aisecuritylab)
+* 💬 Telegram Chat — [LLAMATOR | AI Red Team Community](https://t.me/llamator)
+* 🖤 Supported by [AI Talent Hub and ITMO University](https://ai.itmo.ru)
 
+## Contacts 📬
 
-## Supported by 🚀
+✉️ **Email**: [team@llamator.org](mailto:team@llamator.org)
 
-* [AI Security Lab ITMO](https://ai.itmo.ru/aisecuritylab)
-* [Raft Security](https://raftds.ru/)
-* [AI Talent Hub](https://ai.itmo.ru/)
+## Enterprise Version 🏢
+
+⚡️<span style="color:#FFC107;"><em>Coming Soon</em></span>⚡️
 
 ## License 📜
 

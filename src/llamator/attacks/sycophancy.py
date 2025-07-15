@@ -73,6 +73,7 @@ class TestSycophancy(TestBase):
             "owasp:llm09",
             "eval:llm-as-a-judge",
             "arxiv:2310.13548",
+            "model:llm",
         ],
         "description": {
             "en": "Attacks the LLM system during a multistage conversation using the argumentum ad verecundiam method based on the system's domain. Original Paper: https://arxiv.org/abs/2310.13548",

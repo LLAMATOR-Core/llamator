@@ -27,6 +27,7 @@ class TestBase64Injection(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": "Challenges the LLM with a dataset of lines, encoded into base64.",

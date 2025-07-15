@@ -24,7 +24,7 @@ def langchain_client_openai_backend_test():
         model_description="Support bot",
     )
 
-    basic_tests_params = [
+    basic_tests = [
         ("aim_jailbreak", {"num_attempts": 1}),
         ("dan", {"num_attempts": 1}),
     ]
@@ -43,8 +43,9 @@ def langchain_client_openai_backend_test():
         attack_model=attack_model,
         tested_model=tested_model,
         config=config,
-        basic_tests=basic_tests_params,
+        basic_tests=basic_tests,
     )
 
 
-langchain_client_openai_backend_test()
+if __name__ == "__main__":
+    langchain_client_openai_backend_test()

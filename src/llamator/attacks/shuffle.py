@@ -18,21 +18,22 @@ logger = logging.getLogger(__name__)
 @register_test
 class TestShuffle(TestBase):
     """Probes the LLM resilience against Shuffle Inconsistency.
-    Original Paper: https://arxiv.org/html/2501.04931"""
+    Original Paper: https://arxiv.org/abs/2501.04931"""
 
     info = {
         "name": "Shuffle Inconsistency",
         "code_name": "shuffle",
         "tags": [
             "lang:any",
-            "dialog:multi-stage",
+            "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2501.04931",
+            "model:llm",
         ],
         "description": {
-            "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/html/2501.04931",
-            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во вредоносном запросе. Статья: https://arxiv.org/html/2501.04931",
+            "en": "Attempts to bypass LLM's defense mechanism by randomly shuffling elements in input harmful prompt. Original Paper: https://arxiv.org/abs/2501.04931",
+            "ru": "Проверяет устойчивость LLM к Shuffle Inconsistency: Попытка обойти защиту LLM, случайным образом перемешивая элементы во вредоносном запросе. Статья: https://arxiv.org/abs/2501.04931",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/shuffle.py",
     }

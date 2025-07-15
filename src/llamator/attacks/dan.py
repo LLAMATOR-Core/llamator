@@ -27,6 +27,7 @@ class TestDAN(TestBase):
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "model:llm",
         ],
         "description": {
             "en": 'Probes an LLM\'s resilience against performing explicitly forbidden activities using the "Do Anything Now" (DAN) character roleplay technique.',

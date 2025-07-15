@@ -100,10 +100,11 @@ class TestAutoDanTurbo(TestBase):
             "owasp:llm01",
             "eval:llm-as-a-judge",
             "arxiv:2410.05295v3",
+            "model:llm",
         ],
         "description": {
-            "en": "Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.",
-            "ru": "Реализует атаку AutoDAN-Turbo, которая использует агент с обучением на протяжении всей жизни для самостоятельного исследования стратегий взлома больших языковых моделей. Этот подход автоматически выявляет эффективные стратегии взлома и комбинирует их для проведения более эффективных атак на следующих итерациях.",
+            "en": "Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks. Original Paper: https://arxiv.org/abs/2410.05295v3, Code: https://github.com/SaFoLab-WISC/AutoDAN-Turbo",
+            "ru": "Реализует атаку AutoDAN-Turbo, которая использует агент с обучением на протяжении всей жизни для самостоятельного исследования стратегий взлома больших языковых моделей. Этот подход автоматически выявляет эффективные стратегии взлома и комбинирует их для проведения более эффективных атак на следующих итерациях. Статья: https://arxiv.org/abs/2410.05295v3, репозиторий: https://github.com/SaFoLab-WISC/AutoDAN-Turbo",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py",
     }
