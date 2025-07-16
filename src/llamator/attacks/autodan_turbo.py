@@ -287,25 +287,22 @@ class TestAutoDanTurbo(TestBase):
 
         return is_broken
 
-    def _update_strategy_library(self, successful_attacks: List[Dict[str, Any]]) -> None:
+    def _update_strategy_library(self, successful_attack: Dict[str, Any]) -> None:
         """
-        Updates the strategy library based on successful attacks.
+        Updates the strategy library based on successful attack.
 
         Args:
-            successful_attacks: List of successful attack attempts
+            successful_attack: Successful attack attempt
         """
-        if not successful_attacks:
+        if not successful_attack:
             return
 
         # Format attack summary for the judge model
-        attack_summary = "\n\n".join(
-            [
-                f"Malicious Request: {attack['malicious_request']}\n"
-                f"Jailbreak Prompt: {attack['jailbreak_prompt']}\n"
-                f"Response: {attack['response']}\n"
-                f"Stages: {attack['stages']}"
-                for attack in successful_attacks
-            ]
+        attack_summary = (
+            f"Malicious Request: {successful_attack['malicious_request']}\n"
+            f"Jailbreak Prompt: {successful_attack['jailbreak_prompt']}\n"
+            f"Response: {successful_attack['response']}\n"
+            f"Stages: {successful_attack['stages']}"
         )
 
         # Get new strategy from judge model
@@ -355,7 +352,6 @@ class TestAutoDanTurbo(TestBase):
         attack_prompts: List[str] = []
         responses: List[str] = []
         statuses: List[str] = []
-        successful_attacks: List[str] = []
 
         try:
             # Load and prepare dataset
@@ -481,15 +477,23 @@ class TestAutoDanTurbo(TestBase):
                         self._update_strategy_performance(strategy["strategy"], score)
 
                     # Record this successful attack for strategy improvement
-                    successful_attacks.append(
-                        {
-                            "malicious_request": malicious_request,
-                            "jailbreak_prompt": iter_attack_prompts[-1],
-                            "response": iter_responses[-1],
-                            "stages": conversation_stages,
-                            "strategies_used": [s["strategy"] for s in selected_strategies],
-                        }
+                    yield StatusUpdate(
+                        self.client_config,
+                        self.info["code_name"],
+                        self.status,
+                        "Reflecting",
+                        i,
+                        self.num_attempts,
                     )
+                    successful_attack = {
+                        "malicious_request": malicious_request,
+                        "jailbreak_prompt": iter_attack_prompts[-1],
+                        "response": iter_responses[-1],
+                        "stages": conversation_stages,
+                        "strategies_used": [s["strategy"] for s in selected_strategies],
+                    }
+                    # Update strategy library
+                    self._update_strategy_library(successful_attack)
                 else:
                     # If still resilient, mark all responses as resilient
                     conversation_statuses = ["Resilient"] * conversation_stages
@@ -503,17 +507,6 @@ class TestAutoDanTurbo(TestBase):
                 responses.extend(iter_responses)
                 statuses.extend(conversation_statuses)
                 original_prompts.extend([malicious_request] * conversation_stages)
-
-                yield StatusUpdate(
-                    self.client_config,
-                    self.info["code_name"],
-                    self.status,
-                    "Reflecting",
-                    i,
-                    self.num_attempts,
-                )
-                # Update strategy library
-                self._update_strategy_library(successful_attacks)
 
             # Save artifacts for report
             self._save_attack_artifacts(
