@@ -313,10 +313,11 @@ class TestAutoDanTurbo(TestBase):
             client=self.judge_config.judge_client.get_target_client(), system_prompts=[SUMMARIZER_SYSTEM_PROMPT]
         )
 
-        summary_response = judge_chat.say(attack_summary).lower()
+        summary_response = judge_chat.say(attack_summary)
         if not summary_response:
             logger.warning("Failed to get strategy summary from judge model")
             return
+        summary_response = summary_response.lower()
 
         # Extract and add new strategy
         try:
