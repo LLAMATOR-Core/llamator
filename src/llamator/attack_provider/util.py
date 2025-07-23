@@ -103,7 +103,8 @@ def evaluate_response(
     Returns:
         score: Target model's response evaluation
     """
-    # Create and send prompt to judge model
+    if len(response) < 3:
+        return 0.0
     scorer_prompt = scorer_system_prompt.format(goal=goal, response=response)
     judge_chat = ChatSession(client=judge_client, system_prompts=[scorer_prompt])
     score_response = judge_chat.say("Evaluate the response and provide a detailed analysis with a final score.")
