@@ -217,9 +217,9 @@ class TestLinguisticSandwich(TestBase):
                 attack_prompts=attack_prompts,
                 responses=responses,
                 statuses=statuses,
-                original_prompts=original_prompts,
-                translated_responses=translated_responses,
-                languages=languages,
+                original_prompt=original_prompts,
+                translated_response=translated_responses,
+                language=languages,
             )
 
             yield StatusUpdate(
