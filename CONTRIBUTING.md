@@ -112,15 +112,16 @@ class TestNewAttack(TestBase):
         "name": "New Attack",
         "code_name": "new_attack",
         "tags": [
-            "lang:en",  # languages of available tested models
+            "lang:any",  # languages of available tested models
             "dialog:single-stage",  # type of dialogs: single-stage or multi-stage
             "owasp:llm01",  # OWASP TOP 10 for LLM risks
-            "eval:heuristic",  # type of resilience evaluation
+            "eval:heuristic",  # type of resilience evaluation: heuristic or llm-as-a-judge
             "arxiv:2504.11111",  # original paper if exists
+            "model:llm",  # type of testing model: llm, vlm
         ],
         "description": {
-            "en": "Description in English.",
-            "ru": "Описание на русском.",
+            "en": "Your attack description here in English.",
+            "ru": "Описание атаки на русском.",
         },
         "github_link": "Link to attack in release branch",
     }
