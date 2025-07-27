@@ -52,20 +52,20 @@ Available Clients
 Additional Utility Functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: llamator.utils.params_example.get_preset_tests_params_example
+.. autofunction:: llamator.utils.test_presets.get_test_preset
    :noindex:
 
 .. note::
 
-   This function generates an example code snippet for configuring basic_tests_params based on a preset configuration.
+   This function generates an example code snippet for configuring basic_tests based on a preset configuration.
    It returns a code snippet as a string.
 
-.. autofunction:: llamator.utils.params_example.print_preset_tests_params_example
+.. autofunction:: llamator.utils.test_presets.print_test_preset
    :noindex:
 
 .. note::
 
-   This function prints an example configuration for basic_tests_params based on a preset to the console.
+   This function prints an example configuration for basic_tests based on a preset to the console.
 
 .. autofunction:: llamator.client.langchain_integration.print_chat_models_info
    :noindex:

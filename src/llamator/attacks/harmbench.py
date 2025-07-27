@@ -29,10 +29,11 @@ class TestHarmbench(TestBase):
             "owasp:llm01",
             "eval:heuristic",
             "arxiv:2402.04249",
+            "model:llm",
         ],
         "description": {
-            "en": "Challenges the LLM with harmful behavior prompts from HarmBench.",
-            "ru": "Испытывает LLM набором вредоносных запросов из датасета HarmBench.",
+            "en": "Challenges the LLM with harmful behavior prompts from HarmBench: https://arxiv.org/abs/2402.04249",
+            "ru": "Испытывает LLM набором вредоносных запросов из датасета HarmBench: https://arxiv.org/abs/2402.04249",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/harmbench.py",
     }
