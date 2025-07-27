@@ -48,9 +48,9 @@ pre-commit install
 
 ### Run Tests
 
-1. Navigate to `tests/test_local_llamator.py`.
+1. Navigate to the `tests` directory.
 2. Create `.env` from `.env.example` and fill in the necessary fields.
-3. Run the test function based on your LLM client setup.
+3. Run an appropriate test file for your LLM client configuration.
 
 ## Making Changes
 
