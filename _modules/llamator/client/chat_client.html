@@ -491,6 +491,9 @@
 <span class="sd">        The maximum allowed history length for the attacker.</span>
 <span class="sd">    tested_client_response_handler : Callable[..., str], optional</span>
 <span class="sd">        A function that handles the tested client&#39;s response before passing it to the attacker.</span>
+<span class="sd">    attacker_response_separator : str, optional</span>
+<span class="sd">        Separator for splitting the attacker&#39;s request into a reasoning part and a direct request.</span>
+<span class="sd">        Only the direct request is sent to the tested client.</span>
 <span class="sd">    current_step : int</span>
 <span class="sd">        The current step of the attacker.</span>
 <span class="sd">    refine_args : tuple</span>
@@ -517,6 +520,7 @@
         <span class="n">stop_criterion</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]],</span> <span class="nb">bool</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">history_limit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
         <span class="n">tested_client_response_handler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">attacker_response_separator</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">refine_args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">refine_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -537,6 +541,9 @@
 <span class="sd">        tested_client_response_handler : Callable[..., str], optional</span>
 <span class="sd">            A function that handles the tested client&#39;s response before passing it to the attacker.</span>
 <span class="sd">            If None, a default function that returns the response unchanged is used. (default is None)</span>
+<span class="sd">        attacker_response_separator : str, optional</span>
+<span class="sd">            Separator for splitting the attacker&#39;s request into a reasoning part and a direct request.</span>
+<span class="sd">            Only the direct request is sent to the tested client.</span>
 <span class="sd">        refine_args : tuple, optional</span>
 <span class="sd">            Additional positional arguments for tested_client_response_handler. (default is None)</span>
 <span class="sd">        refine_kwargs : dict, optional</span>
@@ -551,6 +558,7 @@
             <span class="k">if</span> <span class="n">tested_client_response_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_tested_client_response_handler</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attacker_response_separator</span> <span class="o">=</span> <span class="n">attacker_response_separator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">current_step</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">refine_args</span> <span class="o">=</span> <span class="n">refine_args</span> <span class="k">if</span> <span class="n">refine_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">refine_kwargs</span> <span class="o">=</span> <span class="n">refine_kwargs</span> <span class="k">if</span> <span class="n">refine_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
@@ -615,15 +623,17 @@
 
         <span class="c1"># Attacker initiates the conversation</span>
         <span class="n">attacker_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attacker_session</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">start_prompt</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">attacker_response</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">attacker_response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="si">}</span><span class="s2">: Attacker response: </span><span class="si">{</span><span class="n">attacker_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># Send attacker&#39;s response to the tested client and receive tested client&#39;s response</span>
-            <span class="n">tested_client_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tested_client_session</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">attacker_response</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">attacker_response_separator</span><span class="p">:</span>
+                <span class="n">attacker_response</span> <span class="o">=</span> <span class="n">attacker_response</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">attacker_response_separator</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">tested_client_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tested_client_session</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">attacker_response</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="si">}</span><span class="s2">: Tested client response: </span><span class="si">{</span><span class="n">tested_client_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">tested_client_response</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tested_client_response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
 
             <span class="c1"># Check stopping criterion by history</span>
@@ -646,7 +656,7 @@
             <span class="c1"># Send the handled tested client&#39;s response to the attacker for refinement and sending next iteration</span>
             <span class="n">attacker_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attacker_session</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">attacker_prompt</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">current_step</span><span class="si">}</span><span class="s2">: Attacker response: </span><span class="si">{</span><span class="n">attacker_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">attacker_response</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attacker_response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
 
             <span class="c1"># Increment step</span>

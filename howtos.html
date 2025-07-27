@@ -325,7 +325,7 @@
 </section>
 <section id="installation-guide">
 <h2>Installation Guide<a class="headerlink" href="#installation-guide" title="Link to this heading">¶</a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">3</span>.2.0
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">llamator</span><span class="o">==</span><span class="m">3</span>.3.0
 </pre></div>
 </div>
 </section>
@@ -416,25 +416,26 @@
 <hr class="docutils" />
 <section id="helper-functions">
 <h2>Helper Functions<a class="headerlink" href="#helper-functions" title="Link to this heading">¶</a></h2>
-<section id="print-preset-tests-params-example">
-<h3><code class="docutils literal notranslate"><span class="pre">print_preset_tests_params_example</span></code><a class="headerlink" href="#print-preset-tests-params-example" title="Link to this heading">¶</a></h3>
+<section id="print-test-preset">
+<h3><code class="docutils literal notranslate"><span class="pre">print_test_preset</span></code><a class="headerlink" href="#print-test-preset" title="Link to this heading">¶</a></h3>
 <p>Prints example configuration for presets to the console.</p>
+<p>Available presets: <code class="docutils literal notranslate"><span class="pre">all</span></code>, <code class="docutils literal notranslate"><span class="pre">eng</span></code>, <code class="docutils literal notranslate"><span class="pre">llm</span></code>, <code class="docutils literal notranslate"><span class="pre">owasp:llm01</span></code>, <code class="docutils literal notranslate"><span class="pre">owasp:llm07</span></code>, <code class="docutils literal notranslate"><span class="pre">owasp:llm09</span></code>, <code class="docutils literal notranslate"><span class="pre">rus</span></code>, <code class="docutils literal notranslate"><span class="pre">vlm</span></code></p>
 <p><strong>Usage:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_preset_tests_params_example</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">print_test_preset</span>
 
 <span class="c1"># Print configuration for all available tests</span>
-<span class="n">print_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">print_test_preset</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="get-preset-tests-params-example">
-<h3><code class="docutils literal notranslate"><span class="pre">get_preset_tests_params_example</span></code><a class="headerlink" href="#get-preset-tests-params-example" title="Link to this heading">¶</a></h3>
+<section id="get-test-preset">
+<h3><code class="docutils literal notranslate"><span class="pre">get_test_preset</span></code><a class="headerlink" href="#get-test-preset" title="Link to this heading">¶</a></h3>
 <p>Returns a string containing example configurations for presets.</p>
 <p><strong>Usage:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_preset_tests_params_example</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">llamator</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_test_preset</span>
 
 <span class="c1"># Get example for all available tests</span>
-<span class="n">all_tests_preset</span> <span class="o">=</span> <span class="n">get_preset_tests_params_example</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+<span class="n">all_tests_preset</span> <span class="o">=</span> <span class="n">get_test_preset</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">all_tests_preset</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -521,8 +522,8 @@
 <li><a class="reference internal" href="#installation-guide">Installation Guide</a></li>
 <li><a class="reference internal" href="#usage-guide-using-lm-studio">Usage Guide (using LM Studio)</a></li>
 <li><a class="reference internal" href="#helper-functions">Helper Functions</a><ul>
-<li><a class="reference internal" href="#print-preset-tests-params-example"><code class="docutils literal notranslate"><span class="pre">print_preset_tests_params_example</span></code></a></li>
-<li><a class="reference internal" href="#get-preset-tests-params-example"><code class="docutils literal notranslate"><span class="pre">get_preset_tests_params_example</span></code></a></li>
+<li><a class="reference internal" href="#print-test-preset"><code class="docutils literal notranslate"><span class="pre">print_test_preset</span></code></a></li>
+<li><a class="reference internal" href="#get-test-preset"><code class="docutils literal notranslate"><span class="pre">get_test_preset</span></code></a></li>
 <li><a class="reference internal" href="#print-chat-models-info"><code class="docutils literal notranslate"><span class="pre">print_chat_models_info</span></code></a></li>
 </ul>
 </li>

@@ -320,7 +320,7 @@
 <summary><strong>Adversarial Suffix</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">suffix</span></code></p>
 <p>Uses a specially crafted suffix to bypass LLM filters and restrictions, forcing the model to generate prohibited or harmful content despite the original query. Evaluates the model’s vulnerability to input data manipulation.</p>
-<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2307.15043">https://arxiv.org/abs/2307.15043</a>, Original Code: <a class="reference external" href="https://github.com/llm-attacks/llm-attacks">https://github.com/llm-attacks/llm-attacks</a></em></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2307.15043">https://arxiv.org/abs/2307.15043</a>, Code: <a class="reference external" href="https://github.com/llm-attacks/llm-attacks">https://github.com/llm-attacks/llm-attacks</a></em></p>
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/suffix.py">View code on GitHub</a></p>
 </details>
 <details>
@@ -339,7 +339,7 @@
 <summary><strong>Best-of-N (BoN) Jailbreak</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">bon</span></code></p>
 <p>Probes the LLM resilience against Best-Of-N (BoN) attack by randomly transform symbols in input harmful prompt.</p>
-<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2412.03556">https://arxiv.org/abs/2412.03556</a>, Original Code: <a class="reference external" href="https://github.com/jplhughes/bon-jailbreaking">https://github.com/jplhughes/bon-jailbreaking</a></em></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2412.03556">https://arxiv.org/abs/2412.03556</a>, Code: <a class="reference external" href="https://github.com/jplhughes/bon-jailbreaking">https://github.com/jplhughes/bon-jailbreaking</a></em></p>
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/bon.py">View code on GitHub</a></p>
 </details>
 <details>
@@ -388,17 +388,24 @@
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/linguistic.py">View code on GitHub</a></p>
 </details>
 <details>
-<summary><strong>Past Tense Attack</strong></summary>
-<p>In code name: <code class="docutils literal notranslate"><span class="pre">past_tense</span></code></p>
-<p>Challenges the LLM with a dataset of harmful behavior prompts in past tense form.</p>
-<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/past_tense.py">View code on GitHub</a></p>
+<summary><strong>Linguistic Sandwich</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">linguistic_sandwich</span></code></p>
+<p>Exploits attention blink phenomena by hiding adversarial questions between innocent questions in low-resource languages. The attack leverages the concept that LLMs may have reduced attention when processing mixed low-resource languages.</p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2404.07242v1">https://arxiv.org/abs/2404.07242v1</a></em></p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/linguistic_sandwich.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>Shuffle Inconsistency</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">shuffle</span></code></p>
 <p>Attempts to bypass LLM’s defense mechanism by randomly shuffling elements in input harmful prompt.</p>
-<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/html/2501.04931">https://arxiv.org/html/2501.04931</a></em></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2501.04931">https://arxiv.org/abs/2501.04931</a></em></p>
 <p><a href="https://github.com/RomiconEZ/llamator/blob/release/src/llamator/attacks/shuffle.py">View code on GitHub</a></p>
+</details>
+<details>
+<summary><strong>Time Machine Attack</strong></summary>
+<p>In code name: <code class="docutils literal notranslate"><span class="pre">time_machine</span></code></p>
+<p>Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.</p>
+<p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py">View code on GitHub</a></p>
 </details>
 <details>
 <summary><strong>UCAR Jailbreak</strong></summary>
@@ -412,7 +419,7 @@
 <h2>Multi-stage attacks<a class="headerlink" href="#multi-stage-attacks" title="Link to this heading">¶</a></h2>
 <details>
 <summary><strong>What Drives the Multi-stage?</strong></summary>
-<p>Multi-stage attacks are inspired by the <a class="reference external" href="https://arxiv.org/html/2310.08419">Jailbreaking Black Box Large Language Models in Twenty Queries (PAIR)</a> paper.</p>
+<p>Multi-stage attacks are inspired by the <a class="reference external" href="https://arxiv.org/abs/2310.08419">Jailbreaking Black Box Large Language Models in Twenty Queries (PAIR)</a> paper.</p>
 <p>For managing a multi-stage interaction between an attacker and tested chat clients, the <code class="docutils literal notranslate"><span class="pre">MultiStageInteractionSession</span></code> class is available <a class="reference external" href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/client/chat_client.py">[source]</a>. It contains the following properties:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">attacker_session</span></code> is the session for the attacker.</p></li>
@@ -431,7 +438,7 @@
 <summary><strong>AutoDAN-Turbo</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">autodan_turbo</span></code></p>
 <p>Implements the AutoDAN-Turbo attack methodology which uses a lifelong agent for strategy self-exploration to jailbreak LLMs. This attack automatically discovers jailbreak strategies without human intervention and combines them for more effective attacks.</p>
-<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2410.05295v3">https://arxiv.org/abs/2410.05295v3</a>, Original Code: <a class="reference external" href="https://github.com/SaFoLab-WISC/AutoDAN-Turbo">https://github.com/SaFoLab-WISC/AutoDAN-Turbo</a></em></p>
+<p><em>Original Paper: <a class="reference external" href="https://arxiv.org/abs/2410.05295v3">https://arxiv.org/abs/2410.05295v3</a>, Code: <a class="reference external" href="https://github.com/SaFoLab-WISC/AutoDAN-Turbo">https://github.com/SaFoLab-WISC/AutoDAN-Turbo</a></em></p>
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/autodan_turbo.py">View code on GitHub</a></p>
 </details>
 <details>
@@ -444,7 +451,7 @@
 <details>
 <summary><strong>Prompt Automatic Iterative Refinement (PAIR)</strong></summary>
 <p>In code name: <code class="docutils literal notranslate"><span class="pre">pair</span></code></p>
-<p>Challenges the LLM with a dataset of harmful behavior prompts using multistage refinement with judge model scoring.
+<p>Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring.
 Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs</p>
 <p><a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a></p>
 </details>
