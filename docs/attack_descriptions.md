@@ -220,7 +220,8 @@ _Original Paper: <https://arxiv.org/abs/2404.01833>_
 In code name: `pair`
 
 Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring.
-    Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
+
+_Original Paper: <https://arxiv.org/abs/2310.08419v4>, Code: <https://github.com/patrickrchao/JailbreakingLLMs>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a>
 </details>
