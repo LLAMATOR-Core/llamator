@@ -46,7 +46,7 @@ class TestTimeMachine(TestBase):
     """Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities."""
 
     info = {
-        "name": "Time Machine",
+        "name": "Time Machine Attack",
         "code_name": "time_machine",
         "tags": [
             "lang:en",

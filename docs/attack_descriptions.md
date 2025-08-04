@@ -151,7 +151,7 @@ _Original Paper: <https://arxiv.org/abs/2501.04931>_
 </details>
 
 <details>
-<summary><strong>Time Machine</strong></summary>
+<summary><strong>Time Machine Attack</strong></summary>
 
 In code name: `time_machine`
 
