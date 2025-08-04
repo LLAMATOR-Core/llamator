@@ -151,7 +151,7 @@ _Original Paper: <https://arxiv.org/abs/2501.04931>_
 </details>
 
 <details>
-<summary><strong>Time Machine Attack</strong></summary>
+<summary><strong>Time Machine</strong></summary>
 
 In code name: `time_machine`
 
@@ -168,6 +168,19 @@ In code name: `ucar`
 Probes an LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a>
+</details>
+
+### OWASP [LLM10:2025](https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/) Unbounded Consumption
+
+<details>
+<summary><strong>Repetition Token</strong></summary>
+
+In code name: `repetition_token`
+
+DoS attack that attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
+The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/repetition_token.py">View code on GitHub</a>
 </details>
 
 ## Multi-stage attacks
