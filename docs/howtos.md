@@ -107,7 +107,7 @@ print(test_result_dict)
 ### `print_test_preset`
 Prints example configuration for presets to the console.
 
-Available presets: `all`, `eng`, `llm`, `owasp:llm01`, `owasp:llm07`, `owasp:llm09`, `rus`, `vlm`
+Available presets: `all`, `eng`, `rus`, `owasp:llm01`, `owasp:llm07`, `owasp:llm09`, `owasp:llm10`, `llm`, `vlm`
 
 **Usage:**
 
