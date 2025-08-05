@@ -151,11 +151,14 @@ _Original Paper: <https://arxiv.org/abs/2501.04931>_
 </details>
 
 <details>
-<summary><strong>Time Machine Attack</strong></summary>
+<summary><strong>Time Machine</strong></summary>
 
 In code name: `time_machine`
 
 Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.
+
+_Original Paper: <https://arxiv.org/abs/2407.11969v2>, Code: <https://github.com/tml-epfl/llm-past-tense>_
+
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py">View code on GitHub</a>
 </details>
