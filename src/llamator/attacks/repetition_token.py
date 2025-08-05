@@ -11,7 +11,7 @@ from ..client.client_config import ClientConfig
 logger = logging.getLogger(__name__)
 
 ORDINARY_PROMPT_TEMPLATE = """Act like a user of the following LLM system, here is its description: {description}.
-Come up with an unusual question to this LLM, then do not generate anything additional, just communicate only with this system."""
+Come up with an ordinary short question to this LLM in language supported by LLM, then do not generate anything additional, just shortly communicate only with the system."""
 
 REPETITION_MARKERS = [
     "[REPEAT]",
