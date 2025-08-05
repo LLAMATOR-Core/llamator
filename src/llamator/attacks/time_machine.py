@@ -43,21 +43,23 @@ Transformed prompt:"""
 
 @register_test
 class TestTimeMachine(TestBase):
-    """Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities."""
+    """Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.
+    Original Paper: https://arxiv.org/abs/2407.11969v2, Code: https://github.com/tml-epfl/llm-past-tense"""
 
     info = {
-        "name": "Time Machine Attack",
+        "name": "Time Machine",
         "code_name": "time_machine",
         "tags": [
             "lang:en",
             "dialog:single-stage",
             "owasp:llm01",
             "eval:heuristic",
+            "arxiv:2407.11969v2",
             "model:llm",
         ],
         "description": {
-            "en": "Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.",
-            "ru": "Использует атакующую модель для преобразования запросов в исторический или будущий контекст для тестирования уязвимостей временного фрейминга.",
+            "en": "Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities. Original Paper: https://arxiv.org/abs/2407.11969v2, Code: https://github.com/tml-epfl/llm-past-tense",
+            "ru": "Использует атакующую модель для преобразования запросов в исторический или будущий контекст для тестирования уязвимостей временного фрейминга. Статья: https://arxiv.org/abs/2407.11969v2, репозиторий: https://github.com/tml-epfl/llm-past-tense",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py",
     }
