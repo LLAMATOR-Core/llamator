@@ -159,7 +159,6 @@ Uses an attack model to dynamically transform prompts into historical or future 
 
 _Original Paper: <https://arxiv.org/abs/2407.11969v2>, Code: <https://github.com/tml-epfl/llm-past-tense>_
 
-
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py">View code on GitHub</a>
 </details>
 
