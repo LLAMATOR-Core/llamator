@@ -113,7 +113,8 @@ class TestLinguisticSandwich(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = data[data["language"] == "en"]
+            if "language" in data.columns:
+                data = data[data["language"] == "en"]
             data = self._prepare_attack_dataset(dataset=data)
 
             for attack_prompt_index, row in data.iterrows():

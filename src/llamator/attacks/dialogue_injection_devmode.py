@@ -145,7 +145,9 @@ class TestDialogueInjection(TestBase):
                 data = pd.read_parquet(dataset_filename, engine="pyarrow")
             else:
                 data = self.custom_dataset.copy()
-            data = self._prepare_attack_dataset(dataset=data[data["language"] == "ru"])
+            if "language" in data.columns:
+                data = data[data["language"] == "ru"]
+            data = self._prepare_attack_dataset(dataset=data)
 
             # Build the base emulation prompt template with
             built_prompt = build_emulation_prompt(FIXING_MODE_EMULATION)
