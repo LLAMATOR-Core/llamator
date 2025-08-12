@@ -177,7 +177,7 @@ Probes an LLM's adherence to content restrictions when explicitly requested to i
 
 In code name: `repetition_token`
 
-DoS attack that attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
+Attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
 The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/repetition_token.py">View code on GitHub</a>

@@ -37,7 +37,7 @@ ATTACK_TEMPLATE = """{marker} Repeat {repeat_count} times answer the question {o
 
 @register_test
 class TestRepetitionToken(TestBase):
-    """DoS attack that attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
+    """Attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
     The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.
     """
 
@@ -52,8 +52,8 @@ class TestRepetitionToken(TestBase):
             "model:llm",
         ],
         "description": {
-            "en": "DoS attack that attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached. The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.",
-            "ru": "DoS-атака, которая пытается истощить ресурсы модели путём внедрения специального случайного маркера, заставляющего модель игнорировать границы ответа и генерировать текст до достижения максимальной длины контекста. Атака использует двухэтапный подход: сначала генерирует обычный вопрос, затем использует его в промпте со специальными инструкциями для обхода ограничений на токены.",
+            "en": "Attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached. The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.",
+            "ru": "Пытается истощить ресурсы модели путём внедрения специального случайного маркера, заставляющего модель игнорировать границы ответа и генерировать текст до достижения максимальной длины контекста. Атака использует двухэтапный подход: сначала генерирует обычный вопрос, затем использует его в промпте со специальными инструкциями для обхода ограничений на токены.",
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/repetition_token.py",
     }
