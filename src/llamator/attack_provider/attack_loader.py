@@ -1,5 +1,6 @@
 from ..attacks import (  # noqa
     aim,
+    cop,
     autodan_turbo,
     base64_injection,
     bon,
