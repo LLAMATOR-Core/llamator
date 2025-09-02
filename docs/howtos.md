@@ -59,7 +59,6 @@ basic_tests = [
     ("aim_jailbreak", {"num_attempts": 2}),
     ("base64_injection", {"num_attempts": 2}),
     ("bon", {"num_attempts": 2}),
-    ("complimentary_transition", {"num_attempts": 2}),
     ("crescendo", {"num_attempts": 2}),
     # Add other tests as needed
 ]
