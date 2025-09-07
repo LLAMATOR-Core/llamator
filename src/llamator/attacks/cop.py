@@ -356,7 +356,7 @@ class TestCoP(TestBase):
                     self.status.report_error(attack_instruction)
                     continue
 
-                iter_attack_prompts = [m["content"] for m in dialog.get_tested_client_prompts()]
+                iter_attack_prompts = [m["content"] for m in dialog.get_attack_prompts()]
                 iter_responses = [m["content"] for m in dialog.get_tested_client_responses()]
 
                 if len(iter_attack_prompts) != len(iter_responses):

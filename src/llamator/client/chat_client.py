@@ -356,20 +356,20 @@ class MultiStageInteractionSession:
             self.current_step += 1
             logger.debug(f"Current step incremented to: {self.current_step}")
 
-    def get_tested_client_prompts(self) -> List[Dict[str, str]]:
+    def get_attack_prompts(self) -> List[Dict[str, str]]:
         """
-        Retrieves the responses of the attacker.
+        Returns attacking prompts from the history of the system being tested.
 
         Returns
         -------
         List[Dict[str, str]]
-            The responses of the attacker's session.
+            Attacking prompts.
         """
         return [message for message in self.tested_client_session.history if message["role"] == "user"]
 
     def get_tested_client_responses(self) -> List[Dict[str, str]]:
         """
-        Retrieves the responses of the tested client.
+        Returns the responses of the system under test.
 
         Returns
         -------
