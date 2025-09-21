@@ -3,6 +3,7 @@ from ..attacks import (  # noqa
     autodan_turbo,
     base64_injection,
     bon,
+    cop,
     crecsendo,
     dan,
     deceptive_delight,

@@ -218,6 +218,18 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Code: <https://github.com
 </details>
 
 <details>
+<summary><strong>Composition of Principles (CoP)</strong></summary>
+
+In code name: `cop`
+
+Implements the Composition-of-Principles (CoP) agentic red-teaming methodology which composes human-provided jailbreak principles to generate and iteratively refine single-turn jailbreak prompts. The pipeline selects effective principles, prompts an attacker model to compose a prompt, verifies success with an LLM judge, and mines new principles from successful attempts to improve future attacks.
+
+Original Paper: <https://arxiv.org/html/2506.00781>
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/cop.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Crescendo</strong></summary>
 
 In code name: `crescendo`
