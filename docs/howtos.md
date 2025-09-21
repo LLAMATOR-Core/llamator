@@ -116,7 +116,7 @@ print(test_result_dict)
 ### `print_test_preset`
 Prints the attack configurations as a string that you can copy and then use to define the basic_tests list.
 
-Available presets: 
+Available presets:
 - `all`
 - `eng`
 - `rus`
