@@ -19,6 +19,7 @@ Public API
 
 from __future__ import annotations
 
+import copy
 import textwrap
 from typing import Any, Literal, Tuple
 
@@ -94,12 +95,11 @@ preset_configs: dict[str, list[tuple[str, dict[str, Any]]]] = _build_presets()
 # Literal type with all valid preset names (for static type-checkers)
 PresetName = Literal[Tuple[Literal[tuple(preset_configs.keys())]]]  # type: ignore[misc]
 
+
 # --------------------------------------------------------------------------- #
 # high-level helpers
 # --------------------------------------------------------------------------- #
-
-
-def get_test_preset(preset_name: PresetName = "all") -> str:  # type: ignore[valid-type]
+def get_string_test_preset(preset_name: PresetName = "all") -> str:  # type: ignore[valid-type]
     """
     Build an example ``basic_tests`` code block for *preset_name*.
     """
@@ -115,7 +115,24 @@ def get_test_preset(preset_name: PresetName = "all") -> str:  # type: ignore[val
     return "\n".join(lines)
 
 
+def get_test_preset(preset_name: PresetName = "all") -> list[tuple[str, dict[str, Any]]]:  # type: ignore[valid-type]
+    """
+    Return a Python list of ``(code_name, params)`` pairs for *preset_name*.
+
+    Notes
+    -----
+    * The returned structure is a deep copy of the internal preset to prevent
+      accidental mutation of module-level state by callers.
+    * Raises ``ValueError`` if the preset does not exist.
+    """
+    preset = preset_configs.get(preset_name)
+    if preset is None:
+        available = ", ".join(sorted(preset_configs))
+        raise ValueError(f"Unknown preset '{preset_name}'. Available presets: {available}.")
+    return [(code, copy.deepcopy(params)) for code, params in preset]
+
+
 def print_test_preset(preset_name: PresetName = "all") -> None:  # type: ignore[valid-type]
-    """Print example block produced by :func:`get_test_preset`."""
+    """Print example block produced by :func:`get_string_test_preset`."""
     print(f"# Example configuration for preset '{preset_name}':")
-    print(textwrap.indent(get_test_preset(preset_name), "", lambda _l: True))
+    print(textwrap.indent(get_string_test_preset(preset_name), "", lambda _l: True))

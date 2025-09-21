@@ -111,9 +111,9 @@ print(test_result_dict)
 ## Helper Functions
 
 ### `print_test_preset`
-Prints example configuration for presets to the console.
+Prints the attack configurations as a string that you can copy and then use to define the basic_tests list.
 
-Available presets: `all`, `eng`, `llm`, `owasp:llm01`, `owasp:llm07`, `owasp:llm09`, `rus`, `vlm`
+Available presets: `all`, `eng`, `rus`, `owasp:llm01`, `owasp:llm07`, `owasp:llm09`, `owasp:llm10`, `llm`, `vlm`
 
 **Usage:**
 
@@ -125,7 +125,7 @@ print_test_preset("all")
 ```
 
 ### `get_test_preset`
-Returns a string containing example configurations for presets.
+Returns a list of attack configurations for the specified preset that can be passed to basic_tests.
 
 **Usage:**
 ```python

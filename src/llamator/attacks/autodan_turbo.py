@@ -439,7 +439,7 @@ class TestAutoDanTurbo(TestBase):
                     continue
 
                 # Process conversation results
-                iter_attack_prompts = [response["content"] for response in dialog_session.get_attacker_responses()]
+                iter_attack_prompts = [response["content"] for response in dialog_session.get_attack_prompts()]
                 iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
 
                 if len(iter_attack_prompts) != len(iter_responses):

@@ -109,7 +109,9 @@ class TestCrescendo(TestBase):
         if len(tested_client_history) < self.multistage_depth * 2:
             return False
         last_response = tested_client_history[-1]["content"] if tested_client_history else ""
-        return not contains_refusal_keywords(last_response)
+        if last_response:
+            return not contains_refusal_keywords(last_response)
+        return False
 
     def run(self) -> Generator[StatusUpdate, None, None]:
         original_prompts: List[str] = []
@@ -188,10 +190,7 @@ class TestCrescendo(TestBase):
                     self.status.report_error(attack_prompt)
                     continue
 
-                iter_attack_prompts = [
-                    response["content"]
-                    for response in dialog_session.get_attacker_responses()[1:]  # exclude attack strategy
-                ]
+                iter_attack_prompts = [response["content"] for response in dialog_session.get_attack_prompts()]
                 iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
                 if len(iter_attack_prompts) != len(iter_responses):
                     logger.warning("Mismatched number of requests and responses")
