@@ -14,6 +14,7 @@ from ..attacks import (  # noqa
     linguistic_sandwich,
     logical_inconsistencies,
     pair,
+    repetition_token,
     shuffle,
     suffix,
     sycophancy,

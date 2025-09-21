@@ -172,6 +172,19 @@ Probes an LLM's adherence to content restrictions when explicitly requested to i
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a>
 </details>
 
+### OWASP [LLM10:2025](https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/) Unbounded Consumption
+
+<details>
+<summary><strong>Repetition Token</strong></summary>
+
+In code name: `repetition_token`
+
+Attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
+The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/repetition_token.py">View code on GitHub</a>
+</details>
+
 ## Multi-stage attacks
 
 <details>
