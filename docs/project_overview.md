@@ -27,9 +27,10 @@ LLAMATOR - Red Teaming python-framework for testing chatbots and GenAI systems
 
 ## OWASP Classification
 
-* 💉 [LLM01: Prompt Injection and Jailbreaks](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/blob/main/2_0_vulns/LLM01_PromptInjection.md)
-* 🕵 [LLM07: System Prompt Leakage](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/blob/main/2_0_vulns/LLM07_SystemPromptLeakage.md)
-* 🎭 [LLM09: Misinformation](https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/blob/main/2_0_vulns/LLM09_Misinformation.md)
+* 💉 [LLM01: Prompt Injection and Jailbreaks](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)
+* 🕵️‍♀️ [LLM07: System Prompt Leakage](https://genai.owasp.org/llmrisk/llm072025-system-prompt-leakage/)
+* 🤥 [LLM09: Misinformation](https://genai.owasp.org/llmrisk/llm092025-misinformation/)
+* 💸 [LLM10: Unbounded Consumption](https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/)
 
 ## Community
 
