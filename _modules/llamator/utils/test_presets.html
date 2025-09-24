@@ -320,6 +320,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Tuple</span>
 
@@ -395,14 +396,11 @@
 <span class="c1"># Literal type with all valid preset names (for static type-checkers)</span>
 <span class="n">PresetName</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">preset_configs</span><span class="o">.</span><span class="n">keys</span><span class="p">())]]]</span>  <span class="c1"># type: ignore[misc]</span>
 
+
 <span class="c1"># --------------------------------------------------------------------------- #</span>
 <span class="c1"># high-level helpers</span>
 <span class="c1"># --------------------------------------------------------------------------- #</span>
-
-
-<div class="viewcode-block" id="get_test_preset">
-<a class="viewcode-back" href="../../../code_documentation.html#llamator.utils.test_presets.get_test_preset">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">get_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">PresetName</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># type: ignore[valid-type]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_string_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">PresetName</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>  <span class="c1"># type: ignore[valid-type]</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Build an example ``basic_tests`` code block for *preset_name*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -415,16 +413,35 @@
     <span class="k">for</span> <span class="n">code_name</span><span class="p">,</span> <span class="n">param_dict</span> <span class="ow">in</span> <span class="n">preset</span><span class="p">:</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;    (&quot;</span><span class="si">{</span><span class="n">code_name</span><span class="si">}</span><span class="s1">&quot;, </span><span class="si">{</span><span class="n">format_param_block</span><span class="p">(</span><span class="n">param_dict</span><span class="p">)</span><span class="si">}</span><span class="s1">),&#39;</span><span class="p">)</span>
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;]&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_test_preset">
+<a class="viewcode-back" href="../../../code_documentation.html#llamator.utils.test_presets.get_test_preset">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">PresetName</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>  <span class="c1"># type: ignore[valid-type]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a Python list of ``(code_name, params)`` pairs for *preset_name*.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    * The returned structure is a deep copy of the internal preset to prevent</span>
+<span class="sd">      accidental mutation of module-level state by callers.</span>
+<span class="sd">    * Raises ``ValueError`` if the preset does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">preset</span> <span class="o">=</span> <span class="n">preset_configs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">preset_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">preset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">available</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">preset_configs</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown preset &#39;</span><span class="si">{</span><span class="n">preset_name</span><span class="si">}</span><span class="s2">&#39;. Available presets: </span><span class="si">{</span><span class="n">available</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="n">code</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">params</span><span class="p">))</span> <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="n">params</span> <span class="ow">in</span> <span class="n">preset</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="print_test_preset">
 <a class="viewcode-back" href="../../../code_documentation.html#llamator.utils.test_presets.print_test_preset">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">print_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">:</span> <span class="n">PresetName</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># type: ignore[valid-type]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print example block produced by :func:`get_test_preset`.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Print example block produced by :func:`get_string_test_preset`.&quot;&quot;&quot;</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;# Example configuration for preset &#39;</span><span class="si">{</span><span class="n">preset_name</span><span class="si">}</span><span class="s2">&#39;:&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">get_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_l</span><span class="p">:</span> <span class="kc">True</span><span class="p">))</span></div>
+    <span class="nb">print</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">indent</span><span class="p">(</span><span class="n">get_string_test_preset</span><span class="p">(</span><span class="n">preset_name</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">_l</span><span class="p">:</span> <span class="kc">True</span><span class="p">))</span></div>
 
 </pre></div>
         </article>
