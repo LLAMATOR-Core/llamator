@@ -193,9 +193,7 @@ class TestSystemPromptLeakage(TestBase):
                         self.status.report_error(attack_prompt)
                         continue
 
-                    iter_attack_prompts = [attack_prompt] + [
-                        response["content"] for response in dialog_session.get_attacker_responses()
-                    ]
+                    iter_attack_prompts = [response["content"] for response in dialog_session.get_attack_prompts()]
                     iter_responses = [response["content"] for response in dialog_session.get_tested_client_responses()]
                     if len(iter_attack_prompts) != len(iter_responses):
                         self.status.report_error(str(attack_prompt_index))

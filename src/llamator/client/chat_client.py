@@ -154,6 +154,8 @@ class ChatSession:
             logger.debug(f"say: result={result}")
         except Exception as e:
             logger.error(f"say: {e}")
+            self.history.append({"role": "user", "content": user_prompt})
+            self.history.append({"role": "assistant", "content": ""})
             return None
 
         self.history.append({"role": "user", "content": user_prompt})
@@ -326,8 +328,6 @@ class MultiStageInteractionSession:
                 attacker_response = attacker_response.split(self.attacker_response_separator)[-1]
             tested_client_response = self.tested_client_session.say(attacker_response.strip())
             logger.debug(f"Step {self.current_step}: Tested client response: {tested_client_response}")
-            if tested_client_response is None:
-                return None
 
             # Check stopping criterion by history
             if self.stop_criterion(tested_client_history=self.tested_client_session.history):
@@ -342,7 +342,7 @@ class MultiStageInteractionSession:
             # Handling the tested client's response before passing it to the attacker
             # (e.g. adding scoring, more instructions for attacker)
             attacker_prompt = self.tested_client_response_handler(
-                tested_client_response, *self.refine_args, **self.refine_kwargs
+                tested_client_response if tested_client_response else "Error", *self.refine_args, **self.refine_kwargs
             )
             logger.debug(f"Step {self.current_step}: Attacker prompt: {attacker_prompt}")
 
@@ -356,20 +356,20 @@ class MultiStageInteractionSession:
             self.current_step += 1
             logger.debug(f"Current step incremented to: {self.current_step}")
 
-    def get_attacker_responses(self) -> List[Dict[str, str]]:
+    def get_attack_prompts(self) -> List[Dict[str, str]]:
         """
-        Retrieves the responses of the attacker.
+        Returns attacking prompts from the history of the system being tested.
 
         Returns
         -------
         List[Dict[str, str]]
-            The responses of the attacker's session.
+            Attacking prompts.
         """
-        return [message for message in self.attacker_session.history if message["role"] == "assistant"]
+        return [message for message in self.tested_client_session.history if message["role"] == "user"]
 
     def get_tested_client_responses(self) -> List[Dict[str, str]]:
         """
-        Retrieves the responses of the tested client.
+        Returns the responses of the system under test.
 
         Returns
         -------

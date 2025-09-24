@@ -151,11 +151,13 @@ _Original Paper: <https://arxiv.org/abs/2501.04931>_
 </details>
 
 <details>
-<summary><strong>Time Machine Attack</strong></summary>
+<summary><strong>Time Machine</strong></summary>
 
 In code name: `time_machine`
 
 Uses an attack model to dynamically transform prompts into historical or future contexts to test temporal framing vulnerabilities.
+
+_Original Paper: <https://arxiv.org/abs/2407.11969v2>, Code: <https://github.com/tml-epfl/llm-past-tense>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/time_machine.py">View code on GitHub</a>
 </details>
@@ -168,6 +170,19 @@ In code name: `ucar`
 Probes an LLM's adherence to content restrictions when explicitly requested to ignore such filters. It assesses the robustness of the LLM's content moderation systems against direct challenges.
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/ucar.py">View code on GitHub</a>
+</details>
+
+### OWASP [LLM10:2025](https://genai.owasp.org/llmrisk/llm102025-unbounded-consumption/) Unbounded Consumption
+
+<details>
+<summary><strong>Repetition Token</strong></summary>
+
+In code name: `repetition_token`
+
+Attempts to exhaust model resources by injecting random marker that force the model to ignore response boundaries and generate until the maximum context length is reached.
+The attack uses a two-stage approach: first generating a normal question, then using it in a prompt with special instructions to bypass token limits.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/repetition_token.py">View code on GitHub</a>
 </details>
 
 ## Multi-stage attacks
@@ -203,6 +218,18 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Code: <https://github.com
 </details>
 
 <details>
+<summary><strong>Composition of Principles (CoP)</strong></summary>
+
+In code name: `cop`
+
+Implements the Composition-of-Principles (CoP) agentic red-teaming methodology which composes human-provided jailbreak principles to generate and iteratively refine single-turn jailbreak prompts. The pipeline selects effective principles, prompts an attacker model to compose a prompt, verifies success with an LLM judge, and mines new principles from successful attempts to improve future attacks.
+
+Original Paper: <https://arxiv.org/html/2506.00781>
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/cop.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Crescendo</strong></summary>
 
 In code name: `crescendo`
@@ -220,7 +247,8 @@ _Original Paper: <https://arxiv.org/abs/2404.01833>_
 In code name: `pair`
 
 Challenges the LLM with a dataset of adversarial prompts using multistage refinement with judge model scoring.
-    Original Paper: https://arxiv.org/abs/2310.08419v4, Code: https://github.com/patrickrchao/JailbreakingLLMs
+
+_Original Paper: <https://arxiv.org/abs/2310.08419v4>, Code: <https://github.com/patrickrchao/JailbreakingLLMs>_
 
 <a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/pair.py">View code on GitHub</a>
 </details>
