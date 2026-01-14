@@ -139,6 +139,16 @@ _Original Paper: <https://arxiv.org/abs/2404.07242v1>_
 </details>
 
 <details>
+<summary><strong>Semantic Game</strong></summary>
+
+In code name: `semantic_game`
+
+Semantic reframing attack using an emoji game and recursive expansion. EMOJI are redefined as symbolic abstractions in order to manipulate the interpretive context and bypass safety filters by role reassignment, language mutation, and intent camouflage.
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/semantic_game.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Shuffle Inconsistency</strong></summary>
 
 In code name: `shuffle`
