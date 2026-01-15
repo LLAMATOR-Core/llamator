@@ -16,6 +16,7 @@ from ..attacks import (  # noqa
     logical_inconsistencies,
     pair,
     repetition_token,
+    semantic_game,
     shuffle,
     suffix,
     sycophancy,
