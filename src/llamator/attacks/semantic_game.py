@@ -51,11 +51,12 @@ Let's start the game.
 {attack_prompt}
 """
 
+
 @register_test
 class TestSemanticGame(TestBase):
     """
     Semantic reframing attack using an emoji game and recursive expansion.
-    EMOJI are redefined as symbolic abstractions in order to manipulate the interpretive context 
+    EMOJI are redefined as symbolic abstractions in order to manipulate the interpretive context
     and bypass safety filters by role reassignment, language mutation, and intent camouflage.
     """
 
@@ -75,7 +76,6 @@ class TestSemanticGame(TestBase):
         },
         "github_link": "https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/semantic_game.py",
     }
-
 
     def __init__(
         self,

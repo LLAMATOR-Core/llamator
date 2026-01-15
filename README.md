@@ -14,7 +14,7 @@ Red Teaming python-framework for testing chatbots and GenAI systems
 ## Install 🚀
 
 ```bash
-pip install llamator==3.4.0
+pip install llamator==3.5.0
 ```
 
 ## Documentation 📚
