@@ -228,6 +228,20 @@ _Original Paper: <https://arxiv.org/abs/2410.05295v3>, Code: <https://github.com
 </details>
 
 <details>
+<summary><strong>Boss-Orchestrated Agentic Red-Teaming (BOART)</strong></summary>
+
+In code name: `boart`
+
+Boss selects strategy from library and gives application guidance + criticism. Attacker uses strategy from library and applies it per Boss's guidance.
+
+Architecture: Strategy Library -> Boss (select + guidance + criticism) -> Attacker (strategy + guidance) -> Target -> Judge -> Boss
+
+_Original Code: <https://github.com/nizamovtimur/AgentSecurityGround>_
+
+<a href="https://github.com/LLAMATOR-Core/llamator/blob/release/src/llamator/attacks/boart.py">View code on GitHub</a>
+</details>
+
+<details>
 <summary><strong>Composition of Principles (CoP)</strong></summary>
 
 In code name: `cop`
