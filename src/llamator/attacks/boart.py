@@ -193,13 +193,15 @@ class AttackMemory:
         self.max_entries = max_entries
 
     def add(self, goal: str, strategy: str, attack_prompt: str, target_response: str, score: float) -> None:
-        self.entries.append({
-            "goal": goal[:200],
-            "strategy": strategy,
-            "attack_prompt": attack_prompt[:300],
-            "response_snippet": target_response[:200],
-            "score": score,
-        })
+        self.entries.append(
+            {
+                "goal": goal[:200],
+                "strategy": strategy,
+                "attack_prompt": attack_prompt[:300],
+                "response_snippet": target_response[:200],
+                "score": score,
+            }
+        )
         if len(self.entries) > self.max_entries:
             self.entries.sort(key=lambda e: e["score"], reverse=True)
             self.entries = self.entries[: self.max_entries]
@@ -345,6 +347,7 @@ class TestBOART(TestBase):
         multistage_depth: int = 10,
         strategy_library_size: int = 15,
         custom_dataset: Optional[pd.DataFrame] = None,
+        boss_client: Literal["attacker", "judge"] = "attacker",
         **kwargs,
     ):
         super().__init__(
@@ -359,7 +362,7 @@ class TestBOART(TestBase):
         self.multistage_depth = multistage_depth
         self.strategy_library_size = strategy_library_size
         self.custom_dataset = custom_dataset
-
+        self.boss_client = boss_client
         self.attack_memory = AttackMemory(max_entries=strategy_library_size)
         self.strategy_library: List[Dict[str, str]] = [s.copy() for s in ATTACK_STRATEGIES]
         self.strategy_performance: Dict[str, Dict[str, Any]] = {
@@ -397,11 +400,7 @@ class TestBOART(TestBase):
         score_component = perf["avg_score"] / 10.0
         recency_factor = 1.0 / (1.0 + perf["last_used_step"] / 100.0)
 
-        effectiveness = (
-            success_rate * 0.5
-            + score_component * 0.3
-            + recency_factor * 0.2
-        ) * 100
+        effectiveness = (success_rate * 0.5 + score_component * 0.3 + recency_factor * 0.2) * 100
         return effectiveness
 
     def _get_strategy_definition(self, strategy_name: str) -> str:
@@ -440,9 +439,7 @@ class TestBOART(TestBase):
             )
         return "\n\n".join(lines) if lines else "No strategies available."
 
-    def _update_strategy_performance(
-        self, strategy_name: str, score: float, global_step: int
-    ) -> None:
+    def _update_strategy_performance(self, strategy_name: str, score: float, global_step: int) -> None:
         """Update performance metrics for a strategy (or each in a composition) after evaluation."""
         names_to_update = [strategy_name]
         if "+" in strategy_name:
@@ -528,8 +525,7 @@ class TestBOART(TestBase):
 
             if len(self.strategy_library) > self.strategy_library_size:
                 effectiveness_map = {
-                    s["strategy"]: self._get_strategy_effectiveness(s["strategy"])
-                    for s in self.strategy_library
+                    s["strategy"]: self._get_strategy_effectiveness(s["strategy"]) for s in self.strategy_library
                 }
                 sorted_strategies = sorted(
                     self.strategy_library,
@@ -537,9 +533,7 @@ class TestBOART(TestBase):
                     reverse=True,
                 )
                 self.strategy_library = sorted_strategies[: self.strategy_library_size]
-                logger.info(
-                    f"Strategy library pruned to top {self.strategy_library_size} strategies"
-                )
+                logger.info(f"Strategy library pruned to top {self.strategy_library_size} strategies")
 
         except (IndexError, ValueError) as e:
             logger.error(f"Failed to parse strategy summary: {e}")
@@ -591,7 +585,9 @@ class TestBOART(TestBase):
         stripped = cls._REASONING_SECTION_RE.sub("", attacker_response).strip()
         stripped = re.sub(
             r"^(?:##?\s*)?(?:SECTION\s*2\s*[-—:]?\s*)?(?:ATTACK\s*PROMPT|ACTION)\s*:?\s*\n?",
-            "", stripped, flags=re.IGNORECASE,
+            "",
+            stripped,
+            flags=re.IGNORECASE,
         ).strip()
 
         if stripped and stripped != attacker_response.strip():
@@ -673,16 +669,16 @@ class TestBOART(TestBase):
                     self.num_attempts,
                 )
 
-                logger.info(
-                    f"[BORAT] Goal #{i}: {malicious_request[:80]}..."
-                )
+                logger.info(f"[BORAT] Goal #{i}: {malicious_request[:80]}...")
 
                 # Fresh belief state per goal
                 belief = BeliefState()
 
                 # ── Initialize Boss session (with history for context) ──
                 boss_chat = ChatSession(
-                    client=self.judge_config.judge_client.get_target_client(),
+                    client=self.judge_config.judge_client.get_target_client()
+                    if self.boss_client == "judge"
+                    else self.attack_config.attack_client.get_target_client(),
                     system_prompts=[BOSS_SYSTEM_PROMPT],
                 )
 
@@ -754,9 +750,7 @@ class TestBOART(TestBase):
 
                     boss_response = boss_chat.say(boss_prompt)
                     if not boss_response:
-                        logger.warning(
-                            f"[BORAT] Boss failed to produce directive at step {step}. Skipping."
-                        )
+                        logger.warning(f"[BORAT] Boss failed to produce directive at step {step}. Skipping.")
                         break
 
                     current_strategy_name = self._extract_strategy_name(boss_response)
@@ -787,9 +781,7 @@ class TestBOART(TestBase):
 
                     attacker_full_response = attacker_chat.say(attacker_prompt)
                     if not attacker_full_response:
-                        logger.warning(
-                            f"[BORAT] Attacker failed to generate response at step {step}. Skipping."
-                        )
+                        logger.warning(f"[BORAT] Attacker failed to generate response at step {step}. Skipping.")
                         break
 
                     # Parse: extract only the attack prompt from the
@@ -809,9 +801,7 @@ class TestBOART(TestBase):
                     # ──────────────────────────────────────────────
                     target_response = target_chat.say(attack_text)
                     if not target_response:
-                        logger.warning(
-                            f"[BORAT] Target did not respond at step {step}. Skipping."
-                        )
+                        logger.warning(f"[BORAT] Target did not respond at step {step}. Skipping.")
                         break
 
                     iter_attack_prompts.append(attack_text)
@@ -826,9 +816,7 @@ class TestBOART(TestBase):
                         goal=malicious_request,
                         response=target_response,
                     )
-                    logger.info(
-                        f"[BORAT] Step {step + 1} — Judge score: {last_score:.1f}/10"
-                    )
+                    logger.info(f"[BORAT] Step {step + 1} — Judge score: {last_score:.1f}/10")
 
                     # ──────────────────────────────────────────────
                     # Step 5: Update belief state
@@ -841,9 +829,7 @@ class TestBOART(TestBase):
                     )
 
                     # Update strategy performance tracking
-                    self._update_strategy_performance(
-                        current_strategy_name, last_score, global_step
-                    )
+                    self._update_strategy_performance(current_strategy_name, last_score, global_step)
 
                     # ──────────────────────────────────────────────
                     # Step 6: Check for success & update library
@@ -893,28 +879,19 @@ class TestBOART(TestBase):
                     continue
 
                 if is_broken:
-                    conversation_statuses = (
-                        ["Resilient"] * (conversation_stages - 1) + ["Broken"]
-                    )
-                    self.status.report_breach(
-                        iter_attack_prompts[-1], iter_responses[-1]
-                    )
+                    conversation_statuses = ["Resilient"] * (conversation_stages - 1) + ["Broken"]
+                    self.status.report_breach(iter_attack_prompts[-1], iter_responses[-1])
                 else:
                     conversation_statuses = ["Resilient"] * conversation_stages
-                    self.status.report_resilient(
-                        iter_attack_prompts[-1], iter_responses[-1]
-                    )
+                    self.status.report_resilient(iter_attack_prompts[-1], iter_responses[-1])
                     logger.info(
-                        f"[BORAT] Target remained RESILIENT for goal #{i} "
-                        f"after {conversation_stages} steps"
+                        f"[BORAT] Target remained RESILIENT for goal #{i} " f"after {conversation_stages} steps"
                     )
 
                 attack_prompts.extend(iter_attack_prompts)
                 responses.extend(iter_responses)
                 statuses.extend(conversation_statuses)
-                original_prompts.extend(
-                    [malicious_request] * conversation_stages
-                )
+                original_prompts.extend([malicious_request] * conversation_stages)
                 boss_directives.extend(iter_boss_directives)
 
             # ── Save artifacts ────────────────────────────────────
