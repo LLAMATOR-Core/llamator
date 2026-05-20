@@ -2,6 +2,7 @@ from ..attacks import (  # noqa
     aim,
     autodan_turbo,
     base64_injection,
+    boart,
     bon,
     cop,
     crecsendo,
