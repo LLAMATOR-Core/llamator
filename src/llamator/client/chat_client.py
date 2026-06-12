@@ -92,6 +92,7 @@ class ChatSession:
         system_prompts: Optional[List[str]] = None,
         use_history: Optional[bool] = True,
         strip_client_responses: Optional[bool] = True,
+        timeout: Optional[float] = None,
     ):
         """
         Initializes the ChatSession with a client and optional system prompts.
@@ -112,8 +113,13 @@ class ChatSession:
         strip_client_responses : bool, optional
             Determines whether to strip space, tab, new line, [, ], <, >, \", ' from the start and end of the Client response.
             Defaults to True.
+        timeout : float, optional
+            Maximum time in seconds to wait for a response from the LLM.
+            If exceeded, a TimeoutError is raised and None is returned.
+            Defaults to None (no timeout).
         """
         self.client = client
+        self.timeout = timeout
         self.use_history = use_history
         if system_prompts:
             self.system_prompts = [
@@ -125,7 +131,7 @@ class ChatSession:
         self.history = list(self.system_prompts)
         self.strip_client_responses = strip_client_responses
 
-    def say(self, user_prompt: str) -> Optional[str]:
+    def say(self, user_prompt: str, timeout: Optional[float] = None) -> Optional[str]:
         """
         Sends a user message to the LLM, updates the conversation history based on the use_history flag,
         and returns the assistant's response.
@@ -134,6 +140,10 @@ class ChatSession:
         ----------
         user_prompt : str
             The user's message to be sent to the LLM.
+        timeout : float, optional
+            Maximum time in seconds to wait for a response. Overrides session-level timeout.
+            If exceeded, a TimeoutError is raised and None is returned.
+            Defaults to None (uses session timeout or no timeout).
 
         Returns
         -------
@@ -145,10 +155,29 @@ class ChatSession:
 
         # Interact with the LLM
         try:
-            result = self.client.interact(
-                history=self.history if self.use_history else list(self.system_prompts),
-                messages=[{"role": "user", "content": user_prompt}],
-            )
+            from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
+
+            effective_timeout = timeout if timeout is not None else self.timeout
+
+            if effective_timeout is not None:
+                with ThreadPoolExecutor(max_workers=1) as executor:
+                    future = executor.submit(
+                        self.client.interact,
+                        history=self.history if self.use_history else list(self.system_prompts),
+                        messages=[{"role": "user", "content": user_prompt}],
+                    )
+                    try:
+                        result = future.result(timeout=effective_timeout)
+                    except FutureTimeoutError:
+                        logger.warning(f"say: LLM response timed out after {effective_timeout}s")
+                        self.history.append({"role": "user", "content": user_prompt})
+                        self.history.append({"role": "assistant", "content": ""})
+                        return None
+            else:
+                result = self.client.interact(
+                    history=self.history if self.use_history else list(self.system_prompts),
+                    messages=[{"role": "user", "content": user_prompt}],
+                )
             if self.strip_client_responses:
                 result["content"] = result["content"].strip(" \t\n[]<>\"'`")
             logger.debug(f"say: result={result}")
